@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "9e20293d-8714-4304-a6b4-f7f556529c6c": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "39509746-27ec-4285-8f11-08838f50824d"
+        }
+    },
+    "manufacturer": "Wemos",
+    "name": "LOLIN D1 mini V3",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "5cb16f49-f0d2-4b06-ad67-e08a20f8f864"
+}

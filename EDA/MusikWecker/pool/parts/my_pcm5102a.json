@@ -1,0 +1,32 @@
+{
+    "MPN": [
+        false,
+        "my_pcm5102a"
+    ],
+    "datasheet": [
+        false,
+        ""
+    ],
+    "description": [
+        false,
+        ""
+    ],
+    "entity": "d0948a95-6da7-4415-8257-2eeba64ad607",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        ""
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "442fc61e-51d1-4549-9ab1-2fb516683e68",
+    "pad_map": {},
+    "parametric": {},
+    "tags": [],
+    "type": "part",
+    "uuid": "ebd443bf-eaeb-443d-870c-e70966c8a4b5",
+    "value": [
+        false,
+        ""
+    ]
+}

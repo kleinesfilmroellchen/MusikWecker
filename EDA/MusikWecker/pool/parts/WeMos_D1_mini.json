@@ -1,0 +1,99 @@
+{
+    "MPN": [
+        false,
+        "LOLIN D1 mini V3"
+    ],
+    "datasheet": [
+        false,
+        "https://www.wemos.cc/en/latest/d1/d1_mini.html"
+    ],
+    "description": [
+        false,
+        "ESP8266 breakout board"
+    ],
+    "entity": "5cb16f49-f0d2-4b06-ad67-e08a20f8f864",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        "Wemos"
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "56773b1b-c313-498f-9911-7d9b6fc054c2",
+    "pad_map": {
+        "06247342-bba8-492f-8d79-fe8fa6a2cb22": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "1c723f9a-dd23-4aeb-8399-de115216951f"
+        },
+        "1724d0ed-1fa7-4c6a-a5cd-5740fc0f46fe": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "bdc9b8e6-5ecc-4ca8-9ec8-5eafb709ab01"
+        },
+        "260bb549-9a52-406b-b41e-2ab29acbde87": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "8e06e42f-31c7-4964-be30-6b188b97d5ee"
+        },
+        "283970b1-ecd6-4065-94a2-0f704b9cb864": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "477d6908-6a90-4add-97f1-5f26454850fa"
+        },
+        "28bb2878-4347-4ef1-8a39-ece133bcdbe2": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "bb538ef0-dceb-4c13-b572-9da7c8ead13e"
+        },
+        "38a0df41-8bab-4035-b31c-f542647f1fc0": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "f65ab794-67ce-4fa3-96c1-0cbba65ece3d"
+        },
+        "553f2c78-dfc1-49a8-843d-5a2f2c8178cb": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "6750386c-970f-45aa-87a3-361f06e1dacf"
+        },
+        "80c955b5-1cd7-4733-b1e9-43ef5d576aee": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "56057e67-adc0-4d04-b8b8-debb19d8dfb8"
+        },
+        "83c67a12-7876-44a7-b607-fae393dba454": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "e8e8ea20-7931-4171-b01d-fd1f28c03573"
+        },
+        "b0d6473f-c6f7-4c80-861f-16e4a745bc62": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "bff6be16-fe05-4633-b075-c876d2984525"
+        },
+        "b170c7a3-b8c5-4170-bd4d-8adc04380a5b": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "83a64445-9d16-44fb-91d1-ba39f566ea1b"
+        },
+        "bc5ce3ae-7ebf-42f8-b66c-c995f2eaebea": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "cc3d7083-7261-41a4-800f-207492679fe5"
+        },
+        "c07b414e-f39f-4e70-acfa-e574e386c06d": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "68eee265-9429-4fe1-862d-9d7aea89a5f2"
+        },
+        "cf57a8d6-6f87-46c1-8d89-b13795871fa8": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "f8b13cb8-ed59-49b9-a3f8-5cb8f6a7acf4"
+        },
+        "d0c17406-1721-47f7-9b68-23e4b4c0877c": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "42995af1-4f54-4171-acd9-4a7981dfe82a"
+        },
+        "e8f472b6-7392-484c-8db5-d95f9d5bb02f": {
+            "gate": "9e20293d-8714-4304-a6b4-f7f556529c6c",
+            "pin": "7d7e63fa-b31c-40df-bf06-e6e32eda6b53"
+        }
+    },
+    "parametric": {},
+    "tags": [
+        "mcu"
+    ],
+    "type": "part",
+    "uuid": "b9fb5855-7b98-430a-a491-86579eadd0ff",
+    "value": [
+        false,
+        ""
+    ]
+}

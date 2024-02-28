@@ -1,0 +1,104 @@
+{
+    "manufacturer": "Wemos",
+    "name": "LOLIN D1 mini V3",
+    "pins": {
+        "1c723f9a-dd23-4aeb-8399-de115216951f": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D8",
+            "swap_group": 0
+        },
+        "42995af1-4f54-4171-acd9-4a7981dfe82a": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D6",
+            "swap_group": 0
+        },
+        "477d6908-6a90-4add-97f1-5f26454850fa": {
+            "direction": "power_output",
+            "names": [],
+            "primary_name": "3V3",
+            "swap_group": 0
+        },
+        "56057e67-adc0-4d04-b8b8-debb19d8dfb8": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D5",
+            "swap_group": 0
+        },
+        "6750386c-970f-45aa-87a3-361f06e1dacf": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "A0",
+            "swap_group": 0
+        },
+        "68eee265-9429-4fe1-862d-9d7aea89a5f2": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D2",
+            "swap_group": 0
+        },
+        "7d7e63fa-b31c-40df-bf06-e6e32eda6b53": {
+            "direction": "power_output",
+            "names": [],
+            "primary_name": "5V",
+            "swap_group": 0
+        },
+        "83a64445-9d16-44fb-91d1-ba39f566ea1b": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D0",
+            "swap_group": 0
+        },
+        "8e06e42f-31c7-4964-be30-6b188b97d5ee": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "TX",
+            "swap_group": 0
+        },
+        "bb538ef0-dceb-4c13-b572-9da7c8ead13e": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "RX",
+            "swap_group": 0
+        },
+        "bdc9b8e6-5ecc-4ca8-9ec8-5eafb709ab01": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D1",
+            "swap_group": 0
+        },
+        "bff6be16-fe05-4633-b075-c876d2984525": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D4",
+            "swap_group": 0
+        },
+        "cc3d7083-7261-41a4-800f-207492679fe5": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "RST",
+            "swap_group": 0
+        },
+        "e8e8ea20-7931-4171-b01d-fd1f28c03573": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D3",
+            "swap_group": 0
+        },
+        "f65ab794-67ce-4fa3-96c1-0cbba65ece3d": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "D7",
+            "swap_group": 0
+        },
+        "f8b13cb8-ed59-49b9-a3f8-5cb8f6a7acf4": {
+            "direction": "open_collector",
+            "names": [],
+            "primary_name": "GND",
+            "swap_group": 0
+        }
+    },
+    "type": "unit",
+    "uuid": "39509746-27ec-4285-8f11-08838f50824d"
+}

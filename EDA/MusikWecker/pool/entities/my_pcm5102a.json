@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "e502d13a-3efc-4dfa-8e4d-f77b8663b521": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "16de7210-2c27-4e12-9341-c6d397e50062"
+        }
+    },
+    "manufacturer": "",
+    "name": "my_pcm5102a",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "d0948a95-6da7-4415-8257-2eeba64ad607"
+}

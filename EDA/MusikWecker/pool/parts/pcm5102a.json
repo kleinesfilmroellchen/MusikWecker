@@ -1,0 +1,92 @@
+{
+    "MPN": [
+        false,
+        "pcm5102a"
+    ],
+    "datasheet": [
+        false,
+        "https://www.ti.com/lit/ds/symlink/pcm5102a.pdf?ts=1707244504017&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FPCM5102A"
+    ],
+    "description": [
+        false,
+        "PCM5102A I2S Audio DAC Amplifier"
+    ],
+    "entity": "d0948a95-6da7-4415-8257-2eeba64ad607",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        "Texas Instruments"
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "442fc61e-51d1-4549-9ab1-2fb516683e68",
+    "pad_map": {
+        "0766f699-3326-42d4-b41e-49c9020e8210": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "37203552-f5f8-4e7c-bb18-880dca02d82c"
+        },
+        "452b29e5-bff6-4548-806d-ba4e1c78ed1e": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "7f548755-7af6-49bd-8a6c-efd8bda9e1a8"
+        },
+        "595ff571-0a62-4491-9075-f51eb287d45b": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "1b4a7fda-e534-4bac-8688-b90172a26804"
+        },
+        "5b393d0a-3bfb-4b28-977d-d474c5f2f731": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "d37e4dd3-4118-4f44-9f02-bdfc739104ad"
+        },
+        "619fa53e-8f18-4bd0-9b1d-4bc6e02e5113": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "d8d11334-5c2b-445e-a1ce-76dc96a2a81a"
+        },
+        "6f5496d6-2b5c-44b1-a2b6-8792788d20aa": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "fd6097d6-2b51-4083-9e38-d0c207f1199c"
+        },
+        "8671df89-ff88-47bc-a90d-36db8e962da3": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "433eeec8-9bd5-44b8-8e1d-d7ef937b2405"
+        },
+        "ab4ccba3-e0e7-458b-a0a7-35b32c768855": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "1fbcb1fc-bfb4-462c-bb8f-6a3848053f4c"
+        },
+        "b40960fe-7b49-4c06-ab0c-32d9469d8a4e": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "0056fd7e-502b-429a-80c3-a66c8c1f3fef"
+        },
+        "b63cf8a8-e246-4175-a47d-b4eff56eb71e": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "0c41d6ef-3859-4e9f-bc3f-4921d844bc62"
+        },
+        "ba3fb0e9-35a2-4274-89bb-9d07dd88305c": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "5965a436-ed8a-42e3-9bcb-7250f692b17d"
+        },
+        "c1728cf7-baff-415c-9e7c-528fe8de6b79": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "029c0bf2-1b05-4fcd-af45-2469203e81cd"
+        },
+        "c8eb4d1d-c57e-49a9-9a79-b1a08cb7bf08": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "6638812c-81cd-46d1-9698-042fef4de815"
+        },
+        "d590711b-bc45-44df-895f-30d507e2d48b": {
+            "gate": "e502d13a-3efc-4dfa-8e4d-f77b8663b521",
+            "pin": "c104f509-0c04-401a-a0f5-de8d1abc8e57"
+        }
+    },
+    "parametric": {},
+    "tags": [
+        "audio",
+        "dac"
+    ],
+    "type": "part",
+    "uuid": "048206e9-c1c4-4fc7-82da-0f7edfc295e9",
+    "value": [
+        false,
+        ""
+    ]
+}

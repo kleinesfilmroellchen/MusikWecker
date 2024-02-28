@@ -1,0 +1,6 @@
+[book]
+authors = ["kleines Filmröllchen"]
+language = "en"
+multilingual = true
+src = "."
+title = "MusikWecker Manual"
