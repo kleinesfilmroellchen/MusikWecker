@@ -2,7 +2,7 @@
     "programmer": "AVR ISP",
     "board": "esp8266:esp8266:d1_mini_clone",
     "configuration": "xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=4816,non32xfer=fast,FlashMode=dout,FlashFreq=40,eesz=4M,ip=lm2f,dbg=Serial,lvl=WIFI,wipe=none,baud=921600",
-    "port": "COM3",
+    "port": "COM5",
     "output": "build",
     "sketch": "MusikWecker.ino"
 }

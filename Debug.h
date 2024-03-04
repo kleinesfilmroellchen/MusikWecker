@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DisplayUtils.h"
-#include "defs.h"
+#include "Settings.h"
 #include "defs.h"
 #include <Arduino.h>
 #include <HardwareSerial.h>
@@ -15,15 +15,17 @@ inline void debug_print(Printable text)
 {
     Serial.println(text);
 
-    if (display.getCursorY() >= display.getDisplayHeight()) {
-        display.clear();
-        display.setCursor(LINE_HEIGHT, 0);
-    }
+    if (eeprom_settings.show_timing) {
+        if (display.getCursorY() >= display.getDisplayHeight()) {
+            display.clear();
+            display.setCursor(LINE_HEIGHT, 0);
+        }
 
-    display.firstPage();
-    do {
-        display.setDrawColor(1);
-        display.setFont(TINY_FONT);
-        display.println(text);
-    } while (display.nextPage());
+        display.firstPage();
+        do {
+            display.setDrawColor(1);
+            display.setFont(TINY_FONT);
+            display.println(text);
+        } while (display.nextPage());
+    }
 }

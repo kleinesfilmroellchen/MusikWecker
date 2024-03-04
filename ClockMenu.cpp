@@ -1,4 +1,5 @@
 #include "ClockMenu.h"
+#include "Audio.h"
 #include "Settings.h"
 #include <NTPClient.h>
 
@@ -45,6 +46,11 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
         if (this->timeOfLastNTP >= 0) {
             disp->drawXBM(symbolpos - clocksync_symbol_width, 0, clocksync_symbol_width, clocksync_symbol_height, clocksync_symbol_bits);
             symbolpos -= clocksync_symbol_width + SYMBOL_SPACING;
+        }
+
+        if (audioPlayer && audioPlayer->isRunning()) {
+            disp->drawXBM(symbolpos - sound_symbol_width, 0, sound_symbol_width, sound_symbol_height, sound_symbol_bits);
+            symbolpos -= sound_symbol_width + SYMBOL_SPACING;
         }
 
         volatile uint64_t time = micros64();

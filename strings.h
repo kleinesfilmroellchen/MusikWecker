@@ -16,7 +16,7 @@ static const Span<char const*> main_menu { main_menu_array };
 
 static const char design_menu_0[] PROGMEM = "Digital";
 static const char design_menu_1[] PROGMEM = "Digital + Sekunden";
-static const char design_menu_2[] PROGMEM = "Analog";
+static const char design_menu_2[] PROGMEM = "Analog (minimalistisch)";
 static const char design_menu_3[] PROGMEM = "Rotierende Segmente";
 static const char design_menu_4[] PROGMEM = "Binär";
 static const char design_menu_5[] PROGMEM = "Binär (Tagsekunden)";
@@ -62,3 +62,5 @@ static const char* sd_types[] PROGMEM = { sd_types_0, sd_types_1, sd_types_2, sd
 
 static const char* debuggingLabel PROGMEM = "Firmware-Debugging\naktivieren";
 static const char* autoDisableLabel PROGMEM = "Bildschirm abschalten\nbei Inaktivität";
+static const char* confirmDeleteLabel PROGMEM = "Wirklich löschen?";
+static const char* confirmMoveLabel PROGMEM = "Wirklich hierher\nverschieben?";

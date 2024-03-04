@@ -4,3 +4,9 @@ language = "en"
 multilingual = true
 src = "."
 title = "MusikWecker Manual"
+
+[preprocessor.toc]
+command = "mdbook-toc"
+renderer = ["html"]
+marker = """* auto-gen TOC;
+{:toc}"""

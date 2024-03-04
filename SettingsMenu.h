@@ -2,11 +2,12 @@
 #pragma once
 
 #include "OptionsMenu.h"
+#include <functional>
 
 template <typename SelectionType>
 class SettingsMenu : public DelegateOptionsMenu {
 public:
-    using Action = void (*)(SelectionType);
+    using Action = std::function<void(SelectionType)>;
 
     SettingsMenu(char const* labelText, Action action, Span<SelectionType> options, Span<const char*> optionLabels);
     Menu* drawMenu(T_DISPLAY* disp, uint16_t deltaMillis) override;

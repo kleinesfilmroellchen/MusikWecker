@@ -2,11 +2,9 @@
 
 #pragma once
 
+#include "AudioFileSourceSdFs.h"
 #include "defs.h"
-
-// esp audio library
 #include <AudioFileSource.h>
-#include <AudioFileSourceSD.h>
 #include <AudioGenerator.h>
 #include <AudioGeneratorAAC.h>
 #include <AudioGeneratorFLAC.h>
@@ -16,11 +14,10 @@
 #include <AudioGeneratorWAV.h>
 #include <AudioOutput.h>
 #include <AudioOutputBuffer.h>
-//#include <AudioOutputFilterDecimate.h>
-#include <AudioOutputI2SNoDAC.h>
+#include <AudioOutputI2S.h>
 
-static AudioFileSourceSD* audioSource = nullptr;
-static AudioOutputI2SNoDAC* audioOutput = nullptr;
+static AudioFileSourceSdFs* audioSource = nullptr;
+static AudioOutputI2S* audioOutput = nullptr;
 static AudioGenerator* audioPlayer = nullptr;
 
 void audioSetup();
