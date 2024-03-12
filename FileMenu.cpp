@@ -84,6 +84,8 @@ Menu* FileSelectMenu::handleButton(uint8_t buttons)
         } else if (index == 0 && operation == FileOperation::SelectMoveTarget) {
             // own directory; perform move
             performFileAction(currentDirectory + "/" + sourceFile.substring(sourceFile.lastIndexOf('/') + 1));
+        } else if (index == 0) {
+            updateDirectory();
         } else {
             index -= 2;
             FsFile directory = card.open(currentDirectory);
