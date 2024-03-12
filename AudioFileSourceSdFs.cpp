@@ -54,10 +54,7 @@ bool AudioFileSourceSdFs::close()
     return true;
 }
 
-bool AudioFileSourceSdFs::isOpen()
-{
-    return f ? true : false;
-}
+bool AudioFileSourceSdFs::isOpen() { return f ? true : false; }
 
 uint32_t AudioFileSourceSdFs::getSize()
 {

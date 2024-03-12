@@ -13,29 +13,35 @@ OptionsMenu::OptionsMenu(Span<MenuEntry> menues)
     }
 }
 
-void OptionsMenu::performMenuDraw(T_DISPLAY* display, uint8_t width, uint8_t height)
+void OptionsMenu::performMenuDraw(T_DISPLAY* display, uint8_t width,
+    uint8_t height)
 {
     fixTopMenu(height / LINE_HEIGHT);
 
     if (size() == 0)
         return;
 
-    // Volatile in the entire function prevents compiler optimization that kills logic
-    // index of first and last menu text to draw
+    // Volatile in the entire function prevents compiler optimization that kills
+    // logic index of first and last menu text to draw
     uint16_t firstMenu = this->currentTopMenu,
-             lastMenu = min(this->currentTopMenu + (height / LINE_HEIGHT) - 1, static_cast<int>(size() - 1));
+             lastMenu = min(this->currentTopMenu + (height / LINE_HEIGHT) - 1,
+                 static_cast<int>(size() - 1));
 
-    // Use XOR drawing mode. This will make the selected text inverted without further processing required.
+    // Use XOR drawing mode. This will make the selected text inverted without
+    // further processing required.
     display->setDrawColor(2);
     display->setFont(MAIN_FONT);
-    // loop two variables, i is the menu position, menuIdx is the menu text array index
-    for (uint16_t menuIdx = firstMenu, i = 0; menuIdx <= lastMenu; ++i, ++menuIdx) {
+    // loop two variables, i is the menu position, menuIdx is the menu text array
+    // index
+    for (uint16_t menuIdx = firstMenu, i = 0; menuIdx <= lastMenu;
+         ++i, ++menuIdx) {
         String display_string = this->menues[menuIdx].text;
         // highlight current element
         if (menuIdx == this->currentMenu)
             display->drawBox(0, linepos(i), width, LINE_HEIGHT);
         // issue draw call to display
         drawString(display, display_string.c_str(), i);
+        yield();
     }
 }
 
@@ -44,16 +50,15 @@ Menu* OptionsMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
     this->dirty = false;
     display->firstPage();
     do {
-        performMenuDraw(display, display->getDisplayWidth(), display->getDisplayHeight());
-        audioLoop();
+        performMenuDraw(display, display->getDisplayWidth(),
+            display->getDisplayHeight());
+
+        yield();
     } while (display->nextPage());
     return this;
 }
 
-bool OptionsMenu::shouldRefresh(uint16_t deltaMillis)
-{
-    return this->dirty;
-}
+bool OptionsMenu::shouldRefresh(uint16_t deltaMillis) { return this->dirty; }
 
 void OptionsMenu::fixTopMenu(uint8_t line_count)
 {
@@ -68,7 +73,8 @@ void OptionsMenu::fixTopMenu(uint8_t line_count)
         // b/c unsigned bytes, use max value to detect overflow when decrementing
         if (this->currentMenu == 0xffff)
             this->currentMenu = size() - 1;
-        // check current menu bounds. for now, going beyond the last menu entry will wrap back to the start
+        // check current menu bounds. for now, going beyond the last menu entry will
+        // wrap back to the start
         if (this->currentMenu >= size())
             this->currentMenu = 0;
 
@@ -143,7 +149,8 @@ Menu* DelegateOptionsMenu::handleButton(uint8_t buttons)
     return this;
 }
 
-ClockFaceSelectMenu::ClockFaceSelectMenu(Span<char const*> face_names, Span<ClockFace> clockFaces)
+ClockFaceSelectMenu::ClockFaceSelectMenu(Span<char const*> face_names,
+    Span<ClockFace> clockFaces)
     : DelegateOptionsMenu(DelegateOptionsMenu::create(face_names))
     , clockFaces(clockFaces)
 {
@@ -195,20 +202,26 @@ Menu* ClockFaceSelectMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
         timeSinceButton = lastUpdate - CLOCK_PREVIEW_DELAY - 1;
         auto clockFace = this->clockFaces[this->currentMenu];
 
-        ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(timeClient.getEpochTime(), *mainTZ);
+        ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(
+            timeClient.getEpochTime(), *mainTZ);
         display->firstPage();
         do {
             display->setMaxClipWindow();
-            display->setClipWindow(0, 0, display->getDisplayWidth() / 2, display->getDisplayHeight());
-            performMenuDraw(display, display->getDisplayWidth() / 2, display->getDisplayHeight());
-            audioLoop();
+            display->setClipWindow(0, 0, display->getDisplayWidth() / 2,
+                display->getDisplayHeight());
+            performMenuDraw(display, display->getDisplayWidth() / 2,
+                display->getDisplayHeight());
+
+            yield();
             display->setDrawColor(1);
             display->setMaxClipWindow();
-            display->setClipWindow(display->getDisplayWidth() / 2, 0, display->getDisplayWidth(), display->getDisplayHeight());
-            audioLoop();
-            clockFace(display, &curtime, display->getDisplayWidth() / 2, 0, display->getDisplayWidth() / 2, display->getDisplayHeight());
+            display->setClipWindow(display->getDisplayWidth() / 2, 0,
+                display->getDisplayWidth(),
+                display->getDisplayHeight());
+            clockFace(display, &curtime, display->getDisplayWidth() / 2, 0,
+                display->getDisplayWidth() / 2, display->getDisplayHeight());
 
-            audioLoop();
+            yield();
         } while (display->nextPage());
         display->setMaxClipWindow();
     } else {

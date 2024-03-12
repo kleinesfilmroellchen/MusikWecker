@@ -118,7 +118,7 @@ void setup()
         display.setBusClock(DISPLAY_CLOCK_SPEED);
         debug_print(F("Display ok."));
     }
-    delay(200);
+    yield();
 
     // ----------------------------------------------------------
     // init
@@ -126,7 +126,7 @@ void setup()
     WiFi.mode(WIFI_STA);
     WiFi.begin(STASSID, STAPSK);
     WiFi.setAutoReconnect(true);
-    delay(1000);
+    yield();
 
     // pins
     pinMode(PIN_BUTTON_LEFT, INPUT_PULLUP);
@@ -163,7 +163,7 @@ void setup()
 #if USE_SERIAL
     audioLogger = &Serial;
 #endif
-    audioSetup();
+    AudioManager::the();
 
     display.firstPage();
     do {
@@ -180,14 +180,11 @@ void setup()
     // create menu structure
     currentMenu = createMenuStructure(mainTZ);
 
-    yield();
-
     // start ntp client
     timeClient.begin();
     if (WiFi.status() == WL_CONNECTED) {
         ntpUpdateOccurred = timeClient.update();
     }
-    yield();
 
     // initialize timing variables
     buttonChangeTime = previousLoopTime = drawTime = millis();
@@ -197,8 +194,7 @@ void loop()
 {
     // the timing millisecond counter that rolls around every minute or so
     auto currentLoopTime = millis();
-
-    audioLoop();
+    yield();
 
     // sync own time with ntp server, if wifi is available.
     if (WiFi.status() == WL_CONNECTED) {
@@ -207,12 +203,9 @@ void loop()
         ntpUpdateOccurred = false;
     }
 
-    audioLoop();
-
     // read buttons, some bit magic here
     volatile uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << B_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << B_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << B_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << B_LEFT_BIT));
     // debug_print(buttons, BIN); Serial.flush();
-    audioLoop();
 
     // if a button is held and the time since button change exceeds the hold time "delay"...
     if ((currentLoopTime - buttonChangeTime > BUTTON_HOLD_DELAY) && (buttons != 0)) {
@@ -223,15 +216,13 @@ void loop()
         buttonHoldTimeDelta = BUTTON_HOLD_REPEAT_DELAY;
     }
 
-    audioLoop();
-
     // temporary storage for a possibly different new menu
     Menu* newMenu = currentMenu;
     // handle buttons
     if (buttons != lastButtons || (buttonHoldTimeDelta < 0)) {
         newMenu = newMenu->handleButton(buttons);
     }
-    audioLoop();
+
     // any button state is different: update last button time
     if (buttons != lastButtons) {
         buttonChangeTime = currentLoopTime;
@@ -243,7 +234,6 @@ void loop()
     }
 
     yield();
-    audioLoop();
 
     // draw if menu changed due to buttons
     if (currentMenu != newMenu) {
@@ -251,12 +241,10 @@ void loop()
     }
     // draw if menu wants to refresh
     else if (newMenu->shouldRefresh(currentLoopTime - previousLoopTime)) {
-        audioLoop();
+        yield();
         currentMenu = newMenu->drawMenu(&display, currentLoopTime - drawTime);
         drawTime = currentLoopTime;
     }
-
-    audioLoop();
 
     // store new menu
     currentMenu = newMenu;
@@ -290,7 +278,6 @@ void loop()
         buttonChangeTime = currentLoopTime = millis();
     }
     yield();
-    audioLoop();
 
     // store state and time
     lastButtons = buttons;

@@ -11,7 +11,8 @@ void saveSettings()
         if (storedPtr[i] != currentPtr[i])
             // imma commit a crime
             goto GOTO_saveSettingsExecute;
-    // only hit if the goto never executed; i.e. all setting elements are identical and nothing needs to be stored
+    // only hit if the goto never executed; i.e. all setting elements are
+    // identical and nothing needs to be stored
     debug_print(F("Settings didn't change; not writing EEPROM."));
     return;
 

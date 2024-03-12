@@ -15,12 +15,14 @@ extern ace_time::CompleteZoneManager manager;
 
 DiagnosticPage operator+(DiagnosticPage const& self, uint8_t a)
 {
-    return static_cast<DiagnosticPage>((static_cast<uint8_t>(self) + a) % static_cast<uint8_t>(DiagnosticPage::__Count));
+    return static_cast<DiagnosticPage>(
+        (static_cast<uint8_t>(self) + a) % static_cast<uint8_t>(DiagnosticPage::__Count));
 }
 
 DiagnosticPage operator-(DiagnosticPage const& self, uint8_t a)
 {
-    return static_cast<DiagnosticPage>((static_cast<uint8_t>(self) - a) % static_cast<uint8_t>(DiagnosticPage::__Count));
+    return static_cast<DiagnosticPage>(
+        (static_cast<uint8_t>(self) - a) % static_cast<uint8_t>(DiagnosticPage::__Count));
 }
 
 extern SdFs card;
@@ -39,8 +41,12 @@ Menu* DiagnosticMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             mainTZ->printTo(zoneName);
 
             char timeInfo[128];
-            snprintf_P(timeInfo, sizeof(timeInfo), PSTR("unix %ds\ntz %s offset %05ds\nserver %s\nlast sync %d (synced %d)"),
-                timeClient.getEpochTime(), zoneName.getString().c_str(), mainTZ->getOffsetDateTime(timeClient.getEpochTime()).timeOffset(),
+            snprintf_P(
+                timeInfo, sizeof(timeInfo),
+                PSTR("unix %ds\ntz %s offset %05ds\nserver %s\nlast sync %d (synced "
+                     "%d)"),
+                timeClient.getEpochTime(), zoneName.getString().c_str(),
+                mainTZ->getOffsetDateTime(timeClient.getEpochTime()).timeOffset(),
                 TEMP_TIME_SERVER, millis() - timeOfLastNTP, timeClient.isTimeSet());
             display->setFont(TINY_FONT);
             drawString(display, timeInfo, 0);
@@ -58,8 +64,11 @@ Menu* DiagnosticMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             String sdTypeName = FPSTR(sd_types_array[sdNumericType]);
 
             char fsInfo[256] {};
-            snprintf_P(fsInfo, sizeof(fsInfo), PSTR("sd type %s\nerror %d payload %d\n%lldKi cap %lldKi free\nFAT%d: %d secsz %d clusz"),
-                sdTypeName, card.sdErrorCode(), card.sdErrorData(), capacityKiB, freeKiB, card.fatType(), sectorSize, clusterSize);
+            snprintf_P(fsInfo, sizeof(fsInfo),
+                PSTR("sd type %s\nerror %d payload %d\n%lldKi cap %lldKi "
+                     "free\nFAT%d: %d secsz %d clusz"),
+                sdTypeName, card.sdErrorCode(), card.sdErrorData(),
+                capacityKiB, freeKiB, card.fatType(), sectorSize, clusterSize);
             display->setFont(TINY_FONT);
             drawString(display, fsInfo, 0);
 
@@ -70,7 +79,8 @@ Menu* DiagnosticMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             break;
         }
         }
-        audioLoop();
+
+        yield();
     } while (display->nextPage());
     return this;
 }

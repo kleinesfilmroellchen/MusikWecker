@@ -41,7 +41,7 @@ Menu* SettingsMenu<SelectionType>::drawMenu(T_DISPLAY* display, uint16_t deltaMi
         display->drawHLine(0, linepos(LINE_COUNT - 2) - 1, display->getDisplayWidth());
         drawString(display, label.c_str(), LINE_COUNT - 2);
 
-        audioLoop();
+        yield();
     } while (display->nextPage());
     display->setMaxClipWindow();
 

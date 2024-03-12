@@ -7,12 +7,25 @@
 #include <AudioGenerator.h>
 #include <AudioOutput.h>
 #include <AudioOutputI2S.h>
+#include <Ticker.h>
 #include <memory>
 
-extern std::unique_ptr<AudioFileSourceSdFs> audioSource;
-extern std::unique_ptr<AudioOutputI2S> audioOutput;
-extern std::unique_ptr<AudioGenerator> audioPlayer;
+class AudioManager {
+public:
+    static AudioManager& the();
+    AudioManager();
 
-void audioSetup();
-/** Called during audio playback; handles playing the audio.*/
-void audioLoop();
+    void loop();
+    bool isPlaying() const { return audioPlayer && audioPlayer->isRunning(); }
+
+private:
+    // Singleton instance
+    static std::unique_ptr<AudioManager> instance;
+
+    AudioFileSourceSdFs audioSource;
+    AudioOutputI2S audioOutput;
+    std::unique_ptr<AudioGenerator> audioPlayer;
+    Ticker timer;
+};
+
+void audioTimerInterrupt();

@@ -18,11 +18,9 @@ FileSelectMenu::FileSelectMenu(FileOperation operation)
 void FileSelectMenu::updateDirectory()
 {
     debug_print(currentDirectory);
-    audioLoop();
+
     FsFile directory = card.open(currentDirectory);
-    audioLoop();
     directory.rewindDirectory();
-    audioLoop();
 
     menuEntries.clear();
     menuStrings.clear();
@@ -31,7 +29,6 @@ void FileSelectMenu::updateDirectory()
     menuEntries.push_back(MenuEntry { PSTR(".. (Elternverzeichnis)"), nullptr });
     while (true) {
         FsFile entry = directory.openNextFile();
-        audioLoop();
         if (!entry)
             break;
         PrintString name;
@@ -93,9 +90,7 @@ Menu* FileSelectMenu::handleButton(uint8_t buttons)
             directory.rewindDirectory();
             FsFile child = directory.openNextFile();
             while (index != 0) {
-                audioLoop();
                 child = directory.openNextFile();
-                audioLoop();
                 --index;
             }
             PrintString baseName;
@@ -142,13 +137,15 @@ void FileSelectMenu::performFileAction(String chosenFile)
         operation = FileOperation::ConfirmDelete;
         sourceFile = chosenFile;
         currentDelegate = std::make_unique<SettingsMenu<YesNoSelection>>(
-            confirmDeleteLabel, [this](auto x) { this->performDelete(x); }, yesNoOptions, yes_no_menu);
+            confirmDeleteLabel, [this](auto x) { this->performDelete(x); },
+            yesNoOptions, yes_no_menu);
         break;
     case FileOperation::SelectMoveTarget:
         operation = FileOperation::ConfirmMove;
         targetFile = chosenFile;
         currentDelegate = std::make_unique<SettingsMenu<YesNoSelection>>(
-            confirmMoveLabel, [this](auto x) { this->performMove(x); }, yesNoOptions, yes_no_menu);
+            confirmMoveLabel, [this](auto x) { this->performMove(x); },
+            yesNoOptions, yes_no_menu);
         break;
     // Should not happen...
     case FileOperation::ConfirmDelete:

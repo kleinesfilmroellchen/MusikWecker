@@ -112,8 +112,10 @@ inline void drawString(T_DISPLAY* disp, char const* c_text, uint8_t line)
 
     size_t current_line = line;
     for (auto const& line : lines) {
+        yield();
         disp->drawUTF8(LEFT_TEXT_MARGIN, MAIN_FONT_SIZE + linepos(current_line) + 1, line.c_str());
         current_line++;
-        audioLoop();
     }
 }
+
+void drawRotatedXBM(T_DISPLAY* display, uint16_t x, uint16_t y, double angle, uint16_t w, uint16_t h, uint8_t const* bitmap);

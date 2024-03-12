@@ -14,14 +14,8 @@ Menu* NothingMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
 {
     return this->parent;
 }
-bool NothingMenu::shouldRefresh(uint16_t _)
-{
-    return true;
-}
-Menu* NothingMenu::handleButton(uint8_t _)
-{
-    return this->parent;
-}
+bool NothingMenu::shouldRefresh(uint16_t _) { return true; }
+Menu* NothingMenu::handleButton(uint8_t _) { return this->parent; }
 
 void applyDebugSettings(YesNoSelection yesNo)
 {
@@ -37,7 +31,10 @@ enum class AutoDisable {
     Mins30,
 };
 
-static std::array<AutoDisable, 5> autoDisableOptions = { AutoDisable::No, AutoDisable::Secs10, AutoDisable::Mins5, AutoDisable::Mins10, AutoDisable::Mins30 };
+static std::array<AutoDisable, 5> autoDisableOptions = {
+    AutoDisable::No, AutoDisable::Secs10, AutoDisable::Mins5,
+    AutoDisable::Mins10, AutoDisable::Mins30
+};
 
 void applyAutoDisableSettings(AutoDisable autoDisable)
 {
@@ -75,14 +72,20 @@ Menu* createMenuStructure(ace_time::TimeZone* mainTZ)
     auto cfMenu = std::make_unique<ClockFaceSelectMenu>(design_menu, allClockFaces);
 
     static std::array<MenuEntry, 3> fileSubmenus = {
-        MenuEntry { file_menu_0, std::make_unique<FileSelectMenu>(FileOperation::None) },
-        MenuEntry { file_menu_1, std::make_unique<FileSelectMenu>(FileOperation::Move) },
-        MenuEntry { file_menu_2, std::make_unique<FileSelectMenu>(FileOperation::Delete) },
+        MenuEntry { file_menu_0,
+            std::make_unique<FileSelectMenu>(FileOperation::None) },
+        MenuEntry { file_menu_1,
+            std::make_unique<FileSelectMenu>(FileOperation::Move) },
+        MenuEntry { file_menu_2,
+            std::make_unique<FileSelectMenu>(FileOperation::Delete) },
     };
     auto fileMenu = std::make_unique<OptionsMenu>(fileSubmenus);
 
-    auto debuggingMenu = std::make_unique<SettingsMenu<YesNoSelection>>(debuggingLabel, &applyDebugSettings, yesNoOptions, yes_no_menu);
-    auto autoDisableMenu = std::make_unique<SettingsMenu<AutoDisable>>(autoDisableLabel, &applyAutoDisableSettings, autoDisableOptions, auto_disable_menu);
+    auto debuggingMenu = std::make_unique<SettingsMenu<YesNoSelection>>(
+        debuggingLabel, &applyDebugSettings, yesNoOptions, yes_no_menu);
+    auto autoDisableMenu = std::make_unique<SettingsMenu<AutoDisable>>(
+        autoDisableLabel, &applyAutoDisableSettings, autoDisableOptions,
+        auto_disable_menu);
 
     static std::array<MenuEntry, 3> settingsSubmenus = {
         MenuEntry { settings_menu_0, std::move(autoDisableMenu) },

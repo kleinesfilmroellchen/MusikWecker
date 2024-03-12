@@ -5,7 +5,8 @@
 
 extern eeprom_settings_struct eeprom_settings;
 
-ClockMenu::ClockMenu(NTPClient* timing, ace_time::TimeZone* tz, Menu* mainMenu)
+ClockMenu::ClockMenu(NTPClient* timing, ace_time::TimeZone* tz,
+    Menu* mainMenu)
 {
     this->timing = timing;
     this->timezone = tz;
@@ -22,48 +23,54 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
     // - Date below
 
     char dateStr[11];
-    ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(this->timing->getEpochTime(), *this->timezone);
-    sprintf(dateStr, "%02u.%02u.%4u", curtime.day(), curtime.month(), curtime.year());
-    audioLoop();
+    ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(
+        this->timing->getEpochTime(), *this->timezone);
+    sprintf(dateStr, "%02u.%02u.%4u", curtime.day(), curtime.month(),
+        curtime.year());
 
     disp->firstPage();
-    audioLoop();
     do {
-        // i unnecessarily optimized the sin and cos into a lut, took me three hours.
-        // this was the fix, i wasn't resetting the drawing mode back to normal (white)
-        // fuck my life
+        // i unnecessarily optimized the sin and cos into a lut, took me three
+        // hours. this was the fix, i wasn't resetting the drawing mode back to
+        // normal (white) fuck my life
         disp->setDrawColor(1);
         volatile uint16_t symbolpos = SCREEN_WIDTH;
         // status symbols
         if (WiFi.status() == WL_CONNECTED) {
-            disp->drawXBM(symbolpos - wifi_symbol_width, 0, wifi_symbol_width, wifi_symbol_height, wifi_symbol_bits);
+            disp->drawXBM(symbolpos - wifi_symbol_width, 0, wifi_symbol_width,
+                wifi_symbol_height, wifi_symbol_bits);
             symbolpos -= wifi_symbol_width + SYMBOL_SPACING;
         } else {
-            disp->drawXBM(symbolpos - nowifi_symbol_width, 0, nowifi_symbol_width, nowifi_symbol_height, nowifi_symbol_bits);
+            disp->drawXBM(symbolpos - nowifi_symbol_width, 0, nowifi_symbol_width,
+                nowifi_symbol_height, nowifi_symbol_bits);
             symbolpos -= nowifi_symbol_width + SYMBOL_SPACING;
         }
-        audioLoop();
+        yield();
 
         // TODO: display alarm clock symbol if an alarm clock is set
 
         if (this->timeOfLastNTP >= 0) {
-            disp->drawXBM(symbolpos - clocksync_symbol_width, 0, clocksync_symbol_width, clocksync_symbol_height, clocksync_symbol_bits);
+            disp->drawXBM(symbolpos - clocksync_symbol_width, 0,
+                clocksync_symbol_width, clocksync_symbol_height,
+                clocksync_symbol_bits);
             symbolpos -= clocksync_symbol_width + SYMBOL_SPACING;
         }
-        audioLoop();
+        yield();
 
-        if (audioPlayer && audioPlayer->isRunning()) {
-            disp->drawXBM(symbolpos - sound_symbol_width, 0, sound_symbol_width, sound_symbol_height, sound_symbol_bits);
+        if (AudioManager::the().isPlaying()) {
+            disp->drawXBM(symbolpos - sound_symbol_width, 0, sound_symbol_width,
+                sound_symbol_height, sound_symbol_bits);
             symbolpos -= sound_symbol_width + SYMBOL_SPACING;
         }
-        audioLoop();
+        yield();
 
         volatile uint64_t time = micros64();
-        curClockFace(disp, &curtime, 0, 0, disp->getDisplayWidth(), disp->getDisplayHeight());
+        curClockFace(disp, &curtime, 0, 0, disp->getDisplayWidth(),
+            disp->getDisplayHeight());
         disp->setFont(TINY_FONT);
         disp->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, dateStr);
         volatile uint64_t after_time = micros64();
-        audioLoop();
+        yield();
 
         if (eeprom_settings.show_timing) {
             volatile uint64_t total_time = after_time - time;
@@ -71,10 +78,11 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
             char timingStr[22];
             sprintf(timingStr, "%02.3fm %10d", total_time / 1000.0d, cycles);
 
-            disp->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT, timingStr);
+            disp->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT,
+                timingStr);
         }
 
-        audioLoop();
+        yield();
     } while (disp->nextPage());
 
     return this;

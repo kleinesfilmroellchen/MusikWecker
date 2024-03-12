@@ -1,7 +1,7 @@
 
 #pragma once
-#include <Arduino.h>
 #include "Span.h"
+#include <Arduino.h>
 
 const char tzlist_0[] PROGMEM = "America/Adak";
 const char tzlist_1[] PROGMEM = "Pacific/Chatham";
