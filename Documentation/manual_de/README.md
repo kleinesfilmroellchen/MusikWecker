@@ -11,20 +11,20 @@ Diese Seite behandelt die Grundlagen des Weckers, die Uhranzeige und die Einstel
 
 Der MusikWecker besitzt vier Knöpfe zur Bedienung, die jeweils eine übliche Funktion besitzen:
 
-- Rechts: OK/Enter
-- Oben: Zum darüberliegenden Menüpunkt navigieren
-- Unten: Zum darunterliegenden Menüpunkt navigieren
-- Links: Abbrechen, Menü verlassen
+- _Rechts_: OK/Enter
+- _Oben_: Zum darüberliegenden Menüpunkt navigieren
+- _Unten_: Zum darunterliegenden Menüpunkt navigieren
+- _Links_: Abbrechen, Menü verlassen
 
 Wird ein Knopf längere Zeit gedrückt, so wird der Knopf wiederholt aktiviert.
 
-In den meisten Menüs können Optionen dementsprechend durch Scrollen nach oben und unten ausgewählt werden. Eine Option wird durch Rechts bestätigt, und Links dient zum Abbrechen oder Verlassen des Menüs.
+In den meisten Menüs können Optionen dementsprechend durch Scrollen nach oben und unten ausgewählt werden. Eine Option wird durch _Rechts_ bestätigt, und _Links_ dient zum Abbrechen oder Verlassen des Menüs.
 
-Wenn der Wecker in den Ruhezustand geht, kann nur Links ihn aufwecken.
+Wenn der Wecker in den Ruhezustand geht, kann nur _Links_ ihn aufwecken.
 
 ## Hauptmenü
 
-Vom Startbildschirm aus (dem Uhrbildschirm) kann das Hauptmenü mittels Rechts aufgerufen werden. Das Hauptmenü besteht aus den folgenden Elementen:
+Vom Startbildschirm aus (dem Uhrbildschirm) kann das Hauptmenü mittels _Rechts_ aufgerufen werden. Das Hauptmenü besteht aus den folgenden Elementen:
 
 - Uhrdesign: Auswahl der Uhr, die angezeigt wird.
 - Wecker: Konfiguration von Weckern.
@@ -44,7 +44,7 @@ Der Uhrbildschirm ist der Startbildschirm des Weckers. Er zeigt die aktuelle Uhr
 
 ## Uhrdesign
 
-Das Uhrdesign-Menü erlaubt die Auswahl des Uhrdesigns des Weckers. Wird die Auswahl in diesem Menü mehr als fünf Sekunden nicht bewegt, zeigt die rechte Seite des Bildschirms eine Vorschau des aktuell angewählten Designs. Durch Rechts kann dieses Design ausgewählt werden.
+Das Uhrdesign-Menü erlaubt die Auswahl des Uhrdesigns des Weckers. Wird die Auswahl in diesem Menü mehr als fünf Sekunden nicht bewegt, zeigt die rechte Seite des Bildschirms eine Vorschau des aktuell angewählten Designs. Durch _Rechts_ kann dieses Design ausgewählt werden.
 
 Die folgenden Designs sind aktuell verfügbar:
 

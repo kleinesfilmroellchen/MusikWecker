@@ -14,4 +14,4 @@
 # User Manual (German) / Benutzerhandbuch
 
 - [Einführung](manual_de/README.md)
-- []
+- [Dateiverwaltung](manual_de/file_management.md)
