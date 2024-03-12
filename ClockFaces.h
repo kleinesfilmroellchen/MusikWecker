@@ -9,13 +9,13 @@
 #include <U8g2lib.h>
 
 // size of the analog clock face
-constexpr uint16_t ANALOGCF_SIZE = 56;
+constexpr uint16_t ANALOGCF_SIZE = 60;
 // length of the line segments that represent the hour markings
 constexpr uint16_t ANALOGCF_LINE_LENGTH = 4;
 // length of the hour hand
-constexpr uint16_t ANALOGCF_HOUR_LENGTH = 8;
+constexpr uint16_t ANALOGCF_HOUR_LENGTH = 10;
 // length of the minute hand
-constexpr uint16_t ANALOGCF_MINUTE_LENGTH = 15;
+constexpr uint16_t ANALOGCF_MINUTE_LENGTH = 16;
 // size of the boxes in binary clocks
 constexpr uint16_t BINARYCF_BOX_SIZE = 8;
 // spacing between the boxes in binary clocks
@@ -28,8 +28,12 @@ using ClockFace = void (*)(T_DISPLAY*, ace_time::ZonedDateTime*, uint8_t x0, uin
 
 /** Basic digital 24-hour clock. */
 void basicDigitalCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
-/** Basic analog clock without numbers. */
+/** Minimalistic analog clock without numbers. */
 void basicAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+/** Retro analog clock with Roman numerals. */
+void retroAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+/** Modern analog clock with numbers. */
+void modernAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Analog clock with rotating segments for each time division. */
 void rotatingSegmentAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Digital 24-hour clock with number second indicator. */

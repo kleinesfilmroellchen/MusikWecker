@@ -58,7 +58,7 @@ static const char* sd_types_0 PROGMEM = "invalid";
 static const char* sd_types_1 PROGMEM = "SD1";
 static const char* sd_types_2 PROGMEM = "SD2";
 static const char* sd_types_3 PROGMEM = "SDHC/SDXC";
-static const char* sd_types[] PROGMEM = { sd_types_0, sd_types_1, sd_types_2, sd_types_3 };
+static const std::array<char const*, 4> sd_types_array = { sd_types_0, sd_types_1, sd_types_2, sd_types_3 };
 
 static const char* debuggingLabel PROGMEM = "Firmware-Debugging\naktivieren";
 static const char* autoDisableLabel PROGMEM = "Bildschirm abschalten\nbei Inaktivität";

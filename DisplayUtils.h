@@ -18,24 +18,27 @@ inline uint16_t linepos(uint8_t line);
 
 inline void drawArc(T_DISPLAY* disp, uint16_t x0, uint16_t y0, uint16_t radius, double startAngle, double endAngle)
 {
+    // constrain to 0 -> 2π
     if (startAngle > TWO_PI && endAngle > TWO_PI) {
         startAngle = fmod(startAngle, TWO_PI);
         endAngle = fmod(endAngle, TWO_PI);
     }
     // switch angles if necessary
     double smallerAngle = min(startAngle, endAngle), largerAngle = max(startAngle, endAngle);
-    //  Serial.printf("%3f -> %3f", degrees(smallerAngle), degrees(largerAngle)); debug_print();
-    // constrain to 0 -> 2π
+    if (startAngle == endAngle)
+        return;
 
     // i tried Bresenham for four hours. now i'm giving up.
     int16_t x, y;
     // the increment is chosen so that on about 64 pixel diameter arcs, no gaps appear
     // starting the angle at a boundary aligned to the iteration step stops repeated draws from flickering
-    for (double a = round(smallerAngle / ARC_ITERATION_STEP) * ARC_ITERATION_STEP; a < largerAngle; a += ARC_ITERATION_STEP) {
-        //    Serial.printf("%.4f cos %.4f, %.4f sin %.4f\n", a, lut_fastcos(a), a, lut_fastsin(a));
+    double a = round(smallerAngle / ARC_ITERATION_STEP) * ARC_ITERATION_STEP;
+    x = round(lut_fastcos(a) * radius);
+    y = round(lut_fastsin(a) * radius);
+    disp->drawPixel(x + x0, y + y0);
+    for (; a < largerAngle; a += ARC_ITERATION_STEP) {
         x = round(lut_fastcos(a) * radius);
         y = round(lut_fastsin(a) * radius);
-        //    Serial.printf("%d, %d\n", x, y);
         disp->drawPixel(x + x0, y + y0);
     }
 }

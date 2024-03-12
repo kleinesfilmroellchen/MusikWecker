@@ -29,9 +29,6 @@ constexpr double QUARTER_PI = 0.78539816339744830961566084581988;
 // 135 degrees = 3π/4 radians
 constexpr double THREE_QUARTER_PI = 2.3561944901923449288469825374596;
 
-// iteration step increment for the arc drawing routine
-constexpr double ARC_ITERATION_STEP = (PI / 300);
-
 // chip select pin for sd card
 constexpr uint8_t PIN_SD_CS = TX;
 const SdSpiConfig SD_CONFIG = {
@@ -46,6 +43,9 @@ constexpr uint8_t PIN_SPEAKER1 = 3;
 // screen size
 constexpr uint16_t SCREEN_WIDTH = 128;
 constexpr uint16_t SCREEN_HEIGHT = 64;
+
+// iteration step increment for the arc drawing routine
+constexpr double ARC_ITERATION_STEP = (PI / (SCREEN_HEIGHT*2));
 
 // You may have to adjust this for other displays and connections
 // This is a SSD1306-based 128 by 64 monochrome OLED which runs on hardware I²C address 0x3C (specified by VCOMH0) without a proper reset pin.

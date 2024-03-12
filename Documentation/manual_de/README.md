@@ -2,8 +2,10 @@
 
 Dieses Benutzerhandbuch ist für Benutzer\*innen des MusikWeckers gedacht, nicht für Entwickler.
 
-* auto-gen TOC;
-{:toc}
+Diese Seite behandelt die Grundlagen des Weckers, die Uhranzeige und die Einstellungsmenüs. Auf weiteren Seiten (Liste links) finden sich detaillierte Informationen zu anderen Aspekten.
+
+- auto-gen TOC;
+  {:toc}
 
 ## Bediengrundlagen
 
@@ -22,7 +24,7 @@ Wenn der Wecker in den Ruhezustand geht, kann nur Links ihn aufwecken.
 
 ## Hauptmenü
 
-Vom Startbildschirm aus (dem Uhrenbildschirm) kann das Hauptmenü mittels Rechts aufgerufen werden. Das Hauptmenü besteht aus den folgenden Elementen:
+Vom Startbildschirm aus (dem Uhrbildschirm) kann das Hauptmenü mittels Rechts aufgerufen werden. Das Hauptmenü besteht aus den folgenden Elementen:
 
 - Uhrdesign: Auswahl der Uhr, die angezeigt wird.
 - Wecker: Konfiguration von Weckern.
@@ -30,9 +32,9 @@ Vom Startbildschirm aus (dem Uhrenbildschirm) kann das Hauptmenü mittels Rechts
 - Einstellungen: Verschiedene Einstellungen des MusikWeckers
 - Diagnostik: Diagnosemenüs, die den detaillierten Zustand des Weckers zeigen.
 
-## Startbildschirm (Uhrenbildschirm)
+## Startbildschirm (Uhrbildschirm)
 
-Der Uhrenbildschirm ist der Startbildschirm des Weckers. Er zeigt die aktuelle Uhrzeit entsprechend dem aktuellen Uhrendesign, das aktuelle Datum (falls aktiviert), sowie mehrere Icons, die den Zustand des Weckers beschreiben:
+Der Uhrbildschirm ist der Startbildschirm des Weckers. Er zeigt die aktuelle Uhrzeit entsprechend dem aktuellen Uhrdesign, das aktuelle Datum (falls aktiviert), sowie mehrere Icons, die den Zustand des Weckers beschreiben:
 
 - Funksymbol: Wecker ist mit einem WLAN-Netzwerk verbunden.
 - Kreuz anstelle des Funksymbols: Wecker ist nicht mit einem Netzwerk verbunden.

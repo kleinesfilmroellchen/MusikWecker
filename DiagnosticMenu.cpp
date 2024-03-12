@@ -53,16 +53,19 @@ Menu* DiagnosticMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             auto freeKiB = static_cast<uint64_t>(card.vol()->freeClusterCount() / 1024) * card.vol()->bytesPerCluster();
             auto sectorSize = card.vol()->bytesPerCluster() / card.vol()->sectorsPerCluster();
             auto clusterSize = card.vol()->bytesPerCluster();
+            auto sdNumericType = card.card()->type() % 4;
+            String sdTypeName = FPSTR(sd_types_array[sdNumericType]);
 
             char fsInfo[256] {};
-            snprintf_P(fsInfo, sizeof(fsInfo), PSTR("sd type %d error %d payload %d\n%lldKi cap %lldKi free\nFAT%d: %d secsz %d clusz"),
-                card.card()->type(), card.sdErrorCode(), card.sdErrorData(), capacityKiB, freeKiB, card.fatType(), sectorSize, clusterSize);
+            snprintf_P(fsInfo, sizeof(fsInfo), PSTR("sd type %s\nerror %d payload %d\n%lldKi cap %lldKi free\nFAT%d: %d secsz %d clusz"),
+                sdTypeName, card.sdErrorCode(), card.sdErrorData(), capacityKiB, freeKiB, card.fatType(), sectorSize, clusterSize);
             display->setFont(TINY_FONT);
             drawString(display, fsInfo, 0);
 
             break;
         }
         case DiagnosticPage::__Count: {
+            this->currentPage = DiagnosticPage::Time;
             break;
         }
         }

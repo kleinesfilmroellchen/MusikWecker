@@ -54,11 +54,40 @@ void basicAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0
     const double secondAngle = (secnd / 60.0d) * TWO_PI - HALF_PI,
                  minuteAngle = (minut / 60.0d) * TWO_PI - HALF_PI,
                  hourAngle = ((hor >= 12 ? hor - 12 : hor) / 12.0d) * TWO_PI - HALF_PI;
-    // debug_print(degrees(hourAngle)); debug_print(F("° hour ")); debug_print(degrees(minuteAngle)); debug_print(F("° minute"));
-    const double secInnerX = cos(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 5), secInnerY = sin(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 5),
-                 secOuterX = cos(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2), secOuterY = sin(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2);
+    const double secOuterX = cos(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2), secOuterY = sin(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2);
 
-    display->drawLine(centerX + secInnerX, centerY + secInnerY, centerX + secOuterX, centerY + secOuterY);
+    display->drawLine(centerX, centerY, centerX + secOuterX, centerY + secOuterY);
+    display->drawLine(centerX, centerY,
+        cos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
+        sin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
+    display->drawLine(centerX, centerY,
+        cos(hourAngle) * ANALOGCF_HOUR_LENGTH + centerX,
+        sin(hourAngle) * ANALOGCF_HOUR_LENGTH + centerY);
+}
+
+void modernAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height)
+{
+    const double hor = time->hour() + time->minute() / 60.0d,
+                 minut = time->minute() + time->second() / 60.0d,
+                 secnd = time->second();
+    const uint16_t centerX = getCenter(x0, width), centerY = getCenter(y0, height);
+
+    display->drawDisc(centerX, centerY, ANALOGCF_LINE_LENGTH);
+
+    // draw 12 line segments representing hours
+    for (double i = 0; i < TWO_PI; i += PI_DIV6) {
+        const double innerX = (cos(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     innerY = (sin(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     outerX = (cos(i - HALF_PI) * ANALOGCF_SIZE / 2),
+                     outerY = (sin(i - HALF_PI) * ANALOGCF_SIZE / 2);
+        display->drawLine(innerX + centerX, innerY + centerY,
+            outerX + centerX, outerY + centerY);
+    }
+
+    const double secondAngle = (secnd / 60.0d) * TWO_PI - HALF_PI,
+                 minuteAngle = (minut / 60.0d) * TWO_PI - HALF_PI,
+                 hourAngle = ((hor >= 12 ? hor - 12 : hor) / 12.0d) * TWO_PI - HALF_PI;
+
     display->drawLine(centerX, centerY,
         cos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
         sin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
@@ -77,8 +106,6 @@ void rotatingSegmentAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, 
     const double secondAngle = secnd * TWO_PI / 60.0d,
                  minuteAngle = minut * TWO_PI / 60.0d,
                  hourAngle = (hor >= 12 ? hor - 12 : hor) * TWO_PI / 12.0d;
-
-    //  Serial.printf("%1.3f : %1.3f : %1.3f\n", hourAngle, minuteAngle, secondAngle);
 
     // the offsets need to be as smooth as possible, but not time-precise
     // make them dependent on internal milliseconds, which will only glitch out every 50 days or so
