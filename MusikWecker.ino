@@ -99,7 +99,7 @@ void setup()
 {
 // comment this if you need the serial pins for i/o
 #if USE_SERIAL
-    Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_FULL);
+    Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_TX_ONLY);
     while (!Serial)
         yield();
     Serial.println();
@@ -108,7 +108,7 @@ void setup()
     // connect display first for debugging
     if (!display.begin()) {
         // Force initialize serial port to allow for better debugging; we're resetting in a moment anyways
-        Serial.begin(115200);
+        Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_TX_ONLY);
         while (!Serial)
             yield();
         Serial.println(F("SSD1306 connection FAILED."));
@@ -117,6 +117,7 @@ void setup()
         display.setCursor(LINE_HEIGHT, 0);
         debug_print(F("Display ok."));
     }
+    delay(1000);
 
     // ----------------------------------------------------------
     // init
@@ -124,6 +125,7 @@ void setup()
     WiFi.mode(WIFI_STA);
     WiFi.begin(STASSID, STAPSK);
     WiFi.setAutoReconnect(true);
+    delay(1000);
 
     // pins
     pinMode(PIN_BUTTON_LEFT, INPUT_PULLUP);
@@ -156,6 +158,12 @@ void setup()
     }
     yield();
 
+    debug_print(F("Trying to setup audio..."));
+#if USE_SERIAL
+    audioLogger = &Serial;
+#endif
+    audioSetup();
+
     display.firstPage();
     do {
         display.setFont(MAIN_FONT);
@@ -179,9 +187,6 @@ void setup()
         ntpUpdateOccurred = timeClient.update();
     }
     yield();
-
-    audioLogger = &Serial;
-    audioSetup();
 
     // initialize timing variables
     buttonChangeTime = previousLoopTime = drawTime = millis();
@@ -237,7 +242,6 @@ void loop()
     }
 
     yield();
-
     audioLoop();
 
     // draw if menu changed due to buttons
@@ -246,6 +250,7 @@ void loop()
     }
     // draw if menu wants to refresh
     else if (newMenu->shouldRefresh(currentLoopTime - previousLoopTime)) {
+        audioLoop();
         currentMenu = newMenu->drawMenu(&display, currentLoopTime - drawTime);
         drawTime = currentLoopTime;
     }
@@ -284,6 +289,7 @@ void loop()
         buttonChangeTime = currentLoopTime = millis();
     }
     yield();
+    audioLoop();
 
     // store state and time
     lastButtons = buttons;

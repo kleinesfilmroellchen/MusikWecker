@@ -1,4 +1,5 @@
 #include "OptionsMenu.h"
+#include "Audio.h"
 #include "Debug.h"
 #include "NTPClient.h"
 #include <algorithm>
@@ -44,6 +45,7 @@ Menu* OptionsMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
     display->firstPage();
     do {
         performMenuDraw(display, display->getDisplayWidth(), display->getDisplayHeight());
+        audioLoop();
     } while (display->nextPage());
     return this;
 }
@@ -199,10 +201,14 @@ Menu* ClockFaceSelectMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             display->setMaxClipWindow();
             display->setClipWindow(0, 0, display->getDisplayWidth() / 2, display->getDisplayHeight());
             performMenuDraw(display, display->getDisplayWidth() / 2, display->getDisplayHeight());
+            audioLoop();
             display->setDrawColor(1);
             display->setMaxClipWindow();
             display->setClipWindow(display->getDisplayWidth() / 2, 0, display->getDisplayWidth(), display->getDisplayHeight());
+            audioLoop();
             clockFace(display, &curtime, display->getDisplayWidth() / 2, 0, display->getDisplayWidth() / 2, display->getDisplayHeight());
+
+            audioLoop();
         } while (display->nextPage());
         display->setMaxClipWindow();
     } else {

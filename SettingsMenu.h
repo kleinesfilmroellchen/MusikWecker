@@ -40,6 +40,8 @@ Menu* SettingsMenu<SelectionType>::drawMenu(T_DISPLAY* display, uint16_t deltaMi
         display->setFont(MAIN_FONT);
         display->drawHLine(0, linepos(LINE_COUNT - 2) - 1, display->getDisplayWidth());
         drawString(display, label.c_str(), LINE_COUNT - 2);
+
+        audioLoop();
     } while (display->nextPage());
     display->setMaxClipWindow();
 

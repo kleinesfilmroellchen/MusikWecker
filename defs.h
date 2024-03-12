@@ -5,13 +5,13 @@
 #pragma once
 
 // enable serial with USE_SERIAL=1
-// this breaks the I2S DAC!
+// this may break the I2S DAC!
 #define USE_SERIAL 0
 
 // F = full framebuffer
 // 1 = small partial framebuffer
 // 2 = larger partial framebuffer
-#define FRAMEBUFFER_SIZE 'F'
+#define FRAMEBUFFER_SIZE '2'
 
 #include "SdFatConfig.h"
 #include "ssid.h"

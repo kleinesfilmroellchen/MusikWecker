@@ -1,4 +1,5 @@
 #include "AudioFileSourceSdFs.h"
+#include "PrintString.h"
 
 AudioFileSourceSdFs::AudioFileSourceSdFs(SdFs& card)
     : card(card)
@@ -72,4 +73,14 @@ uint32_t AudioFileSourceSdFs::getPos()
         return 0;
 
     return f.position();
+}
+
+String AudioFileSourceSdFs::fileName() const
+{
+    if (!f)
+        return {};
+
+    PrintString baseName;
+    const_cast<AudioFileSourceSdFs*>(this)->f.printName(&baseName);
+    return baseName.getString();
 }

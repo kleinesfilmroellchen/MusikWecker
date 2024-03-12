@@ -6,19 +6,14 @@
 #include "defs.h"
 #include <AudioFileSource.h>
 #include <AudioGenerator.h>
-#include <AudioGeneratorAAC.h>
-#include <AudioGeneratorFLAC.h>
-#include <AudioGeneratorMP3.h>
-#include <AudioGeneratorMP3a.h>
-#include <AudioGeneratorRTTTL.h>
-#include <AudioGeneratorWAV.h>
 #include <AudioOutput.h>
 #include <AudioOutputBuffer.h>
 #include <AudioOutputI2S.h>
+#include <memory>
 
-static AudioFileSourceSdFs* audioSource = nullptr;
-static AudioOutputI2S* audioOutput = nullptr;
-static AudioGenerator* audioPlayer = nullptr;
+extern std::unique_ptr<AudioFileSourceSdFs> audioSource;
+extern std::unique_ptr<AudioOutputI2S> audioOutput;
+extern std::unique_ptr<AudioGenerator> audioPlayer;
 
 void audioSetup();
 /** Called during audio playback; handles playing the audio.*/

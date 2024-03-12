@@ -19,6 +19,8 @@ public:
     virtual uint32_t getSize() override;
     virtual uint32_t getPos() override;
 
+    String fileName() const;
+
 private:
     SdFs& card;
     FsFile f;

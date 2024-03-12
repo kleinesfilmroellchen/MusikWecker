@@ -1,4 +1,5 @@
 #include "DiagnosticMenu.h"
+#include "Audio.h"
 #include "DisplayUtils.h"
 #include "NTPClient.h"
 #include "PrintString.h"
@@ -69,6 +70,7 @@ Menu* DiagnosticMenu::drawMenu(T_DISPLAY* display, uint16_t deltaMillis)
             break;
         }
         }
+        audioLoop();
     } while (display->nextPage());
     return this;
 }

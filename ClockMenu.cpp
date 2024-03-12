@@ -40,6 +40,7 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
             disp->drawXBM(symbolpos - nowifi_symbol_width, 0, nowifi_symbol_width, nowifi_symbol_height, nowifi_symbol_bits);
             symbolpos -= nowifi_symbol_width + SYMBOL_SPACING;
         }
+        audioLoop();
 
         // TODO: display alarm clock symbol if an alarm clock is set
 
@@ -47,17 +48,20 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
             disp->drawXBM(symbolpos - clocksync_symbol_width, 0, clocksync_symbol_width, clocksync_symbol_height, clocksync_symbol_bits);
             symbolpos -= clocksync_symbol_width + SYMBOL_SPACING;
         }
+        audioLoop();
 
         if (audioPlayer && audioPlayer->isRunning()) {
             disp->drawXBM(symbolpos - sound_symbol_width, 0, sound_symbol_width, sound_symbol_height, sound_symbol_bits);
             symbolpos -= sound_symbol_width + SYMBOL_SPACING;
         }
+        audioLoop();
 
         volatile uint64_t time = micros64();
         curClockFace(disp, &curtime, 0, 0, disp->getDisplayWidth(), disp->getDisplayHeight());
         disp->setFont(TINY_FONT);
         disp->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, dateStr);
         volatile uint64_t after_time = micros64();
+        audioLoop();
 
         if (eeprom_settings.show_timing) {
             volatile uint64_t total_time = after_time - time;
@@ -68,6 +72,7 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
             disp->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT, timingStr);
         }
 
+        audioLoop();
     } while (disp->nextPage());
 
     return this;

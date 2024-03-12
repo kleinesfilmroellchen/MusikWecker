@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Audio.h"
 #include "defs.h"
 #include "triglut_math.h"
 #include <U8g2lib.h>
@@ -40,6 +41,7 @@ inline void drawArc(T_DISPLAY* disp, uint16_t x0, uint16_t y0, uint16_t radius, 
         x = round(lut_fastcos(a) * radius);
         y = round(lut_fastsin(a) * radius);
         disp->drawPixel(x + x0, y + y0);
+        audioLoop();
     }
 }
 
@@ -75,5 +77,6 @@ inline void drawString(T_DISPLAY* disp, char const* c_text, uint8_t line)
     for (auto const& line : lines) {
         disp->drawUTF8(LEFT_TEXT_MARGIN, MAIN_FONT_SIZE + linepos(current_line) + 1, line.c_str());
         current_line++;
+        audioLoop();
     }
 }

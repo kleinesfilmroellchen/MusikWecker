@@ -26,6 +26,8 @@ inline void debug_print(Printable text)
             display.setDrawColor(1);
             display.setFont(TINY_FONT);
             display.println(text);
+
+            audioLoop();
         } while (display.nextPage());
     }
 }
