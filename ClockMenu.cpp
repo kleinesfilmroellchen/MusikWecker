@@ -24,8 +24,10 @@ Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
     char dateStr[11];
     ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(this->timing->getEpochTime(), *this->timezone);
     sprintf(dateStr, "%02u.%02u.%4u", curtime.day(), curtime.month(), curtime.year());
+    audioLoop();
 
     disp->firstPage();
+    audioLoop();
     do {
         // i unnecessarily optimized the sin and cos into a lut, took me three hours.
         // this was the fix, i wasn't resetting the drawing mode back to normal (white)
@@ -88,7 +90,6 @@ bool ClockMenu::shouldRefresh(uint16_t deltaMillis)
         this->timeOfLastNTP = this->timeOfLastNTP - deltaMillis;
 
     this->updateTime += deltaMillis;
-    //  Serial.printf("ut %dms, dt %dms, ntp %dms\n", this->updateTime, deltaMillis, this->timeOfLastNTP);
     if (this->updateTime > CLOCK_UPDATE_INTERVAL) {
         this->updateTime = 0;
         return true;

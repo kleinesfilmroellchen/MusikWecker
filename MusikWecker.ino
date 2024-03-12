@@ -115,9 +115,10 @@ void setup()
         ESP.reset();
     } else {
         display.setCursor(LINE_HEIGHT, 0);
+        display.setBusClock(DISPLAY_CLOCK_SPEED);
         debug_print(F("Display ok."));
     }
-    delay(1000);
+    delay(200);
 
     // ----------------------------------------------------------
     // init

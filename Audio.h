@@ -4,10 +4,8 @@
 
 #include "AudioFileSourceSdFs.h"
 #include "defs.h"
-#include <AudioFileSource.h>
 #include <AudioGenerator.h>
 #include <AudioOutput.h>
-#include <AudioOutputBuffer.h>
 #include <AudioOutputI2S.h>
 #include <memory>
 

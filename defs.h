@@ -34,7 +34,7 @@ constexpr uint8_t PIN_SD_CS = TX;
 const SdSpiConfig SD_CONFIG = {
     PIN_SD_CS,
     DEDICATED_SPI,
-    SD_SCK_MHZ(16),
+    SD_SCK_MHZ(30),
 };
 
 // speaker, pin label RX
@@ -57,6 +57,12 @@ using T_DISPLAY = U8G2_SSD1306_128X64_VCOMH0_1_HW_I2C;
 #elif FRAMEBUFFER_SIZE == '2'
 using T_DISPLAY = U8G2_SSD1306_128X64_VCOMH0_2_HW_I2C;
 #endif
+
+// Hardware I2C clock speed for the display.
+// Even though most displays are run at 400KHz by default, many can be overdriven much higher.
+// Increasing this value reduces audio glitches, since the I2C DMA interferes with I2S DMA.
+// If the display is broken, reduce this value as much as necessary.
+constexpr uint32_t DISPLAY_CLOCK_SPEED = 2'000'000;
 
 //// font stuff
 // Main font used for UI text. Any 10-12 px font will allow 4-5 lines of text.
@@ -125,6 +131,6 @@ constexpr uint16_t TEMP_NTP_UPDATE_INTERVAL = 60000;
 // cache size for AceTime timezone manager
 constexpr uint16_t TZ_CACHE_SIZE = 2;
 // interval in which the clock screen updates (millis)
-constexpr uint16_t CLOCK_UPDATE_INTERVAL = 20;
+constexpr uint16_t CLOCK_UPDATE_INTERVAL = 200;
 // how long the clock sync symbol stays on screen after a ntp time server synchronisation occurred (millis)
 constexpr uint16_t CLOCKSYNC_SYMBOL_DURATION = 3500;
