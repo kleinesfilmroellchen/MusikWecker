@@ -37,15 +37,9 @@ const SdSpiConfig SD_CONFIG = {
     SD_SCK_MHZ(30),
 };
 
-// speaker, pin label RX
-constexpr uint8_t PIN_SPEAKER1 = 3;
-
 // screen size
 constexpr uint16_t SCREEN_WIDTH = 128;
 constexpr uint16_t SCREEN_HEIGHT = 64;
-
-// iteration step increment for the arc drawing routine
-constexpr double ARC_ITERATION_STEP = (PI / (SCREEN_HEIGHT*2));
 
 // You may have to adjust this for other displays and connections
 // This is a SSD1306-based 128 by 64 monochrome OLED which runs on hardware I²C address 0x3C (specified by VCOMH0) without a proper reset pin.
@@ -131,6 +125,6 @@ constexpr uint16_t TEMP_NTP_UPDATE_INTERVAL = 60000;
 // cache size for AceTime timezone manager
 constexpr uint16_t TZ_CACHE_SIZE = 2;
 // interval in which the clock screen updates (millis)
-constexpr uint16_t CLOCK_UPDATE_INTERVAL = 200;
+constexpr uint16_t CLOCK_UPDATE_INTERVAL = 1000 / 20;
 // how long the clock sync symbol stays on screen after a ntp time server synchronisation occurred (millis)
 constexpr uint16_t CLOCKSYNC_SYMBOL_DURATION = 3500;

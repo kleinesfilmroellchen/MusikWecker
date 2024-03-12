@@ -51,10 +51,10 @@ void basicAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0
 
     // draw 12 line segments representing hours
     for (double i = 0; i < TWO_PI; i += PI_DIV6) {
-        const double innerX = (lut_fastcos(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
-                     innerY = (lut_fastsin(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
-                     outerX = (lut_fastcos(i - HALF_PI) * ANALOGCF_SIZE / 2),
-                     outerY = (lut_fastsin(i - HALF_PI) * ANALOGCF_SIZE / 2);
+        const double innerX = (cos(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     innerY = (sin(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     outerX = (cos(i - HALF_PI) * ANALOGCF_SIZE / 2),
+                     outerY = (sin(i - HALF_PI) * ANALOGCF_SIZE / 2);
         audioLoop();
         display->drawLine(innerX + centerX, innerY + centerY,
             outerX + centerX, outerY + centerY);
@@ -64,17 +64,17 @@ void basicAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x0
     const double secondAngle = (secnd / 60.0d) * TWO_PI - HALF_PI,
                  minuteAngle = (minut / 60.0d) * TWO_PI - HALF_PI,
                  hourAngle = ((hor >= 12 ? hor - 12 : hor) / 12.0d) * TWO_PI - HALF_PI;
-    const double secOuterX = lut_fastcos(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2), secOuterY = lut_fastsin(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2);
+    const double secOuterX = cos(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2), secOuterY = sin(secondAngle) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH - 2);
 
     display->drawLine(centerX, centerY, centerX + secOuterX, centerY + secOuterY);
     audioLoop();
     display->drawLine(centerX, centerY,
-        lut_fastcos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
-        lut_fastsin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
+        cos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
+        sin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
     audioLoop();
     display->drawLine(centerX, centerY,
-        lut_fastcos(hourAngle) * ANALOGCF_HOUR_LENGTH + centerX,
-        lut_fastsin(hourAngle) * ANALOGCF_HOUR_LENGTH + centerY);
+        cos(hourAngle) * ANALOGCF_HOUR_LENGTH + centerX,
+        sin(hourAngle) * ANALOGCF_HOUR_LENGTH + centerY);
     audioLoop();
 }
 
@@ -91,10 +91,10 @@ void modernAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x
 
     // draw 12 line segments representing hours
     for (double i = 0; i < TWO_PI; i += PI_DIV6) {
-        const double innerX = (lut_fastcos(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
-                     innerY = (lut_fastsin(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
-                     outerX = (lut_fastcos(i - HALF_PI) * ANALOGCF_SIZE / 2),
-                     outerY = (lut_fastsin(i - HALF_PI) * ANALOGCF_SIZE / 2);
+        const double innerX = (cos(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     innerY = (sin(i - HALF_PI) * (ANALOGCF_SIZE / 2 - ANALOGCF_LINE_LENGTH)),
+                     outerX = (cos(i - HALF_PI) * ANALOGCF_SIZE / 2),
+                     outerY = (sin(i - HALF_PI) * ANALOGCF_SIZE / 2);
         audioLoop();
         display->drawLine(innerX + centerX, innerY + centerY,
             outerX + centerX, outerY + centerY);
@@ -107,12 +107,12 @@ void modernAnalogCF(T_DISPLAY* display, ace_time::ZonedDateTime* time, uint8_t x
                  hourAngle = ((hor >= 12 ? hor - 12 : hor) / 12.0d) * TWO_PI - HALF_PI;
 
     display->drawLine(centerX, centerY,
-        lut_fastcos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
-        lut_fastsin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
+        cos(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerX,
+        sin(minuteAngle) * ANALOGCF_MINUTE_LENGTH + centerY);
     audioLoop();
     display->drawLine(centerX, centerY,
-        lut_fastcos(hourAngle) * ANALOGCF_HOUR_LENGTH + centerX,
-        lut_fastsin(hourAngle) * ANALOGCF_HOUR_LENGTH + centerY);
+        cos(hourAngle) * ANALOGCF_HOUR_LENGTH + centerX,
+        sin(hourAngle) * ANALOGCF_HOUR_LENGTH + centerY);
     audioLoop();
 }
 
