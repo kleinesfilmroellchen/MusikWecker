@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "NTPClient.h"
 #include "PrintString.h"
+#include "TimeManager.h"
 #include "strings.h"
 #include <AceTime.h>
 #include <SdFat.h>
@@ -31,17 +32,15 @@ Menu* DiagnosticMenu::draw_menu(Display* display, uint16_t delta_millis)
 		case DiagnosticPage::Time: {
 			this->dirty = true;
 
-			PrintString zone_name;
-			main_time_zone->printTo(zone_name);
+			String zone_name = TimeManager::the().zone_name();
 
 			char time_info_text[128];
 			snprintf_P(
 				time_info_text, sizeof(time_info_text),
 				PSTR("unix %ds\ntz %s offset %05ds\nserver %s\nlast sync %d (synced "
 					 "%d)"),
-				time_client.getEpochTime(), zone_name.getString().c_str(),
-				main_time_zone->getOffsetDateTime(time_client.getEpochTime()).timeOffset(),
-				TEMP_TIME_SERVER, millis() - time_of_last_ntp, time_client.isTimeSet());
+				TimeManager::the().epoch_time(), zone_name.c_str(), TimeManager::the().current_time().timeOffset(),
+				TEMP_TIME_SERVER, millis() - time_of_last_ntp, TimeManager::the().has_network_time());
 			display->setFont(TINY_FONT);
 			draw_string(display, time_info_text, 0);
 			break;
@@ -82,9 +81,6 @@ Menu* DiagnosticMenu::draw_menu(Display* display, uint16_t delta_millis)
 
 bool DiagnosticMenu::should_refresh(uint16_t delta_millis)
 {
-	if (ntp_update_occurred)
-		this->time_of_last_ntp = millis();
-
 	return dirty;
 }
 

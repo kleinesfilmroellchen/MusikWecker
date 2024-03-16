@@ -39,4 +39,4 @@ public:
 };
 
 /** Helper function that mallocs and creates all menus in the correct structure. Returns the clock menu, the most top-level menu.*/
-Menu* create_menu_structure(ace_time::TimeZone* main_time_zone);
+Menu* create_menu_structure();

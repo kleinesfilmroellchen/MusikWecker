@@ -2,7 +2,7 @@
 #include "Audio.h"
 #include "Debug.h"
 #include "Globals.h"
-#include "NTPClient.h"
+#include "TimeManager.h"
 #include <algorithm>
 
 OptionsMenu::OptionsMenu(Span<MenuEntry> menus)
@@ -200,15 +200,12 @@ Menu* ClockFaceSelectMenu::draw_menu(Display* display, uint16_t delta_millis)
 		time_since_button = last_update - CLOCK_PREVIEW_DELAY - 1;
 		auto clockFace = this->clock_faces[this->current_menu];
 
-		ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(
-			time_client.getEpochTime(), *main_time_zone);
+		ace_time::ZonedDateTime curtime = TimeManager::the().current_time();
 		display->firstPage();
 		do {
 			display->setMaxClipWindow();
-			display->setClipWindow(0, 0, display->getDisplayWidth() / 2,
-				display->getDisplayHeight());
-			perform_menu_draw(display, display->getDisplayWidth() / 2,
-				display->getDisplayHeight());
+			display->setClipWindow(0, 0, display->getDisplayWidth() / 2, display->getDisplayHeight());
+			perform_menu_draw(display, display->getDisplayWidth() / 2, display->getDisplayHeight());
 
 			yield();
 			display->setDrawColor(1);
@@ -238,23 +235,12 @@ TimeZoneSelectMenu::TimeZoneSelectMenu()
 
 		fix_top_menu(LINE_COUNT);
 
-		// actually change the global timezone variable
-		String tzname = FPSTR(tzlist[this->current_menu]);
-		debug_print(F("Stored timezone: "));
-		debug_print(tzname);
-		*main_time_zone = manager.createForZoneName(tzname.c_str());
+		TimeManager::the().set_zone(this->current_menu);
 	}
 }
 
 Menu* TimeZoneSelectMenu::option_selected(uint16_t menu_index)
 {
-	// change the global variable
-	String tzname = FPSTR(tzlist[menu_index]);
-	*main_time_zone = manager.createForZoneName(tzname.c_str());
-
-	// save settings in eeprom
-	eeprom_settings.timezone = menu_index;
-	save_settings();
-
+	TimeManager::the().set_zone(menu_index);
 	return nullptr;
 }

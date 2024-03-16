@@ -9,11 +9,6 @@
 
 extern EepromSettings eeprom_settings;
 
-extern NTPClient time_client;
-extern ace_time::TimeZone* main_time_zone;
-extern bool ntp_update_occurred;
-extern ace_time::CompleteZoneManager manager;
-
 extern ClockFaces::ClockFace current_clock_face;
 
 extern SdFs card;

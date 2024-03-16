@@ -1,16 +1,15 @@
 #include "ClockMenu.h"
 #include "Audio.h"
+#include "Globals.h"
 #include "Settings.h"
+#include "TimeManager.h"
 #include "graphics.h"
 #include <ESP8266WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-ClockMenu::ClockMenu(NTPClient* timing, ace_time::TimeZone* tz,
-	Menu* mainMenu)
+ClockMenu::ClockMenu(Menu* mainMenu)
 {
-	this->timing = timing;
-	this->timezone = tz;
 	this->parent = this;
 	this->sub_menu = mainMenu;
 	mainMenu->parent = this;
@@ -23,11 +22,8 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 	// - Status symbols above
 	// - Date below
 
-	char date_text[11];
-	ace_time::ZonedDateTime current_time = ace_time::ZonedDateTime::forUnixSeconds64(
-		this->timing->getEpochTime(), *this->timezone);
-	snprintf_P(date_text, sizeof(date_text), PSTR("%02u.%02u.%4u"), current_time.day(), current_time.month(),
-		current_time.year());
+	auto date_text = TimeManager::the().date_de();
+	auto current_time = TimeManager::the().current_time();
 
 	display->firstPage();
 	do {
@@ -47,7 +43,7 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 
 		// TODO: display alarm clock symbol if an alarm clock is set
 
-		if (this->last_ntp_update >= 0) {
+		if (TimeManager::the().time_since_ntp_update() < CLOCKSYNC_SYMBOL_DURATION) {
 			display->drawXBMP(current_symbol_position - clocksync_symbol_width, 0,
 				clocksync_symbol_width, clocksync_symbol_height,
 				clocksync_symbol_bits);
@@ -67,7 +63,7 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 			display->getDisplayHeight());
 		yield();
 		display->setFont(TINY_FONT);
-		display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text);
+		display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text.c_str());
 		uint64_t after_time = micros64();
 		yield();
 
@@ -89,13 +85,6 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 
 bool ClockMenu::should_refresh(uint16_t delta_millis)
 {
-	// set ntp sync display timer, if necessary
-	if (ntp_update_occurred)
-		this->last_ntp_update = CLOCKSYNC_SYMBOL_DURATION;
-
-	if (this->last_ntp_update >= 0)
-		this->last_ntp_update = this->last_ntp_update - delta_millis;
-
 	this->last_display_update += delta_millis;
 	if (this->last_display_update > CLOCK_UPDATE_INTERVAL) {
 		this->last_display_update = 0;

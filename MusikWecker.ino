@@ -29,6 +29,7 @@
 #include "DisplayUtils.h"
 #include "Menu.h"
 #include "Settings.h"
+#include "TimeManager.h"
 #include "strings.h"
 #include "zonelist.h"
 #include <AceTime.h>
@@ -55,21 +56,6 @@ void loop();
 Display display(U8G2_R0);
 // SD card
 SdFs card;
-
-// TODO: Move all of these to a time management class.
-// udp interface
-WiFiUDP udp_client;
-// ntp client: udp system, ntp server, time offset, update interval
-// b/c other library does time zone adjustments, no time offset is applied here
-NTPClient time_client(udp_client, TEMP_TIME_SERVER, 0, TEMP_NTP_UPDATE_INTERVAL);
-CompleteZoneProcessorCache<TIME_ZONE_CACHE_SIZE> zoneProcessorCache;
-// time zone manager
-CompleteZoneManager manager(
-	zonedbc::kZoneRegistrySize, zonedbc::kZoneRegistry, zoneProcessorCache);
-// main timezone
-TimeZone* main_time_zone;
-// whether the NTP client has just updated
-bool ntp_update_occurred = false;
 
 EepromSettings eeprom_settings;
 
@@ -168,17 +154,9 @@ void setup()
 		display.setFontMode(1);
 	} while (display.nextPage());
 
-	// initialize menu
-	// malloc time zone
-	main_time_zone = new TimeZone;
-	// create menu structure
-	current_menu = create_menu_structure(main_time_zone);
+	TimeManager::the();
 
-	// start ntp client
-	time_client.begin();
-	if (WiFi.status() == WL_CONNECTED) {
-		ntp_update_occurred = time_client.update();
-	}
+	current_menu = create_menu_structure();
 
 	// initialize timing variables
 	button_change_time = previous_loop_time = drawTime = millis();
@@ -190,12 +168,7 @@ void loop()
 	auto current_loop_time = millis();
 	yield();
 
-	// sync own time with ntp server, if wifi is available.
-	if (WiFi.status() == WL_CONNECTED) {
-		ntp_update_occurred = time_client.update();
-	} else {
-		ntp_update_occurred = false;
-	}
+	TimeManager::the().update_if_needed();
 
 	// read buttons, some bit magic here
 	uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << BUTTON_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << BUTTON_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << BUTTON_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << BUTTON_LEFT_BIT));
@@ -267,7 +240,7 @@ void loop()
 		wifi_fpm_set_sleep_type(NONE_SLEEP_T);
 		WiFi.forceSleepWake();
 		WiFi.begin();
-		time_client.forceUpdate();
+		TimeManager::the().force_update();
 		button_change_time = current_loop_time = millis();
 	}
 	yield();

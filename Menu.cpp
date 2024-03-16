@@ -61,7 +61,7 @@ void apply_auto_disable_settings(AutoDisable auto_disable)
 	save_settings();
 }
 
-Menu* create_menu_structure(ace_time::TimeZone* main_time_zone)
+Menu* create_menu_structure()
 {
 	using namespace ClockFaces;
 	static std::array<ClockFace, 6> clock_faces {
@@ -107,7 +107,7 @@ Menu* create_menu_structure(ace_time::TimeZone* main_time_zone)
 	};
 	OptionsMenu* main_menu = new OptionsMenu(all_menus);
 
-	ClockMenu* clock = new ClockMenu(&time_client, main_time_zone, static_cast<Menu*>(main_menu));
+	ClockMenu* clock = new ClockMenu(static_cast<Menu*>(main_menu));
 
 	return clock;
 }
