@@ -17,35 +17,35 @@
 
 class PrintString : public Print {
 public:
-    PrintString() = default;
+	PrintString() = default;
 
-    virtual size_t write(uint8_t c) override
-    {
-        buffer.concat(char(c));
-        return 1;
-    }
+	virtual size_t write(uint8_t c) override
+	{
+		buffer.concat(char(c));
+		return 1;
+	}
 
-    virtual size_t write(uint8_t const* str, size_t length) override
-    {
-        buffer.concat((char*)str, length);
-        return length;
-    }
+	virtual size_t write(uint8_t const* str, size_t length) override
+	{
+		buffer.concat((char*)str, length);
+		return length;
+	}
 
-    size_t size()
-    {
-        return buffer.length();
-    }
+	size_t size()
+	{
+		return buffer.length();
+	}
 
-    void clear()
-    {
-        buffer = String();
-    }
+	void clear()
+	{
+		buffer = String();
+	}
 
-    String getString()
-    {
-        return buffer;
-    }
+	String getString()
+	{
+		return buffer;
+	}
 
 private:
-    String buffer;
+	String buffer;
 };

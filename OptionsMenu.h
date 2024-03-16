@@ -1,37 +1,33 @@
 #pragma once
 
 #include "ClockFaces.h"
+#include "Definitions.h"
 #include "DisplayUtils.h"
-#include "MenuClass.h"
+#include "Menu.h"
 #include "Settings.h"
 #include "Span.h"
 #include "ace_time/LocalDateTime.h"
-#include "defs.h"
 #include "zonelist.h"
 #include <AceTime.h>
 #include <EEPROM.h>
 #include <U8g2lib.h>
 
-extern ClockFace curClockFace;
-extern ace_time::TimeZone* mainTZ;
-extern eeprom_settings_struct eeprom_settings;
-
 struct MenuEntry {
-    __FlashStringHelper const* text;
-    // Actual menu to which this entry can navigate.
-    std::unique_ptr<Menu> menu;
+	__FlashStringHelper const* text;
+	// Actual menu to which this entry can navigate.
+	std::unique_ptr<Menu> menu;
 
-    template <typename MenuDerived>
-    MenuEntry(char const* text, std::unique_ptr<MenuDerived>&& menu)
-        : text(FPSTR(text))
-        , menu(std::unique_ptr<Menu> { std::forward<std::unique_ptr<MenuDerived>>(menu) })
-    {
-    }
-    MenuEntry(char const* text, std::nullptr_t null)
-        : text(FPSTR(text))
-        , menu(static_cast<std::unique_ptr<Menu>>(null))
-    {
-    }
+	template <typename MenuDerived>
+	MenuEntry(char const* text, std::unique_ptr<MenuDerived>&& menu)
+		: text(FPSTR(text))
+		, menu(std::unique_ptr<Menu> { std::forward<std::unique_ptr<MenuDerived>>(menu) })
+	{
+	}
+	MenuEntry(char const* text, std::nullptr_t null)
+		: text(FPSTR(text))
+		, menu(static_cast<std::unique_ptr<Menu>>(null))
+	{
+	}
 };
 
 /**
@@ -40,53 +36,53 @@ struct MenuEntry {
 */
 class OptionsMenu : public Menu {
 private:
-    Span<MenuEntry> menues;
+	Span<MenuEntry> menues;
 
 protected:
-    /** Index of the currently selected menu. */
-    uint16_t currentMenu = 0;
-    /** Index of the menu that is currently on top of the section of menues which are displayed. */
-    uint16_t currentTopMenu = 0;
-    /** Flag that specifies whether the menu display structure changed. Set by handleButton() and reset by drawMenu(). */
-    bool dirty = true;
+	/** Index of the currently selected menu. */
+	uint16_t currentMenu = 0;
+	/** Index of the menu that is currently on top of the section of menues which are displayed. */
+	uint16_t currentTopMenu = 0;
+	/** Flag that specifies whether the menu display structure changed. Set by handle_button() and reset by draw_menu(). */
+	bool dirty = true;
 
-    /** Implementation of menu drawing that subclasses can use to draw the screen anywhere */
-    void performMenuDraw(T_DISPLAY* disp, uint8_t width, uint8_t height);
+	/** Implementation of menu drawing that subclasses can use to draw the screen anywhere */
+	void perform_menu_draw(Display* display, uint8_t width, uint8_t height);
 
-    void fixTopMenu(uint8_t line_count);
+	void fix_top_menu(uint8_t line_count);
 
 public:
-    OptionsMenu(Span<MenuEntry> menues);
-    Menu* drawMenu(T_DISPLAY* disp, uint16_t deltaMillis) override;
-    bool shouldRefresh(uint16_t deltaMillis) override;
-    Menu* handleButton(uint8_t buttons) override;
+	OptionsMenu(Span<MenuEntry> menues);
+	Menu* draw_menu(Display* display, uint16_t delta_millis) override;
+	bool should_refresh(uint16_t delta_millis) override;
+	Menu* handle_button(uint8_t buttons) override;
 
-    constexpr bool isDirty() const { return dirty; }
-    constexpr uint16_t getCurrentMenu() const { return currentMenu; }
+	constexpr bool is_dirty() const { return dirty; }
+	constexpr uint16_t get_current_menu() const { return currentMenu; }
 
-    constexpr size_t size() const { return menues.size(); }
+	constexpr size_t size() const { return menues.size(); }
 };
 
 /**
-    Options menu that doesn't have any real entries; whenever an entry is selected the child handles it.
+	Options menu that doesn't have any real entries; whenever an entry is selected the child handles it.
 */
 class DelegateOptionsMenu : public OptionsMenu {
 public:
-    static DelegateOptionsMenu create(Span<char const*> names);
+	static DelegateOptionsMenu create(Span<char const*> names);
 
-    Menu* handleButton(uint8_t buttons) override;
+	Menu* handle_button(uint8_t buttons) override;
 
-    /**
-     Gets called whenever one of the options is selected.
-    Children can override this to run their own handler when this happens, and return any new menu they like.
-    If nullptr is returned, the parent menu is returned instead as a default action.
-    */
-    virtual Menu* optionSelected(uint16_t menuIndex) { return nullptr; }
+	/**
+	 Gets called whenever one of the options is selected.
+	Children can override this to run their own handler when this happens, and return any new menu they like.
+	If nullptr is returned, the parent menu is returned instead as a default action.
+	*/
+	virtual Menu* option_selected(uint16_t menuIndex) { return nullptr; }
 
 private:
-    DelegateOptionsMenu(std::vector<MenuEntry> menues);
+	DelegateOptionsMenu(std::vector<MenuEntry> menues);
 
-    std::vector<MenuEntry> fakeEntries;
+	std::vector<MenuEntry> fakeEntries;
 };
 
 /**
@@ -94,17 +90,17 @@ private:
 */
 class ClockFaceSelectMenu : public DelegateOptionsMenu {
 public:
-    ClockFaceSelectMenu(Span<char const*> face_names, Span<ClockFace> clockFaces);
-    Menu* drawMenu(T_DISPLAY* disp, uint16_t deltaMillis) override;
-    bool shouldRefresh(uint16_t deltaMillis) override;
-    Menu* handleButton(uint8_t buttons) override;
+	ClockFaceSelectMenu(Span<char const*> face_names, Span<ClockFaces::ClockFace> clock_faces);
+	Menu* draw_menu(Display* display, uint16_t delta_millis) override;
+	bool should_refresh(uint16_t delta_millis) override;
+	Menu* handle_button(uint8_t buttons) override;
 
-    virtual Menu* optionSelected(uint16_t menuIndex) override;
+	virtual Menu* option_selected(uint16_t menuIndex) override;
 
 private:
-    Span<ClockFace> clockFaces;
-    uint16_t timeSinceButton { 0 };
-    uint16_t lastUpdate { 0 };
+	Span<ClockFaces::ClockFace> clock_faces;
+	uint16_t time_since_button { 0 };
+	uint16_t last_update { 0 };
 };
 
 /**
@@ -112,6 +108,6 @@ private:
  */
 class TimeZoneSelectMenu : public DelegateOptionsMenu {
 public:
-    TimeZoneSelectMenu();
-    virtual Menu* optionSelected(uint16_t menuIndex) override;
+	TimeZoneSelectMenu();
+	virtual Menu* option_selected(uint16_t menuIndex) override;
 };

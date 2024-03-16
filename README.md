@@ -10,3 +10,9 @@ Features:
 - Many aesthetically appealing clock faces
 - Low power consumption thanks to ESP8266 light sleep
 
+## Development
+
+Use a recent Arduino IDE or CLI, and make sure all libraries are up-to-date. (Library definition in a sketch config will follow shortly.)
+
+Generate the auto-generated files by running `python .`. (Python >= 3.9, see requirements.txt) This is necessary when you change the generator scripts or when modifying or adding graphics. The compiler will only complain about missing headers the first time you forget this.
+

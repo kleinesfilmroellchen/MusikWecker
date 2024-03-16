@@ -2,82 +2,82 @@
 #include "PrintString.h"
 
 AudioFileSourceSdFs::AudioFileSourceSdFs(SdFs& card)
-    : card(card)
+	: card(card)
 {
 }
 
 AudioFileSourceSdFs::AudioFileSourceSdFs(SdFs& card, const char* filename)
-    : card(card)
+	: card(card)
 {
-    open(filename);
+	open(filename);
 }
 
 bool AudioFileSourceSdFs::open(const char* filename)
 {
-    f = card.open(filename, O_RDONLY);
-    return f;
+	f = card.open(filename, O_RDONLY);
+	return f;
 }
 
 AudioFileSourceSdFs::~AudioFileSourceSdFs()
 {
-    if (f)
-        f.close();
+	if (f)
+		f.close();
 }
 
 uint32_t AudioFileSourceSdFs::read(void* data, uint32_t len)
 {
-    if (!f)
-        return 0;
+	if (!f)
+		return 0;
 
-    return f.read(static_cast<uint8_t*>(data), len);
+	return f.read(static_cast<uint8_t*>(data), len);
 }
 
 bool AudioFileSourceSdFs::seek(int32_t pos, int dir)
 {
-    if (!f)
-        return false;
-    if (dir == SEEK_SET)
-        return f.seek(pos);
-    else if (dir == SEEK_CUR)
-        return f.seek(f.position() + pos);
-    else if (dir == SEEK_END)
-        return f.seek(f.size() + pos);
-    return false;
+	if (!f)
+		return false;
+	if (dir == SEEK_SET)
+		return f.seek(pos);
+	else if (dir == SEEK_CUR)
+		return f.seek(f.position() + pos);
+	else if (dir == SEEK_END)
+		return f.seek(f.size() + pos);
+	return false;
 }
 
 bool AudioFileSourceSdFs::close()
 {
-    if (!f)
-        return false;
+	if (!f)
+		return false;
 
-    f.close();
-    return true;
+	f.close();
+	return true;
 }
 
 bool AudioFileSourceSdFs::isOpen() { return f ? true : false; }
 
 uint32_t AudioFileSourceSdFs::getSize()
 {
-    if (!f)
-        return 0;
+	if (!f)
+		return 0;
 
-    return f.size();
+	return f.size();
 }
 
 uint32_t AudioFileSourceSdFs::getPos()
 {
-    if (!f)
-        return 0;
+	if (!f)
+		return 0;
 
-    return f.position();
+	return f.position();
 }
 
-String AudioFileSourceSdFs::fileName() const
+String AudioFileSourceSdFs::file_name() const
 {
-    if (!f)
-        return {};
+	if (!f)
+		return {};
 
-    PrintString baseName;
-    const_cast<AudioFileSourceSdFs*>(this)->f.printName(&baseName);
-    return baseName.getString();
+	PrintString base_name;
+	const_cast<AudioFileSourceSdFs*>(this)->f.printName(&base_name);
+	return base_name.getString();
 }

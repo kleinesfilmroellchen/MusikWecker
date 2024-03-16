@@ -20,21 +20,22 @@
 #include <U8g2lib.h>
 #include <stdint.h>
 
-// 2 to the power of 16
-constexpr int _2POW16 = 65536;
+template <uint64_t numerator, uint64_t denominator, typename Floating = double>
+constexpr Floating PI_FACTOR = static_cast<Floating>(numerator) * static_cast<Floating>(PI) / static_cast<Floating>(denominator);
+
 // 30 degrees = π/6 radians
-constexpr double PI_DIV6 = 0.52359877559829887307710723054658;
+constexpr double PI_DIV6 = PI_FACTOR<1, 6>;
 // 90 degrees = π/4 radians
-constexpr double QUARTER_PI = 0.78539816339744830961566084581988;
+constexpr double QUARTER_PI = PI_FACTOR<1, 4>;
 // 135 degrees = 3π/4 radians
-constexpr double THREE_QUARTER_PI = 2.3561944901923449288469825374596;
+constexpr double THREE_QUARTER_PI = PI_FACTOR<3, 4>;
 
 // chip select pin for sd card
 constexpr uint8_t PIN_SD_CS = TX;
 const SdSpiConfig SD_CONFIG = {
-    PIN_SD_CS,
-    DEDICATED_SPI,
-    SD_SCK_MHZ(30),
+	PIN_SD_CS,
+	DEDICATED_SPI,
+	SD_SCK_MHZ(30),
 };
 
 // screen size
@@ -45,11 +46,11 @@ constexpr uint16_t SCREEN_HEIGHT = 64;
 // This is a SSD1306-based 128 by 64 monochrome OLED which runs on hardware I²C address 0x3C (specified by VCOMH0) without a proper reset pin.
 // We could use 128 bytes page buffer if other libraries need a decent amount of memory, change FRAMEBUFFER_SIZE to "1" or "2"
 #if FRAMEBUFFER_SIZE == 'F'
-using T_DISPLAY = U8G2_SSD1306_128X64_VCOMH0_F_HW_I2C;
+using Display = U8G2_SSD1306_128X64_VCOMH0_F_HW_I2C;
 #elif FRAMEBUFFER_SIZE == '1'
-using T_DISPLAY = U8G2_SSD1306_128X64_VCOMH0_1_HW_I2C;
+using Display = U8G2_SSD1306_128X64_VCOMH0_1_HW_I2C;
 #elif FRAMEBUFFER_SIZE == '2'
-using T_DISPLAY = U8G2_SSD1306_128X64_VCOMH0_2_HW_I2C;
+using Display = U8G2_SSD1306_128X64_VCOMH0_2_HW_I2C;
 #endif
 
 // Hardware I2C clock speed for the display.

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "AudioFileSourceSdFs.h"
-#include "defs.h"
 #include <AudioGenerator.h>
 #include <AudioOutput.h>
 #include <AudioOutputI2S.h>
@@ -12,20 +11,20 @@
 
 class AudioManager {
 public:
-    static AudioManager& the();
-    AudioManager();
+	static AudioManager& the();
+	AudioManager();
 
-    void loop();
-    bool isPlaying() const { return audioPlayer && audioPlayer->isRunning(); }
+	void loop();
+	bool is_playing() const { return audio_player && audio_player->isRunning(); }
 
 private:
-    // Singleton instance
-    static std::unique_ptr<AudioManager> instance;
+	// Singleton instance
+	static std::unique_ptr<AudioManager> instance;
 
-    AudioFileSourceSdFs audioSource;
-    AudioOutputI2S audioOutput;
-    std::unique_ptr<AudioGenerator> audioPlayer;
-    Ticker timer;
+	AudioFileSourceSdFs audio_source;
+	AudioOutputI2S audio_output;
+	std::unique_ptr<AudioGenerator> audio_player;
+	Ticker timer;
 };
 
-void audioTimerInterrupt();
+void audio_timer_interrupt();

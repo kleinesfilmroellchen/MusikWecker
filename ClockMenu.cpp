@@ -1,113 +1,113 @@
 #include "ClockMenu.h"
 #include "Audio.h"
 #include "Settings.h"
+#include "graphics.h"
+#include <ESP8266WiFi.h>
 #include <NTPClient.h>
-
-extern eeprom_settings_struct eeprom_settings;
+#include <WiFiUdp.h>
 
 ClockMenu::ClockMenu(NTPClient* timing, ace_time::TimeZone* tz,
-    Menu* mainMenu)
+	Menu* mainMenu)
 {
-    this->timing = timing;
-    this->timezone = tz;
-    this->parent = this;
-    this->subMenu = mainMenu;
-    mainMenu->parent = this;
+	this->timing = timing;
+	this->timezone = tz;
+	this->parent = this;
+	this->subMenu = mainMenu;
+	mainMenu->parent = this;
 }
 
-Menu* ClockMenu::drawMenu(T_DISPLAY* disp, uint16_t deltaMillis)
+Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 {
-    // Clock menu consists of
-    // - clock face determined by clock face function
-    // - Status symbols above
-    // - Date below
+	// Clock menu consists of
+	// - clock face determined by clock face function
+	// - Status symbols above
+	// - Date below
 
-    char dateStr[11];
-    ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(
-        this->timing->getEpochTime(), *this->timezone);
-    sprintf(dateStr, "%02u.%02u.%4u", curtime.day(), curtime.month(),
-        curtime.year());
+	char date_text[11];
+	ace_time::ZonedDateTime current_time = ace_time::ZonedDateTime::forUnixSeconds64(
+		this->timing->getEpochTime(), *this->timezone);
+	sprintf(date_text, "%02u.%02u.%4u", current_time.day(), current_time.month(),
+		current_time.year());
 
-    disp->firstPage();
-    do {
-        // i unnecessarily optimized the sin and cos into a lut, took me three
-        // hours. this was the fix, i wasn't resetting the drawing mode back to
-        // normal (white) fuck my life
-        disp->setDrawColor(1);
-        volatile uint16_t symbolpos = SCREEN_WIDTH;
-        // status symbols
-        if (WiFi.status() == WL_CONNECTED) {
-            disp->drawXBM(symbolpos - wifi_symbol_width, 0, wifi_symbol_width,
-                wifi_symbol_height, wifi_symbol_bits);
-            symbolpos -= wifi_symbol_width + SYMBOL_SPACING;
-        } else {
-            disp->drawXBM(symbolpos - nowifi_symbol_width, 0, nowifi_symbol_width,
-                nowifi_symbol_height, nowifi_symbol_bits);
-            symbolpos -= nowifi_symbol_width + SYMBOL_SPACING;
-        }
-        yield();
+	display->firstPage();
+	do {
+		display->setDrawColor(1);
+		uint16_t current_symbol_position = SCREEN_WIDTH;
+		// status symbols
+		if (WiFi.status() == WL_CONNECTED) {
+			display->drawXBMP(current_symbol_position - wifi_symbol_width, 0, wifi_symbol_width,
+				wifi_symbol_height, wifi_symbol_bits);
+			current_symbol_position -= wifi_symbol_width + SYMBOL_SPACING;
+		} else {
+			display->drawXBMP(current_symbol_position - nowifi_symbol_width, 0, nowifi_symbol_width,
+				nowifi_symbol_height, nowifi_symbol_bits);
+			current_symbol_position -= nowifi_symbol_width + SYMBOL_SPACING;
+		}
+		yield();
 
-        // TODO: display alarm clock symbol if an alarm clock is set
+		// TODO: display alarm clock symbol if an alarm clock is set
 
-        if (this->timeOfLastNTP >= 0) {
-            disp->drawXBM(symbolpos - clocksync_symbol_width, 0,
-                clocksync_symbol_width, clocksync_symbol_height,
-                clocksync_symbol_bits);
-            symbolpos -= clocksync_symbol_width + SYMBOL_SPACING;
-        }
-        yield();
+		if (this->last_ntp_update >= 0) {
+			display->drawXBMP(current_symbol_position - clocksync_symbol_width, 0,
+				clocksync_symbol_width, clocksync_symbol_height,
+				clocksync_symbol_bits);
+			current_symbol_position -= clocksync_symbol_width + SYMBOL_SPACING;
+		}
+		yield();
 
-        if (AudioManager::the().isPlaying()) {
-            disp->drawXBM(symbolpos - sound_symbol_width, 0, sound_symbol_width,
-                sound_symbol_height, sound_symbol_bits);
-            symbolpos -= sound_symbol_width + SYMBOL_SPACING;
-        }
-        yield();
+		if (AudioManager::the().is_playing()) {
+			display->drawXBMP(current_symbol_position - sound_symbol_width, 0, sound_symbol_width,
+				sound_symbol_height, sound_symbol_bits);
+			current_symbol_position -= sound_symbol_width + SYMBOL_SPACING;
+		}
+		yield();
 
-        volatile uint64_t time = micros64();
-        curClockFace(disp, &curtime, 0, 0, disp->getDisplayWidth(),
-            disp->getDisplayHeight());
-        disp->setFont(TINY_FONT);
-        disp->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, dateStr);
-        volatile uint64_t after_time = micros64();
-        yield();
+		uint64_t time = micros64();
+		current_clock_face(display, &current_time, 0, 0, display->getDisplayWidth(),
+			display->getDisplayHeight());
+		yield();
+		display->setFont(TINY_FONT);
+		display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text);
+		uint64_t after_time = micros64();
+		yield();
 
-        if (eeprom_settings.show_timing) {
-            volatile uint64_t total_time = after_time - time;
-            volatile uint32_t cycles = microsecondsToClockCycles(total_time);
-            char timingStr[22];
-            sprintf(timingStr, "%02.3fm %10d", total_time / 1000.0d, cycles);
+		if (eeprom_settings.show_timing) {
+			uint64_t total_time = after_time - time;
+			uint32_t cycles = microsecondsToClockCycles(total_time);
+			char timing_text[22];
+			sprintf(timing_text, "%02.3fm %10d", total_time / 1000.0d, cycles);
 
-            disp->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT,
-                timingStr);
-        }
+			display->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT,
+				timing_text);
+		}
 
-        yield();
-    } while (disp->nextPage());
+		yield();
+	} while (display->nextPage());
 
-    return this;
+	return this;
 }
 
-bool ClockMenu::shouldRefresh(uint16_t deltaMillis)
+bool ClockMenu::should_refresh(uint16_t delta_millis)
 {
-    // set ntp sync display timer, if necessary
-    if (ntpUpdateOccurred)
-        this->timeOfLastNTP = CLOCKSYNC_SYMBOL_DURATION;
+	// set ntp sync display timer, if necessary
+	if (ntp_update_occurred)
+		this->last_ntp_update = CLOCKSYNC_SYMBOL_DURATION;
 
-    if (this->timeOfLastNTP >= 0)
-        this->timeOfLastNTP = this->timeOfLastNTP - deltaMillis;
+	if (this->last_ntp_update >= 0)
+		this->last_ntp_update = this->last_ntp_update - delta_millis;
 
-    this->updateTime += deltaMillis;
-    if (this->updateTime > CLOCK_UPDATE_INTERVAL) {
-        this->updateTime = 0;
-        return true;
-    }
-    return false;
+	this->last_display_update += delta_millis;
+	if (this->last_display_update > CLOCK_UPDATE_INTERVAL) {
+		this->last_display_update = 0;
+		return true;
+	}
+	return false;
 }
-Menu* ClockMenu::handleButton(uint8_t buttons)
+
+Menu* ClockMenu::handle_button(uint8_t buttons)
 {
-    if (buttons & B_RIGHT) {
-        return this->subMenu;
-    }
-    return this;
+	if (buttons & B_RIGHT) {
+		return this->subMenu;
+	}
+	return this;
 }

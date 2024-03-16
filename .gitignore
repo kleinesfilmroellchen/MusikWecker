@@ -2,3 +2,7 @@ build/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 ssid.h
+trig_luts.h
+graphics.h
+zonelist.h
+**/__pycache__/

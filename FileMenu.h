@@ -2,56 +2,56 @@
 
 #pragma once
 
-#include "MenuClass.h"
+#include "Definitions.h"
+#include "Menu.h"
 #include "OptionsMenu.h"
 #include "SettingsMenu.h"
-#include "defs.h"
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include <vector>
 
 enum class FileOperation {
-    // No action performed.
-    None,
-    // Move file.
-    Move,
-    // Delete a file.
-    Delete,
-    // Selecting a target folder for moving.
-    SelectMoveTarget,
-    // Confirm deletion.
-    ConfirmDelete,
-    // Confirm moving.
-    ConfirmMove,
+	// No action performed.
+	None,
+	// Move file.
+	Move,
+	// Delete a file.
+	Delete,
+	// Selecting a target folder for moving.
+	SelectMoveTarget,
+	// Confirm deletion.
+	ConfirmDelete,
+	// Confirm moving.
+	ConfirmMove,
 };
 
 constexpr bool isFileSelectingOperation(FileOperation operation)
 {
-    return operation == FileOperation::None || operation == FileOperation::Move || operation == FileOperation::SelectMoveTarget || operation == FileOperation::Delete;
+	return operation == FileOperation::None || operation == FileOperation::Move || operation == FileOperation::SelectMoveTarget || operation == FileOperation::Delete;
 }
 
 class FileSelectMenu : public Menu {
 public:
-    FileSelectMenu(FileOperation);
+	FileSelectMenu(FileOperation);
 
-    Menu* drawMenu(T_DISPLAY* disp, uint16_t deltaMillis) override;
-    bool shouldRefresh(uint16_t deltaMillis) override;
-    Menu* handleButton(uint8_t buttons) override;
+	Menu* draw_menu(Display* display, uint16_t delta_millis) override;
+	bool should_refresh(uint16_t delta_millis) override;
+	Menu* handle_button(uint8_t buttons) override;
 
 private:
-    void updateDirectory();
+	void update_directory();
 
-    void performFileAction(String chosenFile);
-    void performDelete(YesNoSelection selection);
-    void performMove(YesNoSelection selection);
+	void perform_file_action(String chosen_file);
+	void perform_delete(YesNoSelection selection);
+	void perform_move(YesNoSelection selection);
 
-    std::unique_ptr<OptionsMenu> currentDelegate {};
-    std::vector<MenuEntry> menuEntries {};
-    // menu entries are non-owning
-    std::vector<String> menuStrings {};
-    String currentDirectory = "/";
-    FileOperation operation;
+	std::unique_ptr<OptionsMenu> current_delegate {};
+	std::vector<MenuEntry> menu_entries {};
+	// menu entries are non-owning
+	std::vector<String> menu_strings {};
+	String current_directory = "/";
+	FileOperation operation;
 
-    String sourceFile = "";
-    String targetFile = "";
+	String source_file = "";
+	String target_file = "";
 };

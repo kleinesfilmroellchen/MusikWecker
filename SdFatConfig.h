@@ -361,7 +361,7 @@ typedef uint8_t SdCsPin_t;
  * with no memory alignment restrictions.
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ \
-    && (defined(__AVR__) || defined(__ARM_FEATURE_UNALIGNED))
+	&& (defined(__AVR__) || defined(__ARM_FEATURE_UNALIGNED))
 #define USE_SIMPLE_LITTLE_ENDIAN 1
 #else // __BYTE_ORDER_
 #define USE_SIMPLE_LITTLE_ENDIAN 0
@@ -432,14 +432,14 @@ typedef uint8_t SdCsPin_t;
  * Determine the default SPI configuration.
  */
 #if defined(ARDUINO_ARCH_APOLLO3)                                            \
-    || (defined(__AVR__) && defined(SPDR) && defined(SPSR) && defined(SPIF)) \
-    || (defined(__AVR__) && defined(SPI0) && defined(SPI_RXCIF_bm))          \
-    || defined(ESP8266) || defined(ESP32)                                    \
-    || defined(PLATFORM_ID)                                                  \
-    || defined(ARDUINO_SAM_DUE)                                              \
-    || defined(STM32_CORE_VERSION)                                           \
-    || defined(__STM32F1__) || defined(__STM32F4__)                          \
-    || (defined(CORE_TEENSY) && defined(__arm__))
+	|| (defined(__AVR__) && defined(SPDR) && defined(SPSR) && defined(SPIF)) \
+	|| (defined(__AVR__) && defined(SPI0) && defined(SPI_RXCIF_bm))          \
+	|| defined(ESP8266) || defined(ESP32)                                    \
+	|| defined(PLATFORM_ID)                                                  \
+	|| defined(ARDUINO_SAM_DUE)                                              \
+	|| defined(STM32_CORE_VERSION)                                           \
+	|| defined(__STM32F1__) || defined(__STM32F4__)                          \
+	|| (defined(CORE_TEENSY) && defined(__arm__))
 #define SD_HAS_CUSTOM_SPI 1
 #else // SD_HAS_CUSTOM_SPI
 // Use standard SPI library.
