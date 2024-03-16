@@ -25,7 +25,7 @@ enum class FileOperation {
 	ConfirmMove,
 };
 
-constexpr bool isFileSelectingOperation(FileOperation operation)
+constexpr bool is_file_selecting_operation(FileOperation operation)
 {
 	return operation == FileOperation::None || operation == FileOperation::Move || operation == FileOperation::SelectMoveTarget || operation == FileOperation::Delete;
 }

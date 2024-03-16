@@ -62,7 +62,7 @@ WiFiUDP udp_client;
 // ntp client: udp system, ntp server, time offset, update interval
 // b/c other library does time zone adjustments, no time offset is applied here
 NTPClient time_client(udp_client, TEMP_TIME_SERVER, 0, TEMP_NTP_UPDATE_INTERVAL);
-CompleteZoneProcessorCache<TZ_CACHE_SIZE> zoneProcessorCache;
+CompleteZoneProcessorCache<TIME_ZONE_CACHE_SIZE> zoneProcessorCache;
 // time zone manager
 CompleteZoneManager manager(
 	zonedbc::kZoneRegistrySize, zonedbc::kZoneRegistry, zoneProcessorCache);
@@ -76,7 +76,7 @@ EepromSettings eeprom_settings;
 //// global vars
 
 // state of the buttons in the previous loop
-uint8_t lastButtons = 0xff;
+uint8_t last_buttons = 0xff;
 // ms time when the buttons last changed; use this to register repeated button presses on button hold
 uint32_t button_change_time = 0;
 // ms delta since the last time a button press was executed when holding a button
@@ -198,7 +198,7 @@ void loop()
 	}
 
 	// read buttons, some bit magic here
-	uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << B_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << B_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << B_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << B_LEFT_BIT));
+	uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << BUTTON_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << BUTTON_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << BUTTON_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << BUTTON_LEFT_BIT));
 
 	// if a button is held and the time since button change exceeds the hold time "delay"...
 	if ((current_loop_time - button_change_time > BUTTON_HOLD_DELAY) && (buttons != 0)) {
@@ -212,12 +212,12 @@ void loop()
 	// temporary storage for a possibly different new menu
 	Menu* newMenu = current_menu;
 	// handle buttons
-	if (buttons != lastButtons || (button_hold_time_delta < 0)) {
+	if (buttons != last_buttons || (button_hold_time_delta < 0)) {
 		newMenu = newMenu->handle_button(buttons);
 	}
 
 	// any button state is different: update last button time
-	if (buttons != lastButtons) {
+	if (buttons != last_buttons) {
 		button_change_time = current_loop_time;
 		button_hold_time_delta = BUTTON_HOLD_REPEAT_DELAY;
 	}
@@ -246,7 +246,7 @@ void loop()
 	// The entire light sleep setup itself is rather finnicky in the first place, and there's zero good documentation on it.
 	// Since the clock can restore its state with ease after a power cycle (usually needing <10s to reconnect to Wifi and fetching NTP),
 	// this is not really an issue, but it annoyingly makes the screen turn on sporadically.
-	if (current_loop_time - button_change_time > eeprom_settings.sleep_time) {
+	if (current_loop_time - button_change_time > eeprom_settings.sleep_time && !AudioManager::the().is_playing()) {
 		debug_print(F("Running light sleep..."));
 		display.setPowerSave(true);
 
@@ -273,6 +273,6 @@ void loop()
 	yield();
 
 	// store state and time
-	lastButtons = buttons;
+	last_buttons = buttons;
 	previous_loop_time = current_loop_time;
 }

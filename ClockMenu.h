@@ -16,7 +16,7 @@ class ClockMenu : public Menu {
 private:
 	NTPClient* timing;
 	ace_time::TimeZone* timezone;
-	Menu* subMenu;
+	Menu* sub_menu;
 	uint32_t last_display_update = 0;
 	/** Millisecond time when the last NTP update occurred*/
 	uint32_t last_ntp_update = 0;

@@ -11,7 +11,9 @@
 template <typename Printable>
 inline void debug_print(Printable text)
 {
+#if USE_SERIAL
 	Serial.println(text);
+#endif
 
 	if (eeprom_settings.show_timing) {
 		if (display.getCursorY() >= display.getDisplayHeight()) {

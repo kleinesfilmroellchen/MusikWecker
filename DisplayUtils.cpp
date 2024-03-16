@@ -31,18 +31,18 @@ void draw_rotated_xbm(Display* display, uint16_t x_start, uint16_t y_start,
 	}
 }
 
-void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, double startAngle, double endAngle)
+void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, double start_angle, double end_angle)
 {
 	// constrain to -π -> π
-	startAngle = fmod(startAngle, TWO_PI);
-	startAngle -= PI;
-	endAngle = fmod(endAngle, TWO_PI);
-	endAngle -= PI;
-	if (startAngle == endAngle)
+	start_angle = fmod(start_angle, TWO_PI);
+	start_angle -= PI;
+	end_angle = fmod(end_angle, TWO_PI);
+	end_angle -= PI;
+	if (start_angle == end_angle)
 		return;
 	// make sure that end > start so we don't have to deal with too much modular arithmetic later
-	if (endAngle < startAngle)
-		endAngle += TWO_PI;
+	if (end_angle < start_angle)
+		end_angle += TWO_PI;
 
 	// FIXME: There's probably a faster way of checking whether these X and Y coordinates are in our required range
 	// than throwing them through trig functions.
@@ -50,10 +50,10 @@ void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, doubl
 		auto angle = atan2f(x, y);
 		// if angle is below the start, it may actually be in range,
 		// but since the end angle was raised, we can't detect that with the simple range check.
-		if (angle < startAngle)
+		if (angle < start_angle)
 			angle += TWO_PI;
 
-		if (angle >= startAngle && angle <= endAngle)
+		if (angle >= start_angle && angle <= end_angle)
 			display->drawPixel(x0 + x, y0 + y);
 	};
 
@@ -71,8 +71,8 @@ void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, doubl
 
 	// make sure we draw at least one pixel for small angles if we didn't return above.
 	// (don't use the draw() helper since the range check would likely fail)
-	display->drawPixel(x0 + round(cos(-startAngle + HALF_PI) * radius), y0 + round(sin(-startAngle + HALF_PI) * radius));
-	display->drawPixel(x0 + round(cos(-endAngle + HALF_PI) * radius), y0 + round(sin(-endAngle + HALF_PI) * radius));
+	display->drawPixel(x0 + round(cos(-start_angle + HALF_PI) * radius), y0 + round(sin(-start_angle + HALF_PI) * radius));
+	display->drawPixel(x0 + round(cos(-end_angle + HALF_PI) * radius), y0 + round(sin(-end_angle + HALF_PI) * radius));
 
 	while (x < y) {
 		if (f >= 0) {
@@ -92,6 +92,7 @@ void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, doubl
 		draw(-y, +x);
 		draw(+y, -x);
 		draw(-y, -x);
+		yield();
 	}
 }
 
@@ -99,16 +100,16 @@ void draw_string(Display* display, char const* c_text, uint8_t line)
 {
 	String string = c_text;
 	std::vector<String> lines;
-	auto firstNewline = string.indexOf('\n');
-	if (firstNewline < 0) {
+	auto first_newline = string.indexOf('\n');
+	if (first_newline < 0) {
 		lines.push_back(string);
 	} else {
 		do {
-			auto start = string.substring(0, firstNewline);
-			string = string.substring(firstNewline + 1);
+			auto start = string.substring(0, first_newline);
+			string = string.substring(first_newline + 1);
 			lines.push_back(start);
-			firstNewline = string.indexOf('\n');
-		} while (firstNewline >= 0 && !string.isEmpty());
+			first_newline = string.indexOf('\n');
+		} while (first_newline >= 0 && !string.isEmpty());
 		if (!string.isEmpty())
 			lines.push_back(string);
 	}

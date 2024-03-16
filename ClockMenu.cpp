@@ -12,7 +12,7 @@ ClockMenu::ClockMenu(NTPClient* timing, ace_time::TimeZone* tz,
 	this->timing = timing;
 	this->timezone = tz;
 	this->parent = this;
-	this->subMenu = mainMenu;
+	this->sub_menu = mainMenu;
 	mainMenu->parent = this;
 }
 
@@ -26,7 +26,7 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 	char date_text[11];
 	ace_time::ZonedDateTime current_time = ace_time::ZonedDateTime::forUnixSeconds64(
 		this->timing->getEpochTime(), *this->timezone);
-	sprintf(date_text, "%02u.%02u.%4u", current_time.day(), current_time.month(),
+	snprintf_P(date_text, sizeof(date_text), PSTR("%02u.%02u.%4u"), current_time.day(), current_time.month(),
 		current_time.year());
 
 	display->firstPage();
@@ -75,7 +75,7 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 			uint64_t total_time = after_time - time;
 			uint32_t cycles = microsecondsToClockCycles(total_time);
 			char timing_text[22];
-			sprintf(timing_text, "%02.3fm %10d", total_time / 1000.0d, cycles);
+			snprintf_P(timing_text, sizeof(timing_text), PSTR("%02.3fm %10d"), total_time / 1000.0d, cycles);
 
 			display->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT,
 				timing_text);
@@ -106,8 +106,8 @@ bool ClockMenu::should_refresh(uint16_t delta_millis)
 
 Menu* ClockMenu::handle_button(uint8_t buttons)
 {
-	if (buttons & B_RIGHT) {
-		return this->subMenu;
+	if (buttons & BUTTON_RIGHT) {
+		return this->sub_menu;
 	}
 	return this;
 }

@@ -5,10 +5,11 @@ void save_settings()
 {
 	EepromSettings stored_settings;
 	EEPROM.get(SETTINGS_ADDRESS, stored_settings);
-	uint8_t *storedPtr = (uint8_t*)&stored_settings,
-			*currentPtr = (uint8_t*)&eeprom_settings;
+	// TODO: memcmp
+	uint8_t *stored_pointer = (uint8_t*)&stored_settings,
+			*current_pointer = (uint8_t*)&eeprom_settings;
 	for (uint16_t i = 0; i < SETTINGS_SIZE; ++i)
-		if (storedPtr[i] != currentPtr[i])
+		if (stored_pointer[i] != current_pointer[i])
 			// imma commit a crime
 			goto GOTO_saveSettingsExecute;
 	// only hit if the goto never executed; i.e. all setting elements are

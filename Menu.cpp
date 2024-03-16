@@ -20,9 +20,9 @@ Menu* NothingMenu::draw_menu(Display* display, uint16_t delta_millis)
 bool NothingMenu::should_refresh(uint16_t _) { return true; }
 Menu* NothingMenu::handle_button(uint8_t _) { return this->parent; }
 
-void apply_debug_settings(YesNoSelection yesNo)
+void apply_debug_settings(YesNoSelection yes_no)
 {
-	eeprom_settings.show_timing = yesNo == YesNoSelection::Yes;
+	eeprom_settings.show_timing = yes_no == YesNoSelection::Yes;
 	save_settings();
 }
 
@@ -85,7 +85,7 @@ Menu* create_menu_structure(ace_time::TimeZone* main_time_zone)
 	auto file_menu_object = std::make_unique<OptionsMenu>(file_submenus);
 
 	auto debugging_menu = std::make_unique<SettingsMenu<YesNoSelection>>(
-		debugging_label, &apply_debug_settings, yesNoOptions, yes_no_menu);
+		debugging_label, &apply_debug_settings, yes_no_options, yes_no_menu);
 	auto auto_disable_settings = std::make_unique<SettingsMenu<AutoDisable>>(
 		auto_disable_label, &apply_auto_disable_settings, auto_disable_options,
 		auto_disable_menu);

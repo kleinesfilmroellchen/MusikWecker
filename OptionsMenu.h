@@ -31,18 +31,18 @@ struct MenuEntry {
 };
 
 /**
-   Menu that displays a list of text entries corresponding to sub-menues.
-   The menu can navigate to these menues and return to its parent menu.
+   Menu that displays a list of text entries corresponding to sub-menus.
+   The menu can navigate to these menus and return to its parent menu.
 */
 class OptionsMenu : public Menu {
 private:
-	Span<MenuEntry> menues;
+	Span<MenuEntry> menus;
 
 protected:
 	/** Index of the currently selected menu. */
-	uint16_t currentMenu = 0;
-	/** Index of the menu that is currently on top of the section of menues which are displayed. */
-	uint16_t currentTopMenu = 0;
+	uint16_t current_menu = 0;
+	/** Index of the menu that is currently on top of the section of menus which are displayed. */
+	uint16_t current_top_menu = 0;
 	/** Flag that specifies whether the menu display structure changed. Set by handle_button() and reset by draw_menu(). */
 	bool dirty = true;
 
@@ -52,15 +52,15 @@ protected:
 	void fix_top_menu(uint8_t line_count);
 
 public:
-	OptionsMenu(Span<MenuEntry> menues);
+	OptionsMenu(Span<MenuEntry> menus);
 	Menu* draw_menu(Display* display, uint16_t delta_millis) override;
 	bool should_refresh(uint16_t delta_millis) override;
 	Menu* handle_button(uint8_t buttons) override;
 
 	constexpr bool is_dirty() const { return dirty; }
-	constexpr uint16_t get_current_menu() const { return currentMenu; }
+	constexpr uint16_t get_current_menu() const { return current_menu; }
 
-	constexpr size_t size() const { return menues.size(); }
+	constexpr size_t size() const { return menus.size(); }
 };
 
 /**
@@ -77,12 +77,12 @@ public:
 	Children can override this to run their own handler when this happens, and return any new menu they like.
 	If nullptr is returned, the parent menu is returned instead as a default action.
 	*/
-	virtual Menu* option_selected(uint16_t menuIndex) { return nullptr; }
+	virtual Menu* option_selected(uint16_t menu_index) { return nullptr; }
 
 private:
-	DelegateOptionsMenu(std::vector<MenuEntry> menues);
+	DelegateOptionsMenu(std::vector<MenuEntry> menus);
 
-	std::vector<MenuEntry> fakeEntries;
+	std::vector<MenuEntry> fake_entries;
 };
 
 /**
@@ -95,7 +95,7 @@ public:
 	bool should_refresh(uint16_t delta_millis) override;
 	Menu* handle_button(uint8_t buttons) override;
 
-	virtual Menu* option_selected(uint16_t menuIndex) override;
+	virtual Menu* option_selected(uint16_t menu_index) override;
 
 private:
 	Span<ClockFaces::ClockFace> clock_faces;
@@ -109,5 +109,5 @@ private:
 class TimeZoneSelectMenu : public DelegateOptionsMenu {
 public:
 	TimeZoneSelectMenu();
-	virtual Menu* option_selected(uint16_t menuIndex) override;
+	virtual Menu* option_selected(uint16_t menu_index) override;
 };

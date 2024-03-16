@@ -5,10 +5,10 @@
 #include "NTPClient.h"
 #include <algorithm>
 
-OptionsMenu::OptionsMenu(Span<MenuEntry> menues)
-	: menues(menues)
+OptionsMenu::OptionsMenu(Span<MenuEntry> menus)
+	: menus(menus)
 {
-	for (auto& menu : menues) {
+	for (auto& menu : menus) {
 		if (menu.menu != nullptr)
 			menu.menu->parent = this;
 	}
@@ -24,8 +24,8 @@ void OptionsMenu::perform_menu_draw(Display* display, uint8_t width,
 
 	// Volatile in the entire function prevents compiler optimization that kills
 	// logic index of first and last menu text to draw
-	uint16_t firstMenu = this->currentTopMenu,
-			 lastMenu = min(this->currentTopMenu + (height / LINE_HEIGHT) - 1,
+	uint16_t firstMenu = this->current_top_menu,
+			 lastMenu = min(this->current_top_menu + (height / LINE_HEIGHT) - 1,
 				 static_cast<int>(size() - 1));
 
 	// Use XOR drawing mode. This will make the selected text inverted without
@@ -36,9 +36,9 @@ void OptionsMenu::perform_menu_draw(Display* display, uint8_t width,
 	// index
 	for (uint16_t menuIdx = firstMenu, i = 0; menuIdx <= lastMenu;
 		 ++i, ++menuIdx) {
-		String display_string = this->menues[menuIdx].text;
+		String display_string = this->menus[menuIdx].text;
 		// highlight current element
-		if (menuIdx == this->currentMenu)
+		if (menuIdx == this->current_menu)
 			display->drawBox(0, position_of_line(i), width, LINE_HEIGHT);
 		// issue draw call to display
 		draw_string(display, display_string.c_str(), i);
@@ -63,31 +63,31 @@ bool OptionsMenu::should_refresh(uint16_t delta_millis) { return this->dirty; }
 
 void OptionsMenu::fix_top_menu(uint8_t line_count)
 {
-	auto startTop = this->currentTopMenu;
-	auto startCurrent = this->currentMenu;
+	auto startTop = this->current_top_menu;
+	auto startCurrent = this->current_menu;
 
 	if (size() == 0) {
-		this->currentTopMenu = 0;
-		this->currentMenu = 0;
+		this->current_top_menu = 0;
+		this->current_menu = 0;
 	} else {
 
 		// b/c unsigned bytes, use max value to detect overflow when decrementing
-		if (this->currentMenu == 0xffff)
-			this->currentMenu = size() - 1;
+		if (this->current_menu == 0xffff)
+			this->current_menu = size() - 1;
 		// check current menu bounds. for now, going beyond the last menu entry will
 		// wrap back to the start
-		if (this->currentMenu >= size())
-			this->currentMenu = 0;
+		if (this->current_menu >= size())
+			this->current_menu = 0;
 
 		// current menu moved beyond the last menu on display, move top menu down
-		while (this->currentMenu > (this->currentTopMenu + line_count - 1))
-			++this->currentTopMenu;
+		while (this->current_menu > (this->current_top_menu + line_count - 1))
+			++this->current_top_menu;
 		// current menu moved above the first menu on display, move top menu up
-		if (this->currentMenu < this->currentTopMenu)
-			this->currentTopMenu = this->currentMenu;
+		if (this->current_menu < this->current_top_menu)
+			this->current_top_menu = this->current_menu;
 	}
 
-	if (startTop != this->currentTopMenu || startCurrent != this->currentMenu)
+	if (startTop != this->current_top_menu || startCurrent != this->current_menu)
 		this->dirty = true;
 }
 
@@ -97,20 +97,20 @@ Menu* OptionsMenu::handle_button(uint8_t buttons)
 		this->dirty = true;
 
 	// back and enter button logic
-	if (buttons & B_LEFT) {
+	if (buttons & BUTTON_LEFT) {
 		debug_print(reinterpret_cast<uintptr_t>(this->parent));
 		return this->parent;
 	}
 
-	if ((buttons & B_RIGHT) && size() > 0) {
-		return this->menues[this->currentMenu].menu.get();
+	if ((buttons & BUTTON_RIGHT) && size() > 0) {
+		return this->menus[this->current_menu].menu.get();
 	}
 
 	// down and up button (next/previous element) logic
-	if (buttons & B_DOWN)
-		++this->currentMenu;
-	else if (buttons & B_UP)
-		--this->currentMenu;
+	if (buttons & BUTTON_DOWN)
+		++this->current_menu;
+	else if (buttons & BUTTON_UP)
+		--this->current_menu;
 
 	fix_top_menu(LINE_COUNT);
 
@@ -133,18 +133,18 @@ DelegateOptionsMenu DelegateOptionsMenu::create(Span<char const*> names)
 	return DelegateOptionsMenu { std::move(entries) };
 }
 
-DelegateOptionsMenu::DelegateOptionsMenu(std::vector<MenuEntry> menues)
-	: OptionsMenu(Span<MenuEntry> { menues })
-	, fakeEntries(std::move(menues))
+DelegateOptionsMenu::DelegateOptionsMenu(std::vector<MenuEntry> menus)
+	: OptionsMenu(Span<MenuEntry> { menus })
+	, fake_entries(std::move(menus))
 {
 }
 
 Menu* DelegateOptionsMenu::handle_button(uint8_t buttons)
 {
-	if (buttons & B_LEFT || buttons & B_UP || buttons & B_DOWN)
+	if (buttons & BUTTON_LEFT || buttons & BUTTON_UP || buttons & BUTTON_DOWN)
 		return OptionsMenu::handle_button(buttons);
-	if (buttons & B_RIGHT) {
-		auto* childResult = option_selected(this->currentMenu);
+	if (buttons & BUTTON_RIGHT) {
+		auto* childResult = option_selected(this->current_menu);
 		return childResult == nullptr ? this->parent : childResult;
 	}
 	return this;
@@ -157,16 +157,16 @@ ClockFaceSelectMenu::ClockFaceSelectMenu(Span<char const*> face_names,
 {
 	// adjust current menu point to the clock face in the settings
 	if (eeprom_settings.clock_face_index < size()) {
-		this->currentMenu = eeprom_settings.clock_face_index;
+		this->current_menu = eeprom_settings.clock_face_index;
 		// current menu moved beyond the last menu on display, move top menu down
-		while (this->currentMenu > (this->currentTopMenu + LINE_COUNT - 1))
-			++this->currentTopMenu;
+		while (this->current_menu > (this->current_top_menu + LINE_COUNT - 1))
+			++this->current_top_menu;
 		// current menu moved above the first menu on display, move top menu up
-		if (this->currentMenu < this->currentTopMenu)
-			this->currentTopMenu = this->currentMenu;
+		if (this->current_menu < this->current_top_menu)
+			this->current_top_menu = this->current_menu;
 
 		// actually change the global variable to match the stored clock face index
-		current_clock_face = this->clock_faces[this->currentMenu];
+		current_clock_face = this->clock_faces[this->current_menu];
 	}
 }
 
@@ -176,13 +176,13 @@ Menu* ClockFaceSelectMenu::handle_button(uint8_t buttons)
 	return DelegateOptionsMenu::handle_button(buttons);
 }
 
-Menu* ClockFaceSelectMenu::option_selected(uint16_t menuIndex)
+Menu* ClockFaceSelectMenu::option_selected(uint16_t menu_index)
 {
 	// change the global variable
-	current_clock_face = this->clock_faces[menuIndex];
+	current_clock_face = this->clock_faces[menu_index];
 
 	// save settings in eeprom
-	eeprom_settings.clock_face_index = menuIndex;
+	eeprom_settings.clock_face_index = menu_index;
 	save_settings();
 
 	return nullptr;
@@ -198,7 +198,7 @@ Menu* ClockFaceSelectMenu::draw_menu(Display* display, uint16_t delta_millis)
 {
 	if (last_update - time_since_button > CLOCK_PREVIEW_DELAY) {
 		time_since_button = last_update - CLOCK_PREVIEW_DELAY - 1;
-		auto clockFace = this->clock_faces[this->currentMenu];
+		auto clockFace = this->clock_faces[this->current_menu];
 
 		ace_time::ZonedDateTime curtime = ace_time::ZonedDateTime::forUnixSeconds64(
 			time_client.getEpochTime(), *main_time_zone);
@@ -234,26 +234,26 @@ TimeZoneSelectMenu::TimeZoneSelectMenu()
 {
 	// adjust current menu point to the timezone in the settings
 	if (eeprom_settings.timezone < ZONE_COUNT) {
-		this->currentMenu = eeprom_settings.timezone;
+		this->current_menu = eeprom_settings.timezone;
 
 		fix_top_menu(LINE_COUNT);
 
 		// actually change the global timezone variable
-		String tzname = FPSTR(tzlist[this->currentMenu]);
+		String tzname = FPSTR(tzlist[this->current_menu]);
 		debug_print(F("Stored timezone: "));
 		debug_print(tzname);
 		*main_time_zone = manager.createForZoneName(tzname.c_str());
 	}
 }
 
-Menu* TimeZoneSelectMenu::option_selected(uint16_t menuIndex)
+Menu* TimeZoneSelectMenu::option_selected(uint16_t menu_index)
 {
 	// change the global variable
-	String tzname = FPSTR(tzlist[menuIndex]);
+	String tzname = FPSTR(tzlist[menu_index]);
 	*main_time_zone = manager.createForZoneName(tzname.c_str());
 
 	// save settings in eeprom
-	eeprom_settings.timezone = menuIndex;
+	eeprom_settings.timezone = menu_index;
 	save_settings();
 
 	return nullptr;

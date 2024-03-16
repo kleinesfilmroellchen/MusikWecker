@@ -16,7 +16,7 @@ public:
 	virtual Menu* handle_button(uint8_t buttons) override;
 
 private:
-	DiagnosticPage currentPage = DiagnosticPage::Time;
+	DiagnosticPage current_page = DiagnosticPage::Time;
 	bool dirty = true;
-	uint32_t timeOfLastNTP = 0;
+	uint32_t time_of_last_ntp = 0;
 };

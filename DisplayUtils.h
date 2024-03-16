@@ -19,7 +19,7 @@ inline uint16_t position_of_line(uint8_t line)
 /**
   Draws an arc, i.e. a circle section, of thickness 1 with specified radius and start and end angles.
 */
-void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, double startAngle, double endAngle);
+void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, double start_angle, double end_angle);
 
 /**
    Draw a string onto the display at specified line.

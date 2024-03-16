@@ -99,16 +99,16 @@ constexpr uint8_t PIN_BUTTON_RIGHT = D0; // enter
 constexpr uint8_t PIN_BUTTON_LEFT = D3; // back
 
 // button bits, button constants depend on them
-constexpr uint8_t B_UP_BIT = 0;
-constexpr uint8_t B_DOWN_BIT = 1;
-constexpr uint8_t B_RIGHT_BIT = 2;
-constexpr uint8_t B_LEFT_BIT = 3;
+constexpr uint8_t BUTTON_UP_BIT = 0;
+constexpr uint8_t BUTTON_DOWN_BIT = 1;
+constexpr uint8_t BUTTON_RIGHT_BIT = 2;
+constexpr uint8_t BUTTON_LEFT_BIT = 3;
 
 // button constants for button press handling
-constexpr uint8_t B_UP = 0b1 << B_UP_BIT;
-constexpr uint8_t B_DOWN = 0b1 << B_DOWN_BIT;
-constexpr uint8_t B_RIGHT = 0b1 << B_RIGHT_BIT;
-constexpr uint8_t B_LEFT = 0b1 << B_LEFT_BIT;
+constexpr uint8_t BUTTON_UP = 0b1 << BUTTON_UP_BIT;
+constexpr uint8_t BUTTON_DOWN = 0b1 << BUTTON_DOWN_BIT;
+constexpr uint8_t BUTTON_RIGHT = 0b1 << BUTTON_RIGHT_BIT;
+constexpr uint8_t BUTTON_LEFT = 0b1 << BUTTON_LEFT_BIT;
 
 // ms delay after which a button hold is considered a repeated press; e.g. for fast scrolling or value adjustment
 constexpr uint16_t BUTTON_HOLD_DELAY = 700;
@@ -124,7 +124,7 @@ constexpr uint16_t TEMP_NTP_UPDATE_INTERVAL = 60000;
 // for testing
 // constexpr uint16_t TEMP_NTP_UPDATE_INTERVAL = 5000;
 // cache size for AceTime timezone manager
-constexpr uint16_t TZ_CACHE_SIZE = 2;
+constexpr uint16_t TIME_ZONE_CACHE_SIZE = 2;
 // interval in which the clock screen updates (millis)
 constexpr uint16_t CLOCK_UPDATE_INTERVAL = 1000 / 20;
 // how long the clock sync symbol stays on screen after a ntp time server synchronisation occurred (millis)

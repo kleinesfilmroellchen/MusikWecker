@@ -54,28 +54,28 @@ bool FileSelectMenu::should_refresh(uint16_t delta_millis)
 
 Menu* FileSelectMenu::handle_button(uint8_t buttons)
 {
-	if (buttons & B_UP || buttons & B_DOWN) {
+	if (buttons & BUTTON_UP || buttons & BUTTON_DOWN) {
 		current_delegate->handle_button(buttons);
 		return this;
 	}
 
-	if (buttons & B_LEFT)
+	if (buttons & BUTTON_LEFT)
 		return this->parent;
 
-	if (buttons & B_RIGHT) {
-		if (!isFileSelectingOperation(operation)) {
+	if (buttons & BUTTON_RIGHT) {
+		if (!is_file_selecting_operation(operation)) {
 			return current_delegate->handle_button(buttons);
 		}
 
 		uint16_t index = current_delegate->get_current_menu();
 		// ".." pseudo entry to move to parent
 		if (index == 1) {
-			auto lastSlash = current_directory.lastIndexOf('/');
+			auto last_slash = current_directory.lastIndexOf('/');
 			// we're in the root already
-			if (current_directory.length() == 1 && lastSlash >= 0)
+			if (current_directory.length() == 1 && last_slash >= 0)
 				return this;
 
-			auto parent = current_directory.substring(0, lastSlash);
+			auto parent = current_directory.substring(0, last_slash);
 			current_directory = parent;
 			if (current_directory.isEmpty())
 				current_directory = "/";
@@ -125,10 +125,10 @@ void FileSelectMenu::perform_file_action(String chosen_file)
 	case FileOperation::Move: {
 		operation = FileOperation::SelectMoveTarget;
 		source_file = chosen_file;
-		auto lastSlash = current_directory.lastIndexOf('/');
+		auto last_slash = current_directory.lastIndexOf('/');
 		// we're not in the root
-		if (current_directory.length() > 1 || lastSlash < 0) {
-			auto parent = current_directory.substring(0, lastSlash);
+		if (current_directory.length() > 1 || last_slash < 0) {
+			auto parent = current_directory.substring(0, last_slash);
 			current_directory = parent;
 		}
 		update_directory();
@@ -139,19 +139,19 @@ void FileSelectMenu::perform_file_action(String chosen_file)
 		source_file = chosen_file;
 		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
 			confirm_delete_label, [this](auto x) { this->perform_delete(x); },
-			yesNoOptions, yes_no_menu);
+			yes_no_options, yes_no_menu);
 		break;
 	case FileOperation::SelectMoveTarget:
 		operation = FileOperation::ConfirmMove;
 		target_file = chosen_file;
 		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
 			confirm_move_label, [this](auto x) { this->perform_move(x); },
-			yesNoOptions, yes_no_menu);
+			yes_no_options, yes_no_menu);
 		break;
 	// Should not happen...
 	case FileOperation::ConfirmDelete:
 	case FileOperation::ConfirmMove:
-		current_delegate->handle_button(B_RIGHT);
+		current_delegate->handle_button(BUTTON_RIGHT);
 		break;
 	}
 }

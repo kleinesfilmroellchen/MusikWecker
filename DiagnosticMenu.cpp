@@ -27,49 +27,50 @@ Menu* DiagnosticMenu::draw_menu(Display* display, uint16_t delta_millis)
 	display->firstPage();
 	do {
 		// FIXME: use std::format once Arduino can C++20
-		switch (this->currentPage) {
+		switch (this->current_page) {
 		case DiagnosticPage::Time: {
 			this->dirty = true;
 
-			PrintString zoneName;
-			main_time_zone->printTo(zoneName);
+			PrintString zone_name;
+			main_time_zone->printTo(zone_name);
 
-			char timeInfo[128];
+			char time_info_text[128];
 			snprintf_P(
-				timeInfo, sizeof(timeInfo),
+				time_info_text, sizeof(time_info_text),
 				PSTR("unix %ds\ntz %s offset %05ds\nserver %s\nlast sync %d (synced "
 					 "%d)"),
-				time_client.getEpochTime(), zoneName.getString().c_str(),
+				time_client.getEpochTime(), zone_name.getString().c_str(),
 				main_time_zone->getOffsetDateTime(time_client.getEpochTime()).timeOffset(),
-				TEMP_TIME_SERVER, millis() - timeOfLastNTP, time_client.isTimeSet());
+				TEMP_TIME_SERVER, millis() - time_of_last_ntp, time_client.isTimeSet());
 			display->setFont(TINY_FONT);
-			draw_string(display, timeInfo, 0);
+			draw_string(display, time_info_text, 0);
 			break;
 		}
 
 		case DiagnosticPage::FileSystem: {
 			this->dirty = true;
 
-			auto capacityKiB = static_cast<uint64_t>(card.vol()->clusterCount() / 1024) * card.vol()->bytesPerCluster();
-			auto freeKiB = static_cast<uint64_t>(card.vol()->freeClusterCount() / 1024) * card.vol()->bytesPerCluster();
-			auto sectorSize = card.vol()->bytesPerCluster() / card.vol()->sectorsPerCluster();
-			auto clusterSize = card.vol()->bytesPerCluster();
-			auto sdNumericType = card.card()->type() % 4;
-			String sdTypeName = FPSTR(sd_types_array[sdNumericType]);
+			auto capacity_kib = static_cast<uint64_t>(card.vol()->clusterCount() / 1024) * card.vol()->bytesPerCluster();
+			auto free_kib = static_cast<uint64_t>(card.vol()->freeClusterCount() / 1024) * card.vol()->bytesPerCluster();
+			auto sector_size = card.vol()->bytesPerCluster() / card.vol()->sectorsPerCluster();
+			auto cluster_size = card.vol()->bytesPerCluster();
+			auto sd_numeric_type = card.card()->type() % 4;
+			String sd_type_name = FPSTR(sd_types_array[sd_numeric_type]);
 
-			char fsInfo[256] {};
-			snprintf_P(fsInfo, sizeof(fsInfo),
+			char file_system_info_text[256] {};
+			snprintf_P(file_system_info_text, sizeof(file_system_info_text),
 				PSTR("sd type %s\nerror %d payload %d\n%lldKi cap %lldKi "
 					 "free\nFAT%d: %d secsz %d clusz"),
-				sdTypeName, card.sdErrorCode(), card.sdErrorData(),
-				capacityKiB, freeKiB, card.fatType(), sectorSize, clusterSize);
+				sd_type_name, card.sdErrorCode(), card.sdErrorData(),
+				capacity_kib, free_kib, card.fatType(), sector_size, cluster_size);
 			display->setFont(TINY_FONT);
-			draw_string(display, fsInfo, 0);
+			draw_string(display, file_system_info_text, 0);
 
 			break;
 		}
-		case DiagnosticPage::__Count: {
-			this->currentPage = DiagnosticPage::Time;
+		case DiagnosticPage::__Count:
+		default: {
+			this->current_page = DiagnosticPage::Time;
 			break;
 		}
 		}
@@ -82,7 +83,7 @@ Menu* DiagnosticMenu::draw_menu(Display* display, uint16_t delta_millis)
 bool DiagnosticMenu::should_refresh(uint16_t delta_millis)
 {
 	if (ntp_update_occurred)
-		this->timeOfLastNTP = millis();
+		this->time_of_last_ntp = millis();
 
 	return dirty;
 }
@@ -92,13 +93,13 @@ Menu* DiagnosticMenu::handle_button(uint8_t buttons)
 	if (buttons != 0)
 		this->dirty = true;
 
-	if (buttons & B_LEFT)
+	if (buttons & BUTTON_LEFT)
 		return this->parent;
 
-	if (buttons & B_DOWN)
-		this->currentPage = this->currentPage + 1;
-	if (buttons & B_UP)
-		this->currentPage = this->currentPage - 1;
+	if (buttons & BUTTON_DOWN)
+		this->current_page = this->current_page + 1;
+	if (buttons & BUTTON_UP)
+		this->current_page = this->current_page - 1;
 
 	return this;
 }
