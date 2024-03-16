@@ -27,4 +27,5 @@ private:
 	Ticker timer;
 };
 
-void audio_timer_interrupt();
+// fake non-realtime cooperative "interrupt" invoked via yield()/delay()
+void IRAM_ATTR audio_timer_interrupt();
