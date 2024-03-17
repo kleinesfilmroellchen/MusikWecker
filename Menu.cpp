@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "Settings.h"
 #include "SettingsMenu.h"
+#include "VideoPlayer.h"
 #include "strings.h"
 #include <limits>
 #include <memory>
@@ -100,7 +101,7 @@ Menu* create_menu_structure()
 	// TODO: replace temporary nothing menus by the actual menus once implemented
 	static std::array<MenuEntry, 5> all_menus {
 		MenuEntry { main_menu_0, std::move(clock_face_menu) },
-		MenuEntry { main_menu_1, std::make_unique<NothingMenu>() },
+		MenuEntry { main_menu_1, std::make_unique<VideoPlayer>() },
 		MenuEntry { main_menu_2, std::move(file_menu_object) },
 		MenuEntry { main_menu_3, std::move(settings_menu_object) },
 		MenuEntry { main_menu_4, std::make_unique<DiagnosticMenu>() },

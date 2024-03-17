@@ -1,13 +1,10 @@
-from functools import reduce
 from pathlib import Path
-from PIL import Image, ImageOps
-from io import BytesIO
+from PIL import Image, ImageOps, UnidentifiedImageError
 import regex
-from dataclasses import dataclass
 
 # regex to find the insertion point of the PROGMEM macro, which will be at the end of the regex.
 progmem_insertion_finder = regex.compile(r" char \p{ID_Start}\p{ID_Continue}*\s*\[\]")
-im_identifier_finder = regex.compile(r"\bim_")
+im_identifier_finder = regex.compile(r"\bimage_")
 
 
 def main():
@@ -15,13 +12,14 @@ def main():
     total_code = ""
     for image_path in directory.iterdir():
         print(f"converting {image_path}...")
-        image = Image.open(image_path)
+        try:
+            image = Image.open(image_path)
+        except UnidentifiedImageError:
+            continue
         image = ImageOps.invert(
             image.convert(mode="RGB").convert(mode="1", dither=None)
         )
-        output_bytes = BytesIO()
-        image.save(output_bytes, format="xbm")
-        image_code = output_bytes.getvalue().decode(encoding="utf-8")
+        image_code = image.tobitmap().decode(encoding="utf-8")
 
         # do some transpilation so the xbm code is usable
         image_identifier_name = f"{image_path.stem}_symbol_"

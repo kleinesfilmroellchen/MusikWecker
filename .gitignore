@@ -5,4 +5,5 @@ ssid.h
 trig_luts.h
 graphics.h
 zonelist.h
+bad_apple.h
 **/__pycache__/
