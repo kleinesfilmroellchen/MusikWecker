@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "PrintString.h"
 #include <AudioGeneratorFLAC.h>
+// #include <AudioGeneratorMP3.h>
 #include <AudioOutputBuffer.h>
 #include <memory>
 
@@ -29,7 +30,6 @@ AudioManager::AudioManager()
 		  AudioOutputI2S::APLL_DISABLE)
 {
 	timer.attach_ms(1, audio_timer_interrupt);
-
 	// test with first found file
 	FsFile dir = card.open("/");
 	FsFile file;
@@ -38,17 +38,33 @@ AudioManager::AudioManager()
 		file = dir.openNextFile();
 		base_name = get_base_name(file);
 	} while (file && (!(base_name.endsWith(F(".flac"))) || (base_name.length() < 1)));
+	String file_name = get_base_name(dir) + base_name;
+	play(file_name);
+}
 
+void AudioManager::play(String& file_name)
+{
+	if (audio_player)
+		audio_player->stop();
 	audio_source.close();
-	String fileName = get_base_name(dir) + base_name;
-	debug_print(fileName);
-	if (!audio_source.open(fileName.c_str())) {
-		return;
+
+	if (file_name.endsWith(F(".flac"))) {
+		audio_player = std::make_unique<AudioGeneratorFLAC>();
+		// } else if (file_name.endsWith(F(".mp3"))) {
+		// audio_player = std::make_unique<AudioGeneratorMP3>();
 	}
 
-	audio_player = std::make_unique<AudioGeneratorFLAC>();
+	if (!audio_source.open(file_name.c_str())) {
+		return;
+	}
 	audio_player->begin(&audio_source, &audio_output);
-	debug_print(F("Started playback."));
+}
+
+float AudioManager::current_position() const
+{
+	auto sample_rate = audio_output.sample_rate();
+	auto sample_count = audio_output.sample_count();
+	return static_cast<float>(sample_count) / sample_rate;
 }
 
 void AudioManager::loop()
