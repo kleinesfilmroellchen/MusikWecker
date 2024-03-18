@@ -13,6 +13,7 @@
 #include "strings.h"
 #include <limits>
 #include <memory>
+#include <umm_malloc/umm_heap_select.h>
 
 Menu* NothingMenu::draw_menu(Display* display, uint16_t delta_millis)
 {
@@ -64,6 +65,8 @@ void apply_auto_disable_settings(AutoDisable auto_disable)
 
 Menu* create_menu_structure()
 {
+	// HeapSelectIram iram;
+
 	using namespace ClockFaces;
 	static std::array<ClockFace, 6> clock_faces {
 		&basic_digital,

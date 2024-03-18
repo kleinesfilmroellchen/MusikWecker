@@ -15,7 +15,8 @@
 // start of fixups to make Serenity's AK code work with C++17, std and Arduino
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
 #define VERIFY(expr) __builtin_expect(!(expr), 0)
-#define HAS_CPP20 (__cplusplus >= 202002L)
+// #define HAS_CPP20 (__cplusplus >= 202002L)
+#define HAS_CPP20 false
 
 using FlatPtr = uintptr_t;
 static_assert(sizeof(FlatPtr) == sizeof(void*));
@@ -260,6 +261,12 @@ public:
 	ALWAYS_INLINE constexpr Span(uint8_t (&values)[size])
 		: m_values(values)
 		, m_size(size)
+	{
+	}
+
+	ALWAYS_INLINE Span(std::vector<uint8_t>& vector)
+		: m_values(vector.data())
+		, m_size(vector.size())
 	{
 	}
 

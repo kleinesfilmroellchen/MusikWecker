@@ -40,6 +40,6 @@ private:
 	std::unique_ptr<ace_time::TimeZone> main_time_zone;
 	ace_time::CompleteZoneManager manager;
 
-	bool ntp_update_occurred { false };
 	uint32_t time_of_last_ntp_update {};
+	bool ntp_update_occurred { false };
 };

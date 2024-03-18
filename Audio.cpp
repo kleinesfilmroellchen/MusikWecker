@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "PrintString.h"
 #include <AudioGeneratorFLAC.h>
+#include <umm_malloc/umm_heap_select.h>
 // #include <AudioGeneratorMP3.h>
 #include <AudioOutputBuffer.h>
 #include <memory>
@@ -18,6 +19,8 @@ std::unique_ptr<AudioManager> AudioManager::instance;
 
 AudioManager& AudioManager::the()
 {
+	// HeapSelectIram iram;
+
 	if (!AudioManager::instance)
 		AudioManager::instance = std::make_unique<AudioManager>();
 

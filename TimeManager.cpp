@@ -3,11 +3,13 @@
 #include "PrintString.h"
 #include "zonelist.h"
 #include <ESP8266WiFi.h>
+#include <umm_malloc/umm_heap_select.h>
 
 std::unique_ptr<TimeManager> TimeManager::instance;
 
 TimeManager& TimeManager::the()
 {
+	// HeapSelectIram iram;
 	if (!TimeManager::instance)
 		TimeManager::instance = std::make_unique<TimeManager>();
 

@@ -175,6 +175,7 @@ void FileSelectMenu::perform_move(YesNoSelection selection)
 		FsFile file_to_move = card.open(source_file, O_RDWR);
 		// TODO: handle move error
 		file_to_move.rename(target_file.c_str());
+		file_to_move.remove();
 	}
 
 	operation = FileOperation::Move;

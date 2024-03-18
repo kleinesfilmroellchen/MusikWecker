@@ -2,7 +2,7 @@
 
 #include "Menu.h"
 
-constexpr double FPS = 3;
+constexpr double FPS = 6;
 constexpr uint16_t MILLIS_PER_FRAME = static_cast<uint16_t>((1.0 / FPS) * 1000.0);
 constexpr int IMAGE_WIDTH = 85;
 constexpr int IMAGE_HEIGHT = 64;

@@ -11,7 +11,7 @@
 // F = full framebuffer
 // 1 = small partial framebuffer
 // 2 = larger partial framebuffer
-#define FRAMEBUFFER_SIZE '2'
+#define FRAMEBUFFER_SIZE '1'
 
 #include "SdFatConfig.h"
 #include "ssid.h"
@@ -35,7 +35,9 @@ constexpr uint8_t PIN_SD_CS = TX;
 const SdSpiConfig SD_CONFIG = {
 	PIN_SD_CS,
 	DEDICATED_SPI,
-	SD_SCK_MHZ(30),
+	// Board is pretty glitchy above 20MHz even though any SD card should be able to do 40MHz.
+	// If the SD card decides to act up again, decrease this to 20MHz and slowly increase again as long as it's stable.
+	SD_SCK_MHZ(16),
 };
 
 // screen size
