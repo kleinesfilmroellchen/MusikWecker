@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "c2088c81-0dc4-4e4b-b3e8-717bab75c75c"
+        }
+    },
+    "manufacturer": "Power Analog Microelectronics",
+    "name": "PAM8610",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "32eefd53-7fe0-4d95-9964-09d04cfe7abe"
+}

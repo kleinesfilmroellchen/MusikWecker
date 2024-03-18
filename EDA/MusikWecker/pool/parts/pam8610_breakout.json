@@ -1,0 +1,77 @@
+{
+    "MPN": [
+        false,
+        "PAM8610"
+    ],
+    "datasheet": [
+        false,
+        "https://pdf1.alldatasheet.com/datasheet-pdf/view/246508/PAM/PAM8610.html"
+    ],
+    "description": [
+        false,
+        "10W Stereo Class-D Audio Power Amplifier with DC Volume Control"
+    ],
+    "entity": "32eefd53-7fe0-4d95-9964-09d04cfe7abe",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        "Power Analog Microelectronics"
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "98cbe215-18f9-44b8-9934-b814a7c04497",
+    "pad_map": {
+        "08860485-7871-43d5-8ad3-25a7f3e230d9": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "133d4f55-b9ec-4810-b68e-67b312db11cd"
+        },
+        "25253bc8-c4bc-45ed-965b-2ca8f9cc58d4": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "198a74d5-d9e7-4a3d-acd0-364934607d7e"
+        },
+        "5b17e7f9-f315-4298-9c8f-cd49f4e49aab": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "6b4b94a1-0e56-4449-bd6f-1b00f15b05e9"
+        },
+        "65828db0-b69d-438f-b9c3-f63ceabe388e": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "a1e60661-0cfd-45b0-b6ea-bd6402ec3c14"
+        },
+        "73a51a5a-edf6-4ce2-8500-1c7aa7c10b9b": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "2829f61e-21e6-4543-a067-1b3ba98d0d4c"
+        },
+        "7b5b36df-e222-4250-843d-79f27a33bea7": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "f4a6bca5-44f8-4162-9b70-44082bcf455b"
+        },
+        "858365ad-c166-4278-896f-ca8c801eb365": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "81eb9102-0810-451a-9005-95eebc554e1e"
+        },
+        "acbe3231-0142-4537-8b3f-cf95245352da": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "aa0f7da8-1cc4-4ed9-b92f-c52a6ff20efe"
+        },
+        "b17b1158-60bd-4345-9fb0-0c318f5960c8": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "6538dbd4-aab6-4390-bee0-8a837c0aad38"
+        },
+        "b67494f0-456f-4208-9f46-056c654a5cf9": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "699079f0-d6bb-4580-9068-04dc50aadf10"
+        },
+        "f86eb329-cc2f-42b8-b51f-00b37918aec8": {
+            "gate": "c0c14db1-2d28-4cc9-8ad0-6cfc4c4da6e1",
+            "pin": "4f56fb05-e2d1-4129-b266-9c0334023605"
+        }
+    },
+    "parametric": {},
+    "tags": [],
+    "type": "part",
+    "uuid": "f052be9a-de19-4272-b831-b17f33046d79",
+    "value": [
+        false,
+        ""
+    ]
+}

@@ -1,0 +1,74 @@
+{
+    "manufacturer": "Power Analog Microelectronics",
+    "name": "PAM8610",
+    "pins": {
+        "133d4f55-b9ec-4810-b68e-67b312db11cd": {
+            "direction": "power_input",
+            "names": [],
+            "primary_name": "VCC",
+            "swap_group": 0
+        },
+        "198a74d5-d9e7-4a3d-acd0-364934607d7e": {
+            "direction": "output",
+            "names": [],
+            "primary_name": "L-",
+            "swap_group": 0
+        },
+        "2829f61e-21e6-4543-a067-1b3ba98d0d4c": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "R_IN",
+            "swap_group": 0
+        },
+        "4f56fb05-e2d1-4129-b266-9c0334023605": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "GND_IN",
+            "swap_group": 0
+        },
+        "6538dbd4-aab6-4390-bee0-8a837c0aad38": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "SW-",
+            "swap_group": 0
+        },
+        "699079f0-d6bb-4580-9068-04dc50aadf10": {
+            "direction": "output",
+            "names": [],
+            "primary_name": "R+",
+            "swap_group": 0
+        },
+        "6b4b94a1-0e56-4449-bd6f-1b00f15b05e9": {
+            "direction": "output",
+            "names": [],
+            "primary_name": "L+",
+            "swap_group": 0
+        },
+        "81eb9102-0810-451a-9005-95eebc554e1e": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "SW+",
+            "swap_group": 0
+        },
+        "a1e60661-0cfd-45b0-b6ea-bd6402ec3c14": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "L_IN",
+            "swap_group": 0
+        },
+        "aa0f7da8-1cc4-4ed9-b92f-c52a6ff20efe": {
+            "direction": "power_input",
+            "names": [],
+            "primary_name": "GND",
+            "swap_group": 0
+        },
+        "f4a6bca5-44f8-4162-9b70-44082bcf455b": {
+            "direction": "output",
+            "names": [],
+            "primary_name": "R-",
+            "swap_group": 0
+        }
+    },
+    "type": "unit",
+    "uuid": "c2088c81-0dc4-4e4b-b3e8-717bab75c75c"
+}
