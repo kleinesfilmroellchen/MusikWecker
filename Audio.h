@@ -22,11 +22,6 @@ public:
 		the_sample_count++;
 		return UnderlyingOutput::ConsumeSample(sample);
 	}
-	virtual uint16_t ConsumeSamples(int16_t* samples, uint16_t count) override
-	{
-		the_sample_count += count;
-		return UnderlyingOutput::ConsumeSamples(samples, count);
-	}
 	virtual bool stop() override
 	{
 		the_sample_count = 0;
@@ -48,6 +43,8 @@ public:
 	void play(String& file_name);
 
 	float current_position() const;
+	size_t played_sample_count() const { return audio_output.sample_count();}
+	size_t sample_rate() const { return audio_output.sample_rate();}
 
 private:
 	// Singleton instance

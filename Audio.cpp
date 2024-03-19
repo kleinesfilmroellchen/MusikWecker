@@ -19,8 +19,6 @@ std::unique_ptr<AudioManager> AudioManager::instance;
 
 AudioManager& AudioManager::the()
 {
-	// HeapSelectIram iram;
-
 	if (!AudioManager::instance)
 		AudioManager::instance = std::make_unique<AudioManager>();
 
@@ -67,7 +65,7 @@ float AudioManager::current_position() const
 {
 	auto sample_rate = audio_output.sample_rate();
 	auto sample_count = audio_output.sample_count();
-	return static_cast<float>(sample_count) / sample_rate;
+	return static_cast<float>(static_cast<double>(sample_count) / sample_rate);
 }
 
 void AudioManager::loop()

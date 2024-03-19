@@ -21,23 +21,25 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	// current_frame_data.resize(current_frame_size);
 	// memcpy_P(current_frame_data.data(), current_frame_data_progmem, current_frame_size);
 
+	yield();
 	auto start_time = micros();
 	auto decompressed = SRLV::decompress({ current_frame_data_progmem, current_frame_size }, IMAGE_WIDTH * IMAGE_HEIGHT);
 	auto end_time = micros();
+	yield();
 
 	auto x = (display->getWidth() - IMAGE_WIDTH) / 2;
+	display->setDrawColor(1);
 	display->firstPage();
 	do {
 		yield();
-		display->setDrawColor(1);
 		auto draw_start = micros();
 		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
 		auto draw_end = micros();
 		yield();
 		char frame_info_text[256] {};
 		snprintf_P(frame_info_text, sizeof(frame_info_text),
-			PSTR("f %ld pos %.2f\ndecode %ldmicros\ndraw %ldmicros\nheap %d"),
-			current_frame, AudioManager::the().current_position(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
+			PSTR("f %ld = %.1f pos %.2f\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
+			current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
 		yield();
 		display->setFont(TINY_FONT);
 		yield();
@@ -51,7 +53,8 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 
 bool VideoPlayer::should_refresh(uint16_t delta_millis)
 {
-	auto new_frame = static_cast<size_t>(AudioManager::the().current_position() * FPS) % (sizeof(frames) / sizeof(*frames));
+	// FIXME: magic number here is a hack to fix a consistent A/V desync. may be 44.1/48 confusion but idk.
+	auto new_frame = static_cast<size_t>(AudioManager::the().current_position() * FPS * 0.92) % (sizeof(frames) / sizeof(*frames));
 	auto should_refresh = new_frame != current_frame;
 
 	current_frame = new_frame;

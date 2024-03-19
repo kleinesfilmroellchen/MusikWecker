@@ -6,7 +6,7 @@ from io import BytesIO
 import struct
 
 target_height = 64
-fps = 6
+fps = 9
 ms_per_frame = (1 / fps) * 1000
 
 

@@ -65,7 +65,7 @@ void apply_auto_disable_settings(AutoDisable auto_disable)
 
 Menu* create_menu_structure()
 {
-	// HeapSelectIram iram;
+	HeapSelectIram iram;
 
 	using namespace ClockFaces;
 	static std::array<ClockFace, 6> clock_faces {
