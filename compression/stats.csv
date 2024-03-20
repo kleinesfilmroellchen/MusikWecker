@@ -1,0 +1,25 @@
+Compression Type                                     ,% of raw data
+TIFF with CCITT Group 4                              ,33.6%
+Raw CCITT Group 4 (stripped TIFF)                    ,16.6%
+RLE with nibble compression                          ,31.6%
+RLE with LEB128                                      ,37.3%
+RLE with Rice-Golomb                                 ,29.5%
+RLE with nibble/LEB128                               ,31.3%
+RLE with nibble/LEB128 + transpose                   ,23.7%
+RLE with nibble + transpose                          ,24.6%
+RLE with nibble/LEB128/Pokémon + transpose           ,23.2%
+Blocking 5x4 with six-code combo                     ,26.3%
+Blocking 3x4 with nibble/Pokémon                     ,23.5%*
+Blocking 3x4 with nibble/Pokémon + delta + transpose ,23.2%*
+Blocking 4x4 with nibble/Pokémon + delta             ,29.8%
+Blocking 4x3 with nibble/Pokémon + delta             ,24.2%
+Blocking 4x3 with nibble/Pokémon + delta/snake       ,23.4%
+Blocking 3x4 with nibble/Pokémon + delta/snake       ,22.2%*
+Blocking 3x2 with nibble/Pokémon + delta/snake       ,21.1%*
+Blocking 1x4 with nibble/Pokémon + delta/snake       ,22.4%
+Blocking 10x4 with nibble/Pokémon + delta/snake      ,27.0%
+Blocking 5x4 with nibble/Pokémon + delta/snake       ,24.6%
+RLE with nibble/LEB128/Pokémon + delta/snake         ,22.3%
+Blocking 5x2 with nibble/Pokémon + delta/snake       ,22.6%
+
+*These blocking modes use significantly cropped images and are not easily comparable
