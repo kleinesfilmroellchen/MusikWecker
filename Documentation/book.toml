@@ -5,6 +5,9 @@ multilingual = true
 src = "."
 title = "MusikWecker Manual"
 
+[output.html]
+curly-quotes = true
+
 [preprocessor.toc]
 command = "mdbook-toc"
 renderer = ["html"]

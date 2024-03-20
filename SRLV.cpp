@@ -1,4 +1,5 @@
 #include "SRLV.h"
+#include <bit>
 
 #ifndef pgm_read_byte
 #define pgm_read_byte(x) (*(x))
@@ -105,12 +106,12 @@ static std::vector<uint8_t> decompress_pokemon(Span<uint8_t> data, size_t pixel_
 	};
 
 	for (size_t byte_index = 0; byte_index < data.size(); ++byte_index) {
-		auto byte = pgm_read_byte(data.offset_pointer(byte_index));
+		uint8_t byte = pgm_read_byte(data.offset_pointer(byte_index));
 		yield();
-		auto data = byte & rle_length_limit;
+		uint8_t data = byte & rle_length_limit;
 		if ((byte & full_byte_marker) > 0) {
-			auto run_length = data + 1;
-			size_t i = 0;
+			uint8_t run_length = data + 1;
+			uint8_t i = 0;
 			for (; (current_bit != 1) && i < run_length; ++i)
 				next_pixel();
 			for (; i + 8 < run_length; i += 8)
@@ -118,9 +119,15 @@ static std::vector<uint8_t> decompress_pokemon(Span<uint8_t> data, size_t pixel_
 			for (; i < run_length; ++i)
 				next_pixel();
 		} else {
-			for (int i = 6; i >= 0; --i) {
-				auto pixel_value = (data >> i) & 1;
-				if (pixel_value)
+			for (uint8_t i = 0; i < 7; ++i) {
+				// shift in remaining bits directly
+				if (current_bit == 1) {
+					current_byte = data >> i;
+					current_bit = 1 << (7 - i);
+					break;
+				}
+				uint8_t pixel_value = data & (1 << i);
+				if (pixel_value > 0)
 					current_byte |= current_bit;
 				next_pixel();
 			}
@@ -132,13 +139,13 @@ static std::vector<uint8_t> decompress_pokemon(Span<uint8_t> data, size_t pixel_
 
 	output.resize(byte_count, 0);
 
-	auto previous_pixel = 0;
+	uint8_t previous_pixel = 0;
 	for (size_t i = 0; i < output.size(); ++i) {
-		auto byte = output[i];
+		uint8_t byte = output[i];
 		uint8_t new_byte = 0;
 		for (auto bit = 0; bit <= 7; ++bit) {
-			int delta = (byte & (1 << bit)) > 0;
-			auto pixel_value = delta ^ previous_pixel;
+			uint8_t delta = (byte & (1 << bit)) > 0;
+			uint8_t pixel_value = delta ^ previous_pixel;
 			previous_pixel = pixel_value;
 			new_byte |= (pixel_value << bit);
 		}

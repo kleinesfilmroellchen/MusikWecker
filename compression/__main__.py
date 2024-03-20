@@ -280,7 +280,7 @@ def encode_pokémon(data: bytes) -> bytes:
         if len(current_raw_deltas) > 0:
             byte = 0
             for delta in current_raw_deltas:
-                byte = (byte << 1) | delta
+                byte = (byte >> 1) | (delta << 6)
             assert byte < limit
             output.append(byte)
             current_raw_deltas = []

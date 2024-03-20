@@ -120,7 +120,7 @@ To perform pixel-delta encoding, each pixel is encoded as the XOR of itself with
 For the run-length coding of these deltas, each byte may encode either:
 
 - a run of up to 128 pixels of black (0) or
-- 7 uncompressed pixels
+- 7 uncompressed pixels, in LSB-to-MSB-order
 
 The topmost bit (MSB) of a byte identifies the kind of coding used. `1` means black RLE, while `0` means raw encoding. For the RLE, a bias of 1 is used, so a codeword of `0x80` represents not a run of length 0, but length 1.
 
