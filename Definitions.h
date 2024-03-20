@@ -37,7 +37,7 @@ const SdSpiConfig SD_CONFIG = {
 	DEDICATED_SPI,
 	// Board is pretty glitchy above 20MHz even though any SD card should be able to do 40MHz.
 	// If the SD card decides to act up again, decrease this to 20MHz and slowly increase again as long as it's stable.
-	SD_SCK_MHZ(28),
+	SD_SCK_MHZ(8),
 };
 
 // screen size

@@ -32,15 +32,15 @@ AudioManager::AudioManager()
 {
 	timer.attach_ms(1, audio_timer_interrupt);
 	// test with first found file
-	FsFile dir = card.open("/");
-	FsFile file;
-	String base_name;
-	do {
-		file = dir.openNextFile();
-		base_name = get_base_name(file);
-	} while (file && (!(base_name.endsWith(F(".flac"))) || (base_name.length() < 1)));
-	String file_name = get_base_name(dir) + base_name;
-	play(file_name);
+	// FsFile dir = card.open("/");
+	// FsFile file;
+	// String base_name;
+	// do {
+	// 	file = dir.openNextFile();
+	// 	base_name = get_base_name(file);
+	// } while (file && (!(base_name.endsWith(F(".flac"))) || (base_name.length() < 1)));
+	// String file_name = get_base_name(dir) + base_name;
+	// play(file_name);
 }
 
 void AudioManager::play(String& file_name)
