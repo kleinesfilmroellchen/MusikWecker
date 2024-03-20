@@ -1,7 +1,7 @@
 {
     "programmer": "AVR ISP",
     "board": "esp8266:esp8266:d1_mini_clone",
-    "configuration": "xtal=160,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=4816H,non32xfer=fast,FlashMode=dio,FlashFreq=80,eesz=4M,ip=lm2f,dbg=Serial,lvl=NoAssert-NDEBUG,wipe=none,baud=921600",
+    "configuration": "xtal=160,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=4816H,non32xfer=fast,FlashMode=dio,FlashFreq=80,eesz=4M,ip=lm6f,dbg=Serial,lvl=NoAssert-NDEBUG,wipe=none,baud=921600",
     "port": "COM5",
     "output": "build",
     "sketch": "MusikWecker.ino"
