@@ -425,7 +425,7 @@ def encode(input: Path):
         )
         x_blocks = floor(image.size[0] / x_block_size)
         y_blocks = floor(image.size[1] / y_block_size)
-        image.crop((0, 0, x_blocks * x_block_size, y_blocks * y_block_size))
+        image = image.crop((0, 0, x_blocks * x_block_size, y_blocks * y_block_size))
         image_binary = bytes(reverse_mask(byte) for byte in image.tobytes())
 
         array_name = f"frame_{count}"
