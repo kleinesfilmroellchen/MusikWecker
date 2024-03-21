@@ -19,7 +19,7 @@ Blocking 3x2 with nibble/Pokémon + delta/snake       ,21.1%*
 Blocking 1x4 with nibble/Pokémon + delta/snake       ,22.4%
 Blocking 10x4 with nibble/Pokémon + delta/snake      ,27.0%
 Blocking 5x4 with nibble/Pokémon + delta/snake       ,24.6%
-RLE with nibble/LEB128/Pokémon + delta/snake         ,22.3%
+RLE with nibble/Pokémon + delta/snake                ,22.3%
 Blocking 5x2 with nibble/Pokémon + delta/snake       ,22.6%
 
 *These blocking modes use significantly cropped images and are not easily comparable
