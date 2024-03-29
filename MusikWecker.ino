@@ -33,8 +33,10 @@
 #include "strings.h"
 #include "zonelist.h"
 #include <AceTime.h>
+#include <ArduinoOTA.h>
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <NTPClient.h>
 #include <U8g2lib.h>
 #include <WiFiUdp.h>
@@ -110,6 +112,10 @@ void setup()
 	WiFi.setAutoReconnect(true);
 	yield();
 
+	ArduinoOTA.setHostname(HOSTNAME);
+	ArduinoOTA.begin();
+	MDNS.begin(HOSTNAME);
+
 	// pins
 	pinMode(PIN_BUTTON_LEFT, INPUT_PULLUP);
 	pinMode(PIN_BUTTON_RIGHT, INPUT_PULLUP);
@@ -142,9 +148,7 @@ void setup()
 	yield();
 
 	debug_print(F("Trying to setup audio..."));
-#if USE_SERIAL
-	audioLogger = &Serial;
-#endif
+	audioLogger = &DebugManager::the();
 	AudioManager::the();
 
 	display.firstPage();
@@ -168,7 +172,11 @@ void loop()
 	auto current_loop_time = millis();
 	yield();
 
+	ArduinoOTA.handle();
+
 	TimeManager::the().update_if_needed();
+
+	DebugManager::the().handle();
 
 	// read buttons, some bit magic here
 	uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << BUTTON_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << BUTTON_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << BUTTON_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << BUTTON_LEFT_BIT));

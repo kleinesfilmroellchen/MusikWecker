@@ -110,7 +110,7 @@ static std::vector<uint8_t> decompress_pokemon(Span<uint8_t> data, size_t pixel_
 		yield();
 		uint8_t data = byte & rle_length_limit;
 		if ((byte & full_byte_marker) > 0) {
-			uint8_t run_length = data + 1;
+			uint8_t run_length = data + 7;
 			uint8_t i = 0;
 			for (; (current_bit != 1) && i < run_length; ++i)
 				next_pixel();

@@ -30,6 +30,8 @@ constexpr double QUARTER_PI = PI_FACTOR<1, 4>;
 // 135 degrees = 3π/4 radians
 constexpr double THREE_QUARTER_PI = PI_FACTOR<3, 4>;
 
+constexpr char const* HOSTNAME = "MusikWecker";
+
 // chip select pin for sd card
 constexpr uint8_t PIN_SD_CS = TX;
 const SdSpiConfig SD_CONFIG = {

@@ -80,7 +80,7 @@ Menu* VideoPlayer::handle_button(uint8_t buttons)
 		return this->parent;
 	}
 	if (buttons & BUTTON_RIGHT) {
-		String bad_apple(F("/Bad Apple.flac"));
+		String bad_apple(F("Bad Apple.flac"));
 		AudioManager::the().play(bad_apple);
 	}
 	return this;

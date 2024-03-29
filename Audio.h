@@ -43,8 +43,8 @@ public:
 	void play(String& file_name);
 
 	float current_position() const;
-	size_t played_sample_count() const { return audio_output.sample_count();}
-	size_t sample_rate() const { return audio_output.sample_rate();}
+	size_t played_sample_count() const { return audio_output.sample_count(); }
+	size_t sample_rate() const { return audio_output.sample_rate(); }
 
 private:
 	// Singleton instance

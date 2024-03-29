@@ -1,6 +1,7 @@
 import argparse
+from enum import Enum
 from itertools import batched, chain, product
-from math import ceil, floor
+from math import ceil, floor, log2
 from pathlib import Path
 import cv2
 from PIL import Image
@@ -11,7 +12,7 @@ from dataclasses import dataclass, field
 
 
 target_height = 64
-fps = 9
+fps = 8
 ms_per_frame = (1 / fps) * 1000
 
 x_block_size = 80
@@ -129,27 +130,66 @@ class BitStream:
             return
         self.write_bits(0, 8 - self.current_bit)
 
+    def write_rice(self, value: int, k: int) -> int:
+        """
+        Barring the zig-zag encoding, this is basically:
+        https://github.com/xiph/flac/blob/28e4f0528c76b296c561e922ba67d43751990599/src/libFLAC/bitwriter.c#L727
+        """
+        msbs = value >> k
+        pattern = 1 << k
+        pattern |= value & (pattern - 1)
+        self.write_bits(0, msbs)
+        self.write_bits(pattern, k + 1)
+        return msbs
 
-def write_rice(value: int, k: int, stream: BitStream):
+    def write_exponential_golomb(self, value: int):
+        """Rice order 0"""
+        leading_bits = int(floor(log2(value)) + 1)
+        self.write_bits(0, leading_bits - 1)
+        self.write_bits(value, leading_bits)
+
+
+def encode_rice(data: list[int]) -> tuple[bytes, int]:
     """
-    Barring the zig-zag encoding, this is basically:
-    https://github.com/xiph/flac/blob/28e4f0528c76b296c561e922ba67d43751990599/src/libFLAC/bitwriter.c#L727
+    Rice / Exponential Golomb coding for variable length integers.
+    Adaptive k algorithm based on https://ieeexplore.ieee.org/document/4362102,
+    a variant of the Melcode algorithm: https://ieeexplore.ieee.org/document/855427
     """
-    msbs = value >> k
-    pattern = 1 << k
-    pattern |= value & (pattern - 1)
-    stream.write_bits(0, msbs)
-    stream.write_bits(pattern, k + 1)
+    M = 7
 
+    shortest_data = bytes()
+    shortest_len = 100000000000
+    shortest_k = 0
 
-def encode_rice(data: list[int]) -> bytes:
-    """Rice / Exponential Golomb coding for variable length integers."""
+    # for k in range(1, 10):
+    k = 4
     stream = BitStream()
+    counter = 0
     for value in data:
-        # TODO: select k more intelligently
-        write_rice(value, 5, stream)
+        u = stream.write_rice(value, k)
+        # if u > 1:
+        #     counter += 1
+        # if u > 2:
+        #     counter += 1
+        # if u > 3:
+        #     counter += 1
+        # if u > 4:
+        #     counter += 1
+        # if u == 0 and (counter & (1 << k)) == 0:
+        #     counter -= 1
+        # if counter >= M:
+        #     k += 1
+        #     counter = 0
+        # if counter <= -M:
+        #     k -= 1
+        #     counter = 0
     stream.write_to_byte_boundary()
-    return stream.data
+    # if len(stream.data) < shortest_len:
+    #     shortest_data = stream.data
+    #     shortest_len = len(shortest_data)
+    #     shortest_k = k
+
+    return (stream.data, shortest_k)
 
 
 def encode_leb(data: list[int]) -> bytes:
@@ -240,9 +280,68 @@ def encode_rle_unbounded(data: bytes) -> list[int]:
     return output
 
 
-def encode_pokémon(data: bytes) -> bytes:
+class PacketType(Enum):
+    RLE = 1
+    Data = 0
+
+
+def encode_pokémon(data: bytes) -> tuple[bytes, PacketType]:
     """
-    Compression scheme inspired by Pokémon Red/Blue/Yellow's compression for Pokémon battle graphics.
+    Compression scheme almost identical to Pokémon Red/Blue/Yellow's compression for Pokémon battle graphics.
+    First, perform delta coding with the next pixel to yield many black pixels and a few white ones.
+    Pixels are split up into two-bit pairs.
+    Whenever there's a series of more than two pixels of black, they're encoded as an Exponential Golomb coded number.
+    Otherwise, raw data bit pairs are used, until 00 indicates the end of the raw data.
+    After that, another RLE packet follows, and so on.
+    Whether the first packet is RLE or data will be encoded in the format itself,
+    so the returned boolean indicates whether this was RLE (True) or data (False).
+    """
+    previous_pixel = 0
+    # relatively inefficient storage, but we need to operate on the pixels again anyways so it doesn't matter
+    # the decoder will do the two steps combined to save memory.
+    deltas: list[int] = []
+    for byte in data:
+        for bit in range(8):
+            pixel_value = 1 if (byte & (1 << bit)) >= 1 else 0
+            delta = previous_pixel ^ pixel_value
+            deltas.append(delta)
+            previous_pixel = pixel_value
+
+    output_stream = BitStream()
+    first_packet_type: None | PacketType = None
+    i = 0
+    bit_pairs = list(batched(deltas, 2))
+    while i < len(bit_pairs):
+        packet = bit_pairs[i]
+        i += 1
+        match packet:
+            # encode as much data as possible using RLE
+            case (0, 0):
+                if first_packet_type is None:
+                    first_packet_type = PacketType.RLE
+                else:
+                    # terminate data packet
+                    output_stream.write_bits(0, 2)
+
+                bit_count = 1
+                while i < len(bit_pairs) and bit_pairs[i] == (0, 0):
+                    i += 1
+                    bit_count += 1
+                output_stream.write_exponential_golomb(bit_count)
+
+            case (bit0, bit1):
+                if first_packet_type is None:
+                    first_packet_type = PacketType.Data
+                output_stream.write_bits((bit0 << 1) | bit1, 2)
+
+    output_stream.write_to_byte_boundary()
+    # print([bin(x) for x in output_stream.data])
+    return (output_stream.data, first_packet_type)
+
+
+def encode_garbagémon(data: bytes) -> bytes:
+    """
+    Compression scheme loosely inspired by Pokémon Red/Blue/Yellow's compression for Pokémon battle graphics.
     First, perform delta coding with the next pixel to yield many black pixels and a few white ones.
     Pixels are encoded as either (1) a black run from 1-128 (bias of 1, marker bit 1)
     or (0) seven raw pixels (marker bit 0).
@@ -259,7 +358,8 @@ def encode_pokémon(data: bytes) -> bytes:
             deltas.append(delta)
             previous_pixel = pixel_value
 
-    limit = 128
+    bias = 7
+    limit = 127 + bias
     marker = 0x80
 
     output = bytearray()
@@ -270,9 +370,14 @@ def encode_pokémon(data: bytes) -> bytes:
         nonlocal output, current_run_length, marker, limit
         if current_run_length > 0:
             while current_run_length > limit:
-                output.append((limit - 1) | marker)
+                output.append((limit - bias) | marker)
                 current_run_length -= limit
-            output.append((current_run_length - 1) | marker)
+            if current_run_length >= bias:
+                output.append((current_run_length - bias) | marker)
+            else:
+                current_raw_deltas.extend([0] * current_run_length)
+                if current_run_length == 7:
+                    terminate_raw_deltas()
             current_run_length = 0
 
     def terminate_raw_deltas():
@@ -298,7 +403,7 @@ def encode_pokémon(data: bytes) -> bytes:
         else:
             # terminate any ongoing run since we can't continue it
             # if the run is less than 7 pixels, it's more efficient to encode it together with this white pixel as a raw byte
-            if current_run_length > 0 and current_run_length < 7:
+            if current_run_length > 0 and current_run_length < bias:
                 current_raw_deltas.extend([0] * current_run_length)
                 current_run_length = 0
             else:
@@ -319,7 +424,9 @@ def encode_pokémon(data: bytes) -> bytes:
 T = TypeVar("T")
 
 
-def encode_block(block: Image, previous_block: Image, encoder_counts: list) -> bytes:
+def encode_block(
+    block: Image, previous_block: Image, encoder_counts: list[int], k_counts: list[int]
+) -> bytes:
     block_data = bytes(reverse_mask(byte) for byte in block.tobytes())
     # do zig-zag or snaking encoding of the block data, which may generate longer stretches of the same color
     block_data_snake = bytes(
@@ -352,14 +459,22 @@ def encode_block(block: Image, previous_block: Image, encoder_counts: list) -> b
     # leb_snake_compressed = encode_leb(
     #     encode_rle_unbounded(block_data_snake)
     # )
+    # garbagémon
+    garbagémon_compressed = encode_garbagémon(block_data)
+    garbagémon_compressed_delta = encode_garbagémon(delta)
+    garbagémon_snake_compressed = encode_garbagémon(block_data_snake)
+    # garbagémon_snake_compressed_delta = encode_garbagémon(delta_snake)
     # Pokémon
-    pokémon_compressed = encode_pokémon(block_data)
-    pokémon_compressed_delta = encode_pokémon(delta)
-    pokémon_snake_compressed = encode_pokémon(block_data_snake)
-    # pokémon_snake_compressed_delta = encode_pokémon(delta_snake)
+    # FIXME: doesn't properly account for two different start types so far
+    # pokémon_compressed, _ = encode_pokémon(block_data)
+    # pokémon_compressed_delta, _ = encode_pokémon(delta)
+    # pokémon_snake_compressed, _ = encode_pokémon(block_data_snake)
     # RLE + Rice/Exponential-Golomb
-    rice_compressed = encode_rice(encode_rle_unbounded(block_data))
-    rice_size = len(rice_compressed)
+    # rice_compressed, k_rice = encode_rice(encode_rle_unbounded(block_data))
+    # rice_compressed_delta = encode_rice(encode_rle_unbounded(delta))
+    # rice_snake_compressed, k_rice_snake = encode_rice(
+    #     encode_rle_unbounded(block_data_snake)
+    # )
     # Pick best compressor. In the case that they are equal, pick fast compressor.
     compressed_image_data: bytes
     compressed_size: int = 100000000000000000
@@ -372,10 +487,15 @@ def encode_block(block: Image, previous_block: Image, encoder_counts: list) -> b
             # nibble_snake_compressed_delta,
             # leb_compressed,
             # leb_snake_compressed,
-            pokémon_compressed,
-            pokémon_compressed_delta,
-            pokémon_snake_compressed,
-            # pokémon_snake_compressed_delta,
+            garbagémon_compressed,
+            garbagémon_compressed_delta,
+            garbagémon_snake_compressed,
+            # pokémon_compressed,
+            # pokémon_compressed_delta,
+            # pokémon_snake_compressed,
+            # rice_compressed,
+            # rice_compressed_delta,
+            # rice_snake_compressed,
             # block_data,
         ]
     ):
@@ -385,6 +505,8 @@ def encode_block(block: Image, previous_block: Image, encoder_counts: list) -> b
             compressed_size = len(data)
 
     encoder_counts[compressed_encoder_number] += 1
+    # k_counts[k_rice] += 1
+    # k_counts[k_rice_snake] += 1
     # assert compressed_size < (x_block_size * y_block_size) / 8
     # assert compressed_size < 256
     # bytes([compressed_encoder_number, compressed_size])
@@ -405,7 +527,8 @@ def encode(input: Path):
 
     count = 0
     reuse_count = 0
-    encoder_counts = [0] * 10
+    encoder_counts = [0] * 20
+    k_counts = [0] * 20
 
     binary_size = 0
     raw_size = 0
@@ -453,7 +576,9 @@ def encode(input: Path):
                 previous_block = last_frame.crop(box)
             else:
                 previous_block = block
-            encoded_block = encode_block(block, previous_block, encoder_counts)
+            encoded_block = encode_block(
+                block, previous_block, encoder_counts, k_counts
+            )
             compressed_image_data += encoded_block
 
         c_array = bytes_to_c_array(compressed_image_data, array_name)
@@ -482,19 +607,28 @@ def encode(input: Path):
                 encoder_counts,
                 [
                     "nibble",
-                    "nibble delta",
+                    # "nibble delta",
                     "nibble snake",
-                    # "nibble snake delta",
-                    # "LEB",
-                    # "LEB snake",
-                    "Pokémon",
-                    "Pokémon delta",
-                    "Pokémon snake",
-                    # "Pokémon snake delta",
+                    # "garbagémon",
+                    # "garbagémon delta",
+                    # "garbagémon snake",
+                    # "pokémon",
+                    "pokémon delta",
+                    "pokémon snake",
+                    "rice",
+                    # "rice delta",
+                    "rice snake",
                     # "raw",
                 ],
             )
         )
+    )
+    print(
+        "k:\n",
+        ", ".join(
+            f"{count / (x_blocks*y_blocks*output_frame_count*7) * 100:.2f}% {k}"
+            for k, count in enumerate(k_counts)
+        ),
     )
     print(
         f"{binary_size} bytes compressed, {raw_size} bytes raw, {binary_size / raw_size * 100:.1f}%"

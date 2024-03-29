@@ -5,6 +5,7 @@
 
 #include "ClockFaces.h"
 #include "Settings.h"
+#include <ESP8266WiFi.h>
 #include <NTPClient.h>
 
 extern EepromSettings eeprom_settings;
@@ -14,3 +15,5 @@ extern ClockFaces::ClockFace current_clock_face;
 extern SdFs card;
 
 extern Display display;
+
+extern WiFiServer log_server;
