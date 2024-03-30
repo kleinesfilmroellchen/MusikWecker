@@ -57,4 +57,4 @@ private:
 };
 
 // fake non-realtime cooperative "interrupt" invoked via yield()/delay()
-void IRAM_ATTR audio_timer_interrupt();
+void audio_timer_interrupt();

@@ -1,9 +1,12 @@
 #include "Debug.h"
+#include <umm_malloc/umm_heap_select.h>
 
 std::unique_ptr<DebugManager> DebugManager::instance;
 
 DebugManager& DebugManager::the()
 {
+	HeapSelectIram iram;
+
 	if (!DebugManager::instance)
 		DebugManager::instance = std::make_unique<DebugManager>();
 
@@ -47,6 +50,8 @@ size_t DebugManager::write(const uint8_t* buffer, size_t size)
 
 void DebugManager::handle()
 {
+	HeapSelectIram iram;
+
 	while (log_server.hasClient()) {
 		log_clients.push_back(log_server.accept());
 	}

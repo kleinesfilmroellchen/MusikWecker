@@ -24,22 +24,22 @@ template <uint64_t numerator, uint64_t denominator, typename Floating = double>
 constexpr Floating PI_FACTOR = static_cast<Floating>(numerator) * static_cast<Floating>(PI) / static_cast<Floating>(denominator);
 
 // 30 degrees = π/6 radians
-constexpr double PI_DIV6 = PI_FACTOR<1, 6>;
+constexpr double PI_DIV6 PROGMEM = PI_FACTOR<1, 6>;
 // 90 degrees = π/4 radians
-constexpr double QUARTER_PI = PI_FACTOR<1, 4>;
+constexpr double QUARTER_PI PROGMEM = PI_FACTOR<1, 4>;
 // 135 degrees = 3π/4 radians
-constexpr double THREE_QUARTER_PI = PI_FACTOR<3, 4>;
+constexpr double THREE_QUARTER_PI PROGMEM = PI_FACTOR<3, 4>;
 
-constexpr char const* HOSTNAME = "MusikWecker";
+static char const* HOSTNAME PROGMEM = "MusikWecker";
 
 // chip select pin for sd card
 constexpr uint8_t PIN_SD_CS = TX;
-const SdSpiConfig SD_CONFIG = {
+static const SdSpiConfig SD_CONFIG = {
 	PIN_SD_CS,
 	DEDICATED_SPI,
 	// Board is pretty glitchy above 20MHz even though any SD card should be able to do 40MHz.
 	// If the SD card decides to act up again, decrease this to 20MHz and slowly increase again as long as it's stable.
-	SD_SCK_MHZ(8),
+	SD_SCK_MHZ(30),
 };
 
 // screen size
@@ -122,7 +122,7 @@ constexpr uint16_t BUTTON_HOLD_REPEAT_DELAY = 100;
 constexpr uint16_t CLOCK_PREVIEW_DELAY = 5000;
 
 // temporary hard-coded time server, user will later be able to choose
-constexpr char const* TEMP_TIME_SERVER = "europe.pool.ntp.org";
+constexpr char const* TEMP_TIME_SERVER PROGMEM = "europe.pool.ntp.org";
 // ntp update interval at 30 minutes
 constexpr uint16_t TEMP_NTP_UPDATE_INTERVAL = 60000;
 // for testing

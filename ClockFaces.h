@@ -4,7 +4,6 @@
 
 #include "Definitions.h"
 #include "DisplayUtils.h"
-#include "triglut_math.h"
 #include <AceTime.h>
 #include <U8g2lib.h>
 

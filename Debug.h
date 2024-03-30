@@ -30,5 +30,5 @@ private:
 template <typename Printable>
 inline void debug_print(Printable text)
 {
-	DebugManager::the().println(text);
+	// DebugManager::the().println(text);
 }

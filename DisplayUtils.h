@@ -4,7 +4,6 @@
 
 #include "Audio.h"
 #include "Definitions.h"
-#include "triglut_math.h"
 #include <U8g2lib.h>
 #include <array>
 

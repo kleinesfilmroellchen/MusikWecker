@@ -37,17 +37,11 @@
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <NTPClient.h>
 #include <U8g2lib.h>
-#include <WiFiUdp.h>
 #include <gpio.h>
 #include <spiram-fast.h>
-
-extern "C" {
+#include <umm_malloc/umm_heap_select.h>
 #include <user_interface.h>
-}
-
-using namespace ace_time;
 
 void setup();
 void loop();
@@ -76,12 +70,11 @@ uint32_t drawTime = 0;
 
 // currently open menu, e.g. clock or settings
 Menu* current_menu = nullptr;
-// pointer to current function pointer responsible for clock face drawing
+// current function responsible for clock face drawing
 ClockFaces::ClockFace current_clock_face;
 
 void setup()
 {
-// comment this if you need the serial pins for i/o
 #if USE_SERIAL
 	Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_TX_ONLY);
 	while (!Serial)
@@ -89,20 +82,23 @@ void setup()
 	Serial.println();
 #endif
 
-	// connect display first for debugging
-	if (!display.begin()) {
-		// Force initialize serial port to allow for better debugging; we're resetting in a moment anyways
-		Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_TX_ONLY);
-		while (!Serial)
-			yield();
-		Serial.println(F("SSD1306 connection FAILED."));
-		ESP.reset();
-	} else {
-		display.setCursor(LINE_HEIGHT, 0);
-		display.setBusClock(DISPLAY_CLOCK_SPEED);
-		debug_print(F("Display ok."));
+	{
+		HeapSelectIram iram;
+		// connect display first for debugging
+		if (!display.begin()) {
+			// Force initialize serial port to allow for better debugging; we're resetting in a moment anyways
+			Serial.begin(115200, SerialConfig::SERIAL_8N1, SerialMode::SERIAL_TX_ONLY);
+			while (!Serial)
+				yield();
+			Serial.println(F("SSD1306 connection FAILED."));
+			ESP.reset();
+		} else {
+			display.setCursor(LINE_HEIGHT, 0);
+			display.setBusClock(DISPLAY_CLOCK_SPEED);
+			debug_print(F("Display ok."));
+		}
+		yield();
 	}
-	yield();
 
 	// ----------------------------------------------------------
 	// init
@@ -112,9 +108,12 @@ void setup()
 	WiFi.setAutoReconnect(true);
 	yield();
 
-	ArduinoOTA.setHostname(HOSTNAME);
-	ArduinoOTA.begin();
-	MDNS.begin(HOSTNAME);
+	{
+		HeapSelectIram iram;
+		// ArduinoOTA.setHostname(HOSTNAME);
+		// ArduinoOTA.begin();
+		// MDNS.begin(HOSTNAME);
+	}
 
 	// pins
 	pinMode(PIN_BUTTON_LEFT, INPUT_PULLUP);
@@ -132,23 +131,26 @@ void setup()
 		save_settings();
 	}
 
-	// connect SD card
-	// "Note that even if you don’t use the hardware SS pin, it must be left as an output or the SD library won’t work."
-	pinMode(SS, OUTPUT);
-	bool sdConnectResult = card.begin(SD_CONFIG);
-	if (!sdConnectResult) {
-		debug_print(F("Connection to SD card FAILED. Error code:"));
-		debug_print(card.sdErrorCode());
-		debug_print(F("Data:"));
-		debug_print(card.sdErrorData());
-		// ESP.reset();
-	} else {
-		debug_print(F("SD ok."));
+	{
+		HeapSelectIram iram;
+		// connect SD card
+		// "Note that even if you don’t use the hardware SS pin, it must be left as an output or the SD library won’t work."
+		pinMode(SS, OUTPUT);
+		bool sdConnectResult = card.begin(SD_CONFIG);
+		if (!sdConnectResult) {
+			debug_print(F("Connection to SD card FAILED. Error code:"));
+			debug_print(card.sdErrorCode());
+			debug_print(F("Data:"));
+			debug_print(card.sdErrorData());
+			// ESP.reset();
+		} else {
+			debug_print(F("SD ok."));
+		}
+		yield();
 	}
-	yield();
 
 	debug_print(F("Trying to setup audio..."));
-	audioLogger = &DebugManager::the();
+	// audioLogger = &DebugManager::the();
 	AudioManager::the();
 
 	display.firstPage();
@@ -158,7 +160,7 @@ void setup()
 		display.setFontMode(1);
 	} while (display.nextPage());
 
-	TimeManager::the();
+	TimeManager::the().update_if_needed();
 
 	current_menu = create_menu_structure();
 
@@ -172,56 +174,61 @@ void loop()
 	auto current_loop_time = millis();
 	yield();
 
-	ArduinoOTA.handle();
-
+	// ArduinoOTA.handle();
+	// yield();
+	// MDNS.update();
+	yield();
 	TimeManager::the().update_if_needed();
-
-	DebugManager::the().handle();
+	yield();
+	// DebugManager::the().handle();
 
 	// read buttons, some bit magic here
 	uint8_t buttons = 0x0f & (((analogRead(PIN_BUTTON_UPDOWN) > 750) << BUTTON_UP_BIT) | ((analogRead(PIN_BUTTON_UPDOWN) < 350) << BUTTON_DOWN_BIT) | ((~digitalRead(PIN_BUTTON_RIGHT) & 1) << BUTTON_RIGHT_BIT) | ((~digitalRead(PIN_BUTTON_LEFT) & 1) << BUTTON_LEFT_BIT));
+	{
+		HeapSelectIram iram;
 
-	// if a button is held and the time since button change exceeds the hold time "delay"...
-	if ((current_loop_time - button_change_time > BUTTON_HOLD_DELAY) && (buttons != 0)) {
-		// decrease delta to next simulated button press by loop delta
-		button_hold_time_delta -= current_loop_time - previous_loop_time;
-	} else {
-		// else reset delta
-		button_hold_time_delta = BUTTON_HOLD_REPEAT_DELAY;
-	}
+		// if a button is held and the time since button change exceeds the hold time "delay"...
+		if ((current_loop_time - button_change_time > BUTTON_HOLD_DELAY) && (buttons != 0)) {
+			// decrease delta to next simulated button press by loop delta
+			button_hold_time_delta -= current_loop_time - previous_loop_time;
+		} else {
+			// else reset delta
+			button_hold_time_delta = BUTTON_HOLD_REPEAT_DELAY;
+		}
 
-	// temporary storage for a possibly different new menu
-	Menu* newMenu = current_menu;
-	// handle buttons
-	if (buttons != last_buttons || (button_hold_time_delta < 0)) {
-		newMenu = newMenu->handle_button(buttons);
-	}
+		// temporary storage for a possibly different new menu
+		Menu* newMenu = current_menu;
+		// handle buttons
+		if (buttons != last_buttons || (button_hold_time_delta < 0)) {
+			newMenu = newMenu->handle_button(buttons);
+		}
 
-	// any button state is different: update last button time
-	if (buttons != last_buttons) {
-		button_change_time = current_loop_time;
-		button_hold_time_delta = BUTTON_HOLD_REPEAT_DELAY;
-	}
-	// reset time to next simulated button press if a button press was just simulated
-	if (button_hold_time_delta < 0) {
-		button_hold_time_delta += BUTTON_HOLD_REPEAT_DELAY;
-	}
+		// any button state is different: update last button time
+		if (buttons != last_buttons) {
+			button_change_time = current_loop_time;
+			button_hold_time_delta = BUTTON_HOLD_REPEAT_DELAY;
+		}
+		// reset time to next simulated button press if a button press was just simulated
+		if (button_hold_time_delta < 0) {
+			button_hold_time_delta += BUTTON_HOLD_REPEAT_DELAY;
+		}
 
-	yield();
-
-	// draw if menu changed due to buttons
-	if (current_menu != newMenu) {
-		newMenu = newMenu->draw_menu(&display, current_loop_time - drawTime);
-	}
-	// draw if menu wants to refresh
-	else if (newMenu->should_refresh(current_loop_time - previous_loop_time)) {
 		yield();
-		current_menu = newMenu->draw_menu(&display, current_loop_time - drawTime);
-		drawTime = current_loop_time;
-	}
 
-	// store new menu
-	current_menu = newMenu;
+		// draw if menu changed due to buttons
+		if (current_menu != newMenu) {
+			newMenu = newMenu->draw_menu(&display, current_loop_time - drawTime);
+		}
+		// draw if menu wants to refresh
+		else if (newMenu->should_refresh(current_loop_time - previous_loop_time)) {
+			yield();
+			current_menu = newMenu->draw_menu(&display, current_loop_time - drawTime);
+			drawTime = current_loop_time;
+		}
+
+		// store new menu
+		current_menu = newMenu;
+	}
 
 	// TODO: light sleep regularly crashes the ESP8266, and I don't quite know why.
 	// The entire light sleep setup itself is rather finnicky in the first place, and there's zero good documentation on it.
