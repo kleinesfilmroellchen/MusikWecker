@@ -9,7 +9,7 @@ Der Wecker benutzt eine Micro-SD-Karte, um dort gespeicherte Musik zum Wecken zu
 
 Der Wecker unterstützt nur Karten, die ein FAT-Dateisystem (FAT16, FAT32, exFAT) haben und entsprechend dem SD-Standard formatiert sind. Die Formatierung nach diesen Kriterien wird z.B. vom offiziellen SD-Karten-Formatierungstool der SD Association durchgeführt, welches [hier](https://www.sdcard.org/downloads/formatter/) kostenlos heruntergeladen werden kann.
 
-Zum Einlegen oder Entnehmen einer SD-Karte sollte der Wecker nicht eingeschaltet sein, da dies die Daten auf der SD-Karte beschädigen kann.
+Zum Einlegen oder Entnehmen einer SD-Karte sollte der Wecker nicht eingeschaltet sein, da dies die Daten auf der SD-Karte beschädigen kann. Außerdem kann der Wecker mit dem Entnehmen oder Einlegen der SD-Karte zur Laufzeit nicht gut umgehen und stürzt eventuell ab.
 
 ## Dateiansicht
 

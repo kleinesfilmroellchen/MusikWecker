@@ -2,7 +2,7 @@
 
 Dieses Benutzerhandbuch ist für Benutzer\*innen des MusikWeckers gedacht, nicht für Entwickler.
 
-Diese Seite behandelt die Grundlagen des Weckers, die Uhranzeige und die Einstellungsmenüs. Auf weiteren Seiten (Liste links) finden sich detaillierte Informationen zu anderen Aspekten.
+Diese Seite behandelt die Grundlagen des Weckers. Auf weiteren Seiten (Liste links) finden sich detaillierte Informationen zu anderen Aspekten.
 
 - auto-gen TOC;
   {:toc}

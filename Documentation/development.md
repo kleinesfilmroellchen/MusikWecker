@@ -14,8 +14,14 @@ The TCP logging does not easily handle early boot messages, or early boot failur
 
 ## TODOs because I forget
 
-Some of the things I still need to implement
+Some of the things I still need to implement. In rough order of priority
 
+### Must
+
+- Bugs/QOL
+	- File list doesn't reload everywhere when files are moved and deleted
+	- Diagnostics page is broken
+	- Move clock design page to new settings section (see below)
 - The entire alarm system
 	- Creating and deleting alarms
 	- Alarm saving and restoring (EEPROM is fixed size; how to implement dynamic alarm clock count?)
@@ -25,18 +31,37 @@ Some of the things I still need to implement
 - Software volume control
 - Power saving shenanigans
 	- Core clock-down while we're not playing music. 160MHz is really only needed for the high SPI+I2S+audio decode workload.
-	- Use an actually preempting hardware timer for audio playback. timer1 _should_ work, but we need to reach into Espressif C APIs for this.
-	- Figure out why light sleep is so crashy
-	- Periodically do fake wakeups from light sleep every 10s or so to trick "smart" battery banks into not shutting off power
+	- Flash clock-down for the same reasons.
 - Play music when selected in file view
-	- Play entire folder
-	- a fucking MP3 player (the hardware is here anyways)
-- All the settings:
+- Important settings
 	- Disable/enable date display
 	- Configure clock format for digital clocks (12h/24h)
 	- Configure date format
+		- ISO
+		- German short
+		- German long
 	- Configure NTP update interval
+		- 60s
+		- 5min
+		- 30min
+		- 24h
 	- Configure NTP server
+
+### Want
+
+- Nicer interface for yes/no selection menus
+- Web UI for configuring more complex stuff
+	- Name alarms
+	- Specifying 
+	- Rename files
+- Talk to Home Assistant for updating alarm times (since HA has an easier time receiving alarm data from Google services and the like)
+- MP3 player
+	- "Currently playing" page (in the clock menu?)
+	- Play entire folder
+	- Index all music, allow playback by artist, album, etc.
+
+### Nice to have
+
 - Put together a BOM for making a single PCB for this
 - Design a single PCB for this
 - Manufacture a single PCB for this
