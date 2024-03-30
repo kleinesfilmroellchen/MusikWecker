@@ -12,6 +12,31 @@ Since the serial port's pins are in use for other purposes, debugging via serial
 
 The TCP logging does not easily handle early boot messages, or early boot failures. Debugging those is exceptionally hard to impossible on the MusikWecker and comes down to trial and error, i.e. commenting and un-commenting code until an offending statement is found and using guesswork to determine the underlying issue. Sometimes, serial debugging is possible here; you may need to disable the SD card initialization and/or audio management initialization.
 
+## If the Bad Apple demo is slow
+
+(i.e. stuttery video playback, but fine audio playback)
+
+Force all important I2S routines into IRAM, like so:
+
+```cpp
+// I2S.h in ESP8266 core libraries
+// insert the IRAM_ATTR in the appropriate places:
+
+  // from Stream
+  virtual int IRAM_ATTR available();
+  virtual int IRAM_ATTR read(); // Blocking, will wait for incoming data
+  virtual int IRAM_ATTR peek(); // Blocking, will wait for incoming data   
+  virtual void IRAM_ATTR flush();
+
+  // from Print (see notes on write() methods below)
+  virtual size_t IRAM_ATTR write(uint8_t);
+  virtual size_t IRAM_ATTR write(const uint8_t *buffer, size_t size);
+  virtual int IRAM_ATTR availableForWrite();
+
+```
+
+[An issue to enable this via a configurable option has been opened upstream](https://github.com/esp8266/Arduino/issues/9115).
+
 ## TODOs because I forget
 
 Some of the things I still need to implement. In rough order of priority
