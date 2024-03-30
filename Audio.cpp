@@ -19,7 +19,7 @@ std::unique_ptr<AudioManager> AudioManager::instance;
 
 AudioManager& AudioManager::the()
 {
-	// HeapSelectIram iram;
+	HeapSelectIram iram;
 
 	if (!AudioManager::instance)
 		AudioManager::instance = std::make_unique<AudioManager>();

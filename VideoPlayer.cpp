@@ -15,26 +15,26 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	// the 1.3K of main heap we might have left when entering this function are not enough.
 	HeapSelectIram iram;
 
-	// auto* current_frame_data_progmem = frames[current_frame];
-	// auto current_frame_size = frame_sizes[current_frame];
+	auto* current_frame_data_progmem = frames[current_frame];
+	auto current_frame_size = frame_sizes[current_frame];
 
-	// yield();
-	// auto start_time = micros();
-	// auto decompressed = SRLV::decompress({ current_frame_data_progmem, current_frame_size }, IMAGE_WIDTH * IMAGE_HEIGHT, last_frame);
-	// auto end_time = micros();
-	// yield();
+	yield();
+	auto start_time = micros();
+	auto decompressed = SRLV::decompress({ current_frame_data_progmem, current_frame_size }, IMAGE_WIDTH * IMAGE_HEIGHT, last_frame);
+	auto end_time = micros();
+	yield();
 
 	auto x = (display->getWidth() - IMAGE_WIDTH) / 2;
 	display->setDrawColor(1);
 	display->firstPage();
 	do {
 		yield();
-		// auto draw_start = micros();
-		// display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
-		// auto draw_end = micros();
+		auto draw_start = micros();
+		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
+		auto draw_end = micros();
+#if VIDEO_DEBUG
 		yield();
 		char frame_info_text[256] {};
-		auto draw_start = 0, draw_end = 0, end_time = 0, start_time = 0;
 		snprintf_P(frame_info_text, sizeof(frame_info_text),
 			PSTR("f %ld = %.1f pos %.2f\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
 			current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
@@ -43,11 +43,12 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 		yield();
 		display->setDrawColor(2);
 		draw_string(display, frame_info_text, 0);
+#endif
 		yield();
 	} while (display->nextPage());
 
 	yield();
-	// last_frame = decompressed;
+	last_frame = decompressed;
 
 	return this;
 }
