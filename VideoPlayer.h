@@ -9,9 +9,9 @@ constexpr int IMAGE_HEIGHT = 64;
 
 class VideoPlayer : public Menu {
 public:
-	virtual Menu* draw_menu(Display* display, uint16_t delta_millis) override;
-	virtual bool should_refresh(uint16_t delta_millis) override;
-	virtual Menu* handle_button(uint8_t buttons) override;
+	virtual Menu* ICACHE_RAM_ATTR draw_menu(Display* display, uint16_t delta_millis) override;
+	virtual bool ICACHE_RAM_ATTR should_refresh(uint16_t delta_millis) override;
+	virtual Menu* ICACHE_RAM_ATTR handle_button(uint8_t buttons) override;
 
 private:
 	size_t current_frame { 0 };

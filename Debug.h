@@ -13,9 +13,9 @@ class DebugManager : public Print {
 public:
 	static DebugManager& the();
 	DebugManager();
-	
+
 	virtual size_t write(uint8_t) override;
-	virtual size_t write(const uint8_t *buffer, size_t size) override;
+	virtual size_t write(const uint8_t* buffer, size_t size) override;
 
 	void handle();
 
@@ -32,3 +32,13 @@ inline void debug_print(Printable text)
 {
 	DebugManager::the().println(text);
 }
+
+// template <typename... Arguments>
+// inline void debug_print(__FlashStringHelper const* format, Arguments&&... arguments)
+// {
+// 	// FIXME: compromise between non-infinite printf length
+// 	// and 10K of ram use for C++ standard library formatting functionality.
+// 	char output[256] {};
+// 	snprintf_P(output, sizeof(output), (PGM_P)format, std::forward<Arguments>(arguments)...);
+// 	DebugManager::the().println(output);
+// }

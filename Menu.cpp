@@ -80,11 +80,11 @@ Menu* create_menu_structure()
 
 	static std::array<MenuEntry, 3> file_submenus = {
 		MenuEntry { file_menu_0,
-			std::make_unique<FileSelectMenu>(FileOperation::None) },
+			std::make_unique<FileSelectMenu>(FileMenuState::None) },
 		MenuEntry { file_menu_1,
-			std::make_unique<FileSelectMenu>(FileOperation::Move) },
+			std::make_unique<FileSelectMenu>(FileMenuState::Move) },
 		MenuEntry { file_menu_2,
-			std::make_unique<FileSelectMenu>(FileOperation::Delete) },
+			std::make_unique<FileSelectMenu>(FileMenuState::Delete) },
 	};
 	auto file_menu_object = std::make_unique<OptionsMenu>(file_submenus);
 

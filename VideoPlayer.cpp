@@ -1,12 +1,15 @@
 #include "VideoPlayer.h"
 #include "Audio.h"
 #include "DisplayUtils.h"
-#include "SRLV.h"
 #include "bad_apple.h"
 #include <Arduino.h>
 #include <umm_malloc/umm_heap_select.h>
 #include <user_interface.h>
 #include <vector>
+
+// Needs to be included after user_interface.h so that IRAM_ATTR goes into effect properly.
+// (Can't include user_interface in the header itself since it's platform-independent.)
+#include "SRLV.h"
 
 constexpr size_t ROW_SIZE = IMAGE_WIDTH / 8 + 1;
 
@@ -19,9 +22,13 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	auto current_frame_size = frame_sizes[current_frame];
 
 	yield();
+#if VIDEO_DEBUG
 	auto start_time = micros();
+#endif
 	auto decompressed = SRLV::decompress({ current_frame_data_progmem, current_frame_size }, IMAGE_WIDTH * IMAGE_HEIGHT, last_frame);
+#if VIDEO_DEBUG
 	auto end_time = micros();
+#endif
 	yield();
 
 	auto x = (display->getWidth() - IMAGE_WIDTH) / 2;
@@ -29,10 +36,12 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	display->firstPage();
 	do {
 		yield();
-		auto draw_start = micros();
-		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
-		auto draw_end = micros();
 #if VIDEO_DEBUG
+		auto draw_start = micros();
+#endif
+		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
+#if VIDEO_DEBUG
+		auto draw_end = micros();
 		yield();
 		char frame_info_text[256] {};
 		snprintf_P(frame_info_text, sizeof(frame_info_text),
@@ -66,7 +75,8 @@ bool VideoPlayer::should_refresh(uint16_t delta_millis)
 		}
 	}
 	// FIXME: magic number here is a hack to fix a consistent A/V desync. may be 44.1/48 confusion but idk.
-	auto new_frame = static_cast<size_t>(AudioManager::the().current_position() * FPS * (219.0 / 224.0)) % (sizeof(frames) / sizeof(*frames));
+	constexpr auto adjustment = (219.0 / 224.0);
+	auto new_frame = static_cast<size_t>(AudioManager::the().current_position() * FPS * adjustment) % (sizeof(frames) / sizeof(*frames));
 	auto should_refresh = new_frame != current_frame;
 
 	current_frame = new_frame;

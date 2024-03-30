@@ -8,7 +8,7 @@
 #include <memory>
 #include <stdint.h>
 
-FileSelectMenu::FileSelectMenu(FileOperation operation)
+FileSelectMenu::FileSelectMenu(FileMenuState operation)
 	: operation(operation)
 {
 	update_directory();
@@ -18,24 +18,46 @@ void FileSelectMenu::update_directory()
 {
 	debug_print(current_directory);
 
-	FsFile directory = card.open(current_directory);
-	directory.rewindDirectory();
+	switch (operation) {
+	case FileMenuState::None:
+	case FileMenuState::Delete:
+	case FileMenuState::Move:
+	case FileMenuState::SelectMoveTarget: {
+		FsFile directory = card.open(current_directory);
+		directory.rewindDirectory();
 
-	menu_entries.clear();
-	menu_strings.clear();
+		menu_entries.clear();
+		menu_strings.clear();
 
-	menu_entries.push_back(MenuEntry { current_directory.c_str(), nullptr });
-	menu_entries.push_back(MenuEntry { PSTR(".. (Elternverzeichnis)"), nullptr });
-	while (true) {
-		FsFile entry = directory.openNextFile();
-		if (!entry)
-			break;
-		PrintString name;
-		entry.printName(&name);
-		menu_strings.push_back(name.getString());
-		menu_entries.push_back(MenuEntry { menu_strings.back().c_str(), nullptr });
+		menu_entries.push_back(MenuEntry { current_directory.c_str(), nullptr });
+		menu_entries.push_back(MenuEntry { PSTR(".. (Elternverzeichnis)"), nullptr });
+		while (true) {
+			FsFile entry = directory.openNextFile();
+			if (!entry)
+				break;
+			PrintString name;
+			entry.printName(&name);
+			menu_strings.push_back(name.getString());
+			menu_entries.push_back(MenuEntry { menu_strings.back().c_str(), nullptr });
+		}
+		current_delegate = std::make_unique<OptionsMenu>(menu_entries);
+		break;
 	}
-	current_delegate = std::make_unique<OptionsMenu>(menu_entries);
+	case FileMenuState::ConfirmDelete:
+		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
+			confirm_delete_label, [this](auto x) { this->perform_delete(x); },
+			yes_no_options, yes_no_menu);
+		break;
+	case FileMenuState::ConfirmMove:
+		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
+			confirm_move_label, [this](auto x) { this->perform_move(x); },
+			yes_no_options, yes_no_menu);
+		break;
+	case FileMenuState::MoveError:
+	case FileMenuState::DeleteError:
+		// TODO
+		break;
+	}
 }
 
 Menu* FileSelectMenu::draw_menu(Display* display, uint16_t delta_millis)
@@ -80,7 +102,7 @@ Menu* FileSelectMenu::handle_button(uint8_t buttons)
 			if (current_directory.isEmpty())
 				current_directory = "/";
 			update_directory();
-		} else if (index == 0 && operation == FileOperation::SelectMoveTarget) {
+		} else if (index == 0 && operation == FileMenuState::SelectMoveTarget) {
 			// own directory; perform move
 			perform_file_action(current_directory + "/" + source_file.substring(source_file.lastIndexOf('/') + 1));
 		} else if (index == 0) {
@@ -120,10 +142,12 @@ Menu* FileSelectMenu::handle_button(uint8_t buttons)
 void FileSelectMenu::perform_file_action(String chosen_file)
 {
 	switch (operation) {
-	case FileOperation::None:
+	case FileMenuState::None:
+	case FileMenuState::MoveError:
+	case FileMenuState::DeleteError:
 		break;
-	case FileOperation::Move: {
-		operation = FileOperation::SelectMoveTarget;
+	case FileMenuState::Move: {
+		operation = FileMenuState::SelectMoveTarget;
 		source_file = chosen_file;
 		auto last_slash = current_directory.lastIndexOf('/');
 		// we're not in the root
@@ -134,23 +158,19 @@ void FileSelectMenu::perform_file_action(String chosen_file)
 		update_directory();
 		break;
 	}
-	case FileOperation::Delete:
-		operation = FileOperation::ConfirmDelete;
+	case FileMenuState::Delete:
+		operation = FileMenuState::ConfirmDelete;
 		source_file = chosen_file;
-		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
-			confirm_delete_label, [this](auto x) { this->perform_delete(x); },
-			yes_no_options, yes_no_menu);
+		update_directory();
 		break;
-	case FileOperation::SelectMoveTarget:
-		operation = FileOperation::ConfirmMove;
+	case FileMenuState::SelectMoveTarget:
+		operation = FileMenuState::ConfirmMove;
 		target_file = chosen_file;
-		current_delegate = std::make_unique<SettingsMenu<YesNoSelection>>(
-			confirm_move_label, [this](auto x) { this->perform_move(x); },
-			yes_no_options, yes_no_menu);
+		update_directory();
 		break;
 	// Should not happen...
-	case FileOperation::ConfirmDelete:
-	case FileOperation::ConfirmMove:
+	case FileMenuState::ConfirmDelete:
+	case FileMenuState::ConfirmMove:
 		current_delegate->handle_button(BUTTON_RIGHT);
 		break;
 	}
@@ -158,26 +178,26 @@ void FileSelectMenu::perform_file_action(String chosen_file)
 
 void FileSelectMenu::perform_delete(YesNoSelection selection)
 {
+	bool could_delete = true;
 	if (selection == YesNoSelection::Yes) {
-		debug_print("deleting file");
+		// debug_print(F("File Management: deleting file '%s'"), source_file.c_str());
 		FsFile file_to_delete = card.open(source_file, O_RDWR);
-		// TODO: handle delete error
-		bool status = file_to_delete.remove();
+		could_delete = file_to_delete.remove();
 	}
 
-	operation = FileOperation::Delete;
+	operation = could_delete ? FileMenuState::Delete : FileMenuState::DeleteError;
 	update_directory();
 }
 
 void FileSelectMenu::perform_move(YesNoSelection selection)
 {
+	bool could_move = true;
 	if (selection == YesNoSelection::Yes) {
+		// debug_print(F("File Management: moving file '%s' to '%s'"), source_file.c_str(), target_file.c_str());
 		FsFile file_to_move = card.open(source_file, O_RDWR);
-		// TODO: handle move error
-		file_to_move.rename(target_file.c_str());
-		file_to_move.remove();
+		could_move = file_to_move.rename(target_file.c_str());
 	}
 
-	operation = FileOperation::Move;
+	operation = could_move ? FileMenuState::Move : FileMenuState::MoveError;
 	update_directory();
 }

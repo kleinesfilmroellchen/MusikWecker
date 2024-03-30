@@ -13,7 +13,9 @@
 #include <vector>
 
 // start of fixups to make Serenity's AK code work with C++17, std and Arduino
+#ifndef ALWAYS_INLINE
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
+#endif
 #define VERIFY(expr) __builtin_expect(!(expr), 0)
 // #define HAS_CPP20 (__cplusplus >= 202002L)
 #define HAS_CPP20 false
