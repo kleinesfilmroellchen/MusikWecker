@@ -15,5 +15,3 @@ extern ClockFaces::ClockFace current_clock_face;
 extern SdFs card;
 
 extern Display display;
-
-extern WiFiServer log_server;

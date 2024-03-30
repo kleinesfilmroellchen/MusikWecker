@@ -19,7 +19,7 @@ std::unique_ptr<AudioManager> AudioManager::instance;
 
 AudioManager& AudioManager::the()
 {
-	HeapSelectIram iram;
+	// HeapSelectIram iram;
 
 	if (!AudioManager::instance)
 		AudioManager::instance = std::make_unique<AudioManager>();
@@ -38,16 +38,16 @@ AudioManager::AudioManager()
 void metadata_callback(void*, char const* key, bool is_unicode, char const* value)
 {
 	// TODO: Provide the metadata back to the AudioManager so UI can read it out.
-	PrintString output;
-	output.printf_P(PSTR("Audio: Metadata: %s = %s\n"), key, value);
-	debug_print(output.getString());
+	// PrintString output;
+	// output.printf_P(PSTR("Audio: Metadata: %s = %s\n"), key, value);
+	// debug_print(output.getString());
 }
 
 void error_callback(void*, int code, char const* string)
 {
-	PrintString output;
-	output.printf_P(PSTR("Audio: Status code %d: %s\n"), code, string);
-	debug_print(output.getString());
+	// PrintString output;
+	// output.printf_P(PSTR("Audio: Status code %d: %s\n"), code, string);
+	// debug_print(output.getString());
 }
 
 void AudioManager::play(String& file_name)
