@@ -1,0 +1,20 @@
+{
+    "manufacturer": "",
+    "name": "Generic Speaker",
+    "pins": {
+        "31c5dedc-a9eb-4e15-b6ea-dc5f4862d409": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "-",
+            "swap_group": 0
+        },
+        "4f413759-4311-4462-b8f0-8595d367c48e": {
+            "direction": "input",
+            "names": [],
+            "primary_name": "+",
+            "swap_group": 0
+        }
+    },
+    "type": "unit",
+    "uuid": "611b281f-1a71-43f5-a059-00633c26b649"
+}

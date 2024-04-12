@@ -1,0 +1,147 @@
+{
+    "arcs": {},
+    "can_expand": false,
+    "junctions": {
+        "34313a41-8ad7-4fd5-96c3-9281f64b91f2": {
+            "position": [
+                7500000,
+                -10000000
+            ]
+        },
+        "39e06890-203b-40dd-89eb-b9ecd9ab2d5a": {
+            "position": [
+                3750000,
+                2500000
+            ]
+        },
+        "43163ebe-272e-4366-819b-36d35393710d": {
+            "position": [
+                7500000,
+                8750000
+            ]
+        },
+        "550263de-3822-494c-bdff-17e769325c4b": {
+            "position": [
+                0,
+                2500000
+            ]
+        },
+        "5b7ba432-a6a8-428e-b5d4-576f5d6ff9de": {
+            "position": [
+                7500000,
+                8750000
+            ]
+        },
+        "6599bc73-7992-4f29-903a-4fd1cb716bdc": {
+            "position": [
+                3750000,
+                -3750000
+            ]
+        },
+        "8f752fcd-51be-48eb-898c-ed50c7da49df": {
+            "position": [
+                0,
+                -3750000
+            ]
+        },
+        "ca39ff41-a98b-4bbf-aae2-13683142e749": {
+            "position": [
+                7500000,
+                -10000000
+            ]
+        }
+    },
+    "lines": {
+        "1946c041-a9a0-4740-bae8-423f5d4171e1": {
+            "from": "39e06890-203b-40dd-89eb-b9ecd9ab2d5a",
+            "layer": 0,
+            "to": "5b7ba432-a6a8-428e-b5d4-576f5d6ff9de",
+            "width": 0
+        },
+        "5155256d-d9cd-4680-aded-1fde9ce99714": {
+            "from": "6599bc73-7992-4f29-903a-4fd1cb716bdc",
+            "layer": 0,
+            "to": "ca39ff41-a98b-4bbf-aae2-13683142e749",
+            "width": 0
+        },
+        "84a14909-8c71-483b-b3ea-2ec6b3e5f484": {
+            "from": "34313a41-8ad7-4fd5-96c3-9281f64b91f2",
+            "layer": 0,
+            "to": "ca39ff41-a98b-4bbf-aae2-13683142e749",
+            "width": 0
+        },
+        "93f785a7-542b-496a-a6d9-b03fa13f84fe": {
+            "from": "43163ebe-272e-4366-819b-36d35393710d",
+            "layer": 0,
+            "to": "34313a41-8ad7-4fd5-96c3-9281f64b91f2",
+            "width": 0
+        },
+        "a6a57e86-f4f5-4ea7-a6da-eefe6773529d": {
+            "from": "8f752fcd-51be-48eb-898c-ed50c7da49df",
+            "layer": 0,
+            "to": "550263de-3822-494c-bdff-17e769325c4b",
+            "width": 0
+        },
+        "c1536e31-7da3-4519-a4f3-3c178092d45f": {
+            "from": "5b7ba432-a6a8-428e-b5d4-576f5d6ff9de",
+            "layer": 0,
+            "to": "43163ebe-272e-4366-819b-36d35393710d",
+            "width": 0
+        },
+        "c89ba30c-269d-40ba-83a1-fa74beebb348": {
+            "from": "550263de-3822-494c-bdff-17e769325c4b",
+            "layer": 0,
+            "to": "39e06890-203b-40dd-89eb-b9ecd9ab2d5a",
+            "width": 0
+        },
+        "e02d2efe-ea76-4986-9c0c-98ad1f8f2e82": {
+            "from": "8f752fcd-51be-48eb-898c-ed50c7da49df",
+            "layer": 0,
+            "to": "6599bc73-7992-4f29-903a-4fd1cb716bdc",
+            "width": 0
+        }
+    },
+    "name": "Generic Speaker",
+    "pins": {
+        "31c5dedc-a9eb-4e15-b6ea-dc5f4862d409": {
+            "decoration": {
+                "clock": false,
+                "dot": false,
+                "driver": "default",
+                "schmitt": false
+            },
+            "length": 2500000,
+            "name_orientation": "in_line",
+            "name_visible": true,
+            "orientation": "left",
+            "pad_visible": true,
+            "position": [
+                -2500000,
+                -2500000
+            ]
+        },
+        "4f413759-4311-4462-b8f0-8595d367c48e": {
+            "decoration": {
+                "clock": false,
+                "dot": false,
+                "driver": "default",
+                "schmitt": false
+            },
+            "length": 2500000,
+            "name_orientation": "in_line",
+            "name_visible": true,
+            "orientation": "left",
+            "pad_visible": true,
+            "position": [
+                -2500000,
+                1250000
+            ]
+        }
+    },
+    "polygons": {},
+    "text_placements": {},
+    "texts": {},
+    "type": "symbol",
+    "unit": "611b281f-1a71-43f5-a059-00633c26b649",
+    "uuid": "a80392a8-ce29-4aa9-86f6-822354f517e4"
+}

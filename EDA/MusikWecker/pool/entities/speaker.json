@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "97580c35-b9e7-4b91-b66a-48d24e245a28": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "611b281f-1a71-43f5-a059-00633c26b649"
+        }
+    },
+    "manufacturer": "",
+    "name": "Generic Speaker",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "310f7ccb-183b-4c5f-a357-6c0edaebc2bd"
+}

@@ -1,0 +1,41 @@
+{
+    "MPN": [
+        false,
+        "Generic Speaker"
+    ],
+    "datasheet": [
+        false,
+        ""
+    ],
+    "description": [
+        false,
+        ""
+    ],
+    "entity": "310f7ccb-183b-4c5f-a357-6c0edaebc2bd",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        ""
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "84529497-31a1-4f8f-abac-c07d0782069f",
+    "pad_map": {
+        "7bc2147a-0234-41f6-ab65-444e57a43ce5": {
+            "gate": "97580c35-b9e7-4b91-b66a-48d24e245a28",
+            "pin": "4f413759-4311-4462-b8f0-8595d367c48e"
+        },
+        "7de8ad61-d839-4bad-85e8-5b3d093d4d6c": {
+            "gate": "97580c35-b9e7-4b91-b66a-48d24e245a28",
+            "pin": "31c5dedc-a9eb-4e15-b6ea-dc5f4862d409"
+        }
+    },
+    "parametric": {},
+    "tags": [],
+    "type": "part",
+    "uuid": "1f72a98b-006f-4004-b3a7-70f3c2eeef93",
+    "value": [
+        false,
+        "2 Ohms"
+    ]
+}
