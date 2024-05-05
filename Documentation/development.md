@@ -55,7 +55,6 @@ Some of the things I still need to implement. In rough order of priority
 	- Correct wakeup before an alarm runs (at least 10s to allow WiFi reconnect)
 - Software volume control
 - Power saving shenanigans
-	- Core clock-down while we're not playing music. 160MHz is really only needed for the high SPI+I2S+audio decode workload.
 	- Flash clock-down for the same reasons.
 - Play music when selected in file view
 - Important settings

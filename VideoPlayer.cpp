@@ -41,12 +41,13 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 #endif
 		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
 #if VIDEO_DEBUG
+		auto freq = system_get_cpu_freq();
 		auto draw_end = micros();
 		yield();
 		char frame_info_text[256] {};
 		snprintf_P(frame_info_text, sizeof(frame_info_text),
-			PSTR("f %ld = %.1f pos %.2f\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
-			current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
+			PSTR("f %ld=%.1f pos %.2f cf %3d\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
+			current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), freq, AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
 		yield();
 		display->setFont(TINY_FONT);
 		yield();

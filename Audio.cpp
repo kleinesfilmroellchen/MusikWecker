@@ -2,6 +2,7 @@
 #include "Audio.h"
 #include "Debug.h"
 #include "PrintString.h"
+#include "user_interface.h"
 #include <AudioGeneratorFLAC.h>
 #include <umm_malloc/umm_heap_select.h>
 // #include <AudioGeneratorMP3.h>
@@ -78,13 +79,34 @@ float AudioManager::current_position() const
 	return static_cast<float>(static_cast<double>(sample_count) / sample_rate);
 }
 
+enum class Frequency : bool {
+	Mhz160,
+	Mhz80,
+};
+
+void set_frequency(Frequency frequency)
+{
+	auto target_freq = frequency == Frequency::Mhz160 ? SYS_CPU_160MHZ : SYS_CPU_80MHZ;
+	if (system_get_cpu_freq() != target_freq) {
+		system_update_cpu_freq(target_freq);
+
+		if (frequency == Frequency::Mhz160)
+			debug_print(F("CPU: Clocking to 160 MHz"));
+		else
+			debug_print(F("CPU: Clocking to 80 MHz"));
+	}
+}
+
 void AudioManager::loop()
 {
 	if (audio_player && audio_player->isRunning()) {
+		set_frequency(Frequency::Mhz160);
 		if (!audio_player->loop()) {
 			audio_player->stop();
 			debug_print(F("Audio: Track ended."));
 		}
+	} else {
+		set_frequency(Frequency::Mhz80);
 	}
 }
 
