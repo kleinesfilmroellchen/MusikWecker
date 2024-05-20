@@ -8,11 +8,6 @@
 // this WILL break the I2S DAC!
 #define USE_SERIAL 0
 
-// enable video debugging with VIDEO_DEBUG=1
-// text will appear on top of the video player with various statistics, including heap usage; use this for debugging if video or audio are broken
-// will cause audio to stutter (but not completely break) due to large amount of time spent drawing the debug text.
-#define VIDEO_DEBUG 0
-
 // F = full framebuffer
 // 1 = small partial framebuffer
 // 2 = larger partial framebuffer

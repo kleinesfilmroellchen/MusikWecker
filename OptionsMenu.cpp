@@ -156,8 +156,8 @@ ClockFaceSelectMenu::ClockFaceSelectMenu(Span<char const*> face_names,
 	, clock_faces(clock_faces)
 {
 	// adjust current menu point to the clock face in the settings
-	if (eeprom_settings.clock_face_index < size()) {
-		this->current_menu = eeprom_settings.clock_face_index;
+	if (eeprom_settings.clock_settings.clock_face_index < size()) {
+		this->current_menu = eeprom_settings.clock_settings.clock_face_index;
 		// current menu moved beyond the last menu on display, move top menu down
 		while (this->current_menu > (this->current_top_menu + LINE_COUNT - 1))
 			++this->current_top_menu;
@@ -182,7 +182,7 @@ Menu* ClockFaceSelectMenu::option_selected(uint16_t menu_index)
 	current_clock_face = this->clock_faces[menu_index];
 
 	// save settings in eeprom
-	eeprom_settings.clock_face_index = menu_index;
+	eeprom_settings.clock_settings.clock_face_index = menu_index;
 	save_settings();
 
 	return nullptr;
@@ -213,7 +213,7 @@ Menu* ClockFaceSelectMenu::draw_menu(Display* display, uint16_t delta_millis)
 			display->setClipWindow(display->getDisplayWidth() / 2, 0,
 				display->getDisplayWidth(),
 				display->getDisplayHeight());
-			clockFace(display, &curtime, display->getDisplayWidth() / 2, 0,
+			clockFace(display, &curtime, 0.0, display->getDisplayWidth() / 2, 0,
 				display->getDisplayWidth() / 2, display->getDisplayHeight());
 
 			yield();

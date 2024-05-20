@@ -1,6 +1,7 @@
 #include "VideoPlayer.h"
 #include "Audio.h"
 #include "DisplayUtils.h"
+#include "Globals.h"
 #include "bad_apple.h"
 #include <Arduino.h>
 #include <umm_malloc/umm_heap_select.h>
@@ -22,13 +23,9 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	auto current_frame_size = frame_sizes[current_frame];
 
 	yield();
-#if VIDEO_DEBUG
-	auto start_time = micros();
-#endif
+	auto start_time = eeprom_settings.show_debug ? micros() : 0;
 	auto decompressed = SRLV::decompress({ current_frame_data_progmem, current_frame_size }, IMAGE_WIDTH * IMAGE_HEIGHT, last_frame);
-#if VIDEO_DEBUG
-	auto end_time = micros();
-#endif
+	auto end_time = eeprom_settings.show_debug ? micros() : 0;
 	yield();
 
 	auto x = (display->getWidth() - IMAGE_WIDTH) / 2;
@@ -36,24 +33,23 @@ Menu* VideoPlayer::draw_menu(Display* display, uint16_t delta_millis)
 	display->firstPage();
 	do {
 		yield();
-#if VIDEO_DEBUG
-		auto draw_start = micros();
-#endif
+		auto draw_start = eeprom_settings.show_debug ? micros() : 0;
 		display->drawXBM(x, 0, IMAGE_WIDTH, IMAGE_HEIGHT, decompressed.data());
-#if VIDEO_DEBUG
-		auto freq = system_get_cpu_freq();
-		auto draw_end = micros();
-		yield();
-		char frame_info_text[256] {};
-		snprintf_P(frame_info_text, sizeof(frame_info_text),
-			PSTR("f %ld=%.1f pos %.2f cf %3d\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
-			current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), freq, AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
-		yield();
-		display->setFont(TINY_FONT);
-		yield();
-		display->setDrawColor(2);
-		draw_string(display, frame_info_text, 0);
-#endif
+
+		if (eeprom_settings.show_debug) {
+			auto freq = system_get_cpu_freq();
+			auto draw_end = micros();
+			yield();
+			char frame_info_text[256] {};
+			snprintf_P(frame_info_text, sizeof(frame_info_text),
+				PSTR("f %ld=%.1f pos %.2f cf %3d\nsr %ld sn %ld\ndec  %5ld\ndraw %5ld\nheap %d"),
+				current_frame, AudioManager::the().current_position() * FPS, AudioManager::the().current_position(), freq, AudioManager::the().sample_rate(), AudioManager::the().played_sample_count(), end_time - start_time, draw_end - draw_start, system_get_free_heap_size());
+			yield();
+			display->setFont(TINY_FONT);
+			yield();
+			display->setDrawColor(2);
+			draw_string(display, frame_info_text, 0);
+		}
 		yield();
 	} while (display->nextPage());
 

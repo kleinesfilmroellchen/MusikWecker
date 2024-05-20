@@ -25,6 +25,12 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 	auto date_text = TimeManager::the().date_de();
 	auto current_time = TimeManager::the().current_time();
 
+	if (current_time.toEpochSeconds() != last_timestamp) {
+		last_timestamp = current_time.toEpochSeconds();
+		time_of_second_rollover = micros64();
+	}
+	double micros_in_second = static_cast<double>(micros64() - time_of_second_rollover) / 1'000'000.0d;
+
 	display->firstPage();
 	do {
 		display->setDrawColor(1);
@@ -59,20 +65,25 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 		yield();
 
 		uint64_t time = micros64();
-		current_clock_face(display, &current_time, 0, 0, display->getDisplayWidth(),
+		current_clock_face(display, &current_time, micros_in_second, 0, 0, display->getDisplayWidth(),
 			display->getDisplayHeight());
 		yield();
-		display->setFont(TINY_FONT);
-		display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text.c_str());
+
+		// TODO: Draw different formats of date text depending on the setting
+		if (eeprom_settings.clock_settings.date_format != DateFormat::None) {
+			display->setFont(TINY_FONT);
+			display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text.c_str());
+		}
 		uint64_t after_time = micros64();
 		yield();
 
-		if (eeprom_settings.show_timing) {
+		if (eeprom_settings.show_debug) {
 			uint64_t total_time = after_time - time;
 			uint32_t cycles = microsecondsToClockCycles(total_time);
 			char timing_text[22];
 			snprintf_P(timing_text, sizeof(timing_text), PSTR("%02.3fm %10d"), total_time / 1000.0d, cycles);
 
+			display->setFont(TINY_FONT);
 			display->drawUTF8(SCREEN_WIDTH - LEFT_TEXT_MARGIN - 70, SCREEN_HEIGHT,
 				timing_text);
 		}

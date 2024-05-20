@@ -3,14 +3,15 @@
 #pragma once
 
 #include "Definitions.h"
-#include "DisplayUtils.h"
+#include "strings.h"
 #include <AceTime.h>
 #include <U8g2lib.h>
+#include <array>
 
 namespace ClockFaces {
 
 // size of the analog clock face
-constexpr uint16_t ANALOG_CLOCK_FACE_SIZE = 60;
+constexpr uint16_t ANALOG_CLOCK_FACE_SIZE = 55;
 // length of the line segments that represent the hour markings
 constexpr uint16_t ANALOG_CLOCK_FACE_LINE_LENGTH = 4;
 // length of the hour hand
@@ -25,23 +26,33 @@ constexpr uint16_t BINARY_CLOCK_FACE_BOX_SPACING = 2;
 constexpr uint8_t BINARY_CLOCK_FACE_MAX_BOXES_PER_ROW = static_cast<uint8_t>(SCREEN_WIDTH / (BINARY_CLOCK_FACE_BOX_SIZE + BINARY_CLOCK_FACE_BOX_SPACING));
 
 // typedef the clock face function pointer type
-using ClockFace = void (*)(Display*, ace_time::ZonedDateTime*, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+using ClockFace = void (*)(Display*, ace_time::ZonedDateTime*, double second_fractions, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 
 /** Basic digital 24-hour clock. */
-void basic_digital(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void basic_digital(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Digital 24-hour clock with number second indicator. */
-void digital_with_seconds(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void digital_with_seconds(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Minimalistic analog clock without numbers. */
-void basic_analog(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void basic_analog(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Retro analog clock with Roman numerals. */
-void retro_analog(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void retro_analog(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Modern analog clock with numbers. */
-void modern_analog(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void modern_analog(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Analog clock with rotating segments for each time division. */
-void rotating_segment_analog(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void rotating_segment_analog(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Binary clock that shows hour, minute and second in binary form: as horizontally stacked blocks. */
-void binary(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void binary(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Binary clock that shows seconds of day in binary form. Not very useful but fun to look at. */
-void day_seconds_binary(Display* display, ace_time::ZonedDateTime* time, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+void day_seconds_binary(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
+
+static std::array<ClockFace, 7> clock_faces {
+	&basic_digital,
+	&digital_with_seconds,
+	&basic_analog,
+	&modern_analog,
+	&rotating_segment_analog,
+	&binary,
+	&day_seconds_binary,
+};
 
 }

@@ -15,6 +15,8 @@ class ClockMenu : public Menu {
 private:
 	Menu* sub_menu;
 	uint32_t last_display_update = 0;
+	uint64_t time_of_second_rollover = 0;
+	ace_time::acetime_t last_timestamp = 0;
 
 public:
 	/** The Clock menu takes a reference to the ntp client responsible for time retrieval, the time zone it should display time in, and the main menu. */

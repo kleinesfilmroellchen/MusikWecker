@@ -17,10 +17,11 @@ static const Span<char const*> main_menu { main_menu_array };
 static const char design_menu_0[] PROGMEM = "Digital";
 static const char design_menu_1[] PROGMEM = "Digital + Sekunden";
 static const char design_menu_2[] PROGMEM = "Analog (minimalistisch)";
-static const char design_menu_3[] PROGMEM = "Rotierende Segmente";
-static const char design_menu_4[] PROGMEM = "Binär";
-static const char design_menu_5[] PROGMEM = "Binär (Tagsekunden)";
-static const char* design_menu_array[] PROGMEM = { design_menu_0, design_menu_1, design_menu_2, design_menu_3, design_menu_4, design_menu_5 };
+static const char design_menu_3[] PROGMEM = "Analog (modern)";
+static const char design_menu_4[] PROGMEM = "Rotierende Segmente";
+static const char design_menu_5[] PROGMEM = "Binär";
+static const char design_menu_6[] PROGMEM = "Binär (Tagsekunden)";
+static const char* design_menu_array[] PROGMEM = { design_menu_0, design_menu_1, design_menu_2, design_menu_3, design_menu_4, design_menu_5, design_menu_6 };
 static const Span<char const*> design_menu { design_menu_array };
 
 static const char waketone_menu_0[] PROGMEM = "Zufällig (Reihe)";

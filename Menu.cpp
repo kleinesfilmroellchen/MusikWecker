@@ -24,7 +24,7 @@ Menu* NothingMenu::handle_button(uint8_t _) { return this->parent; }
 
 void apply_debug_settings(YesNoSelection yes_no)
 {
-	eeprom_settings.show_timing = yes_no == YesNoSelection::Yes;
+	eeprom_settings.show_debug = yes_no == YesNoSelection::Yes;
 	save_settings();
 }
 
@@ -67,16 +67,7 @@ Menu* create_menu_structure()
 {
 	HeapSelectIram iram;
 
-	using namespace ClockFaces;
-	static std::array<ClockFace, 6> clock_faces {
-		&basic_digital,
-		&digital_with_seconds,
-		&basic_analog,
-		&rotating_segment_analog,
-		&binary,
-		&day_seconds_binary,
-	};
-	auto clock_face_menu = std::make_unique<ClockFaceSelectMenu>(design_menu, clock_faces);
+	auto clock_face_menu = std::make_unique<ClockFaceSelectMenu>(design_menu, ClockFaces::clock_faces);
 
 	static std::array<MenuEntry, 3> file_submenus = {
 		MenuEntry { file_menu_0,
