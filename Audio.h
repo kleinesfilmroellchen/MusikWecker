@@ -58,3 +58,6 @@ private:
 
 // fake non-realtime cooperative "interrupt" invoked via yield()/delay()
 void IRAM_ATTR audio_timer_interrupt();
+
+// Overrides Arduino's default compile-time-defined frequency setting behavior, since we have our own logic for that.
+extern "C" void preloop_update_frequency();

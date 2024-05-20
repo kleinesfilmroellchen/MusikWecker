@@ -84,16 +84,18 @@ enum class Frequency : bool {
 	Mhz80,
 };
 
+extern "C" void preloop_update_frequency() { }
+
 void set_frequency(Frequency frequency)
 {
-	auto target_freq = frequency == Frequency::Mhz160 ? SYS_CPU_160MHZ : SYS_CPU_80MHZ;
-	if (system_get_cpu_freq() != target_freq) {
+	uint8_t target_freq = frequency == Frequency::Mhz160 ? SYS_CPU_160MHZ : SYS_CPU_80MHZ;
+	uint8_t current_freq = system_get_cpu_freq();
+	if (current_freq != target_freq) {
 		system_update_cpu_freq(target_freq);
 
-		if (frequency == Frequency::Mhz160)
-			debug_print(F("CPU: Clocking to 160 MHz"));
-		else
-			debug_print(F("CPU: Clocking to 80 MHz"));
+		char t[64];
+		snprintf_P(t, sizeof(t), PSTR("CPU: Clocking to %d MHz (from %d MHz)"), target_freq, current_freq);
+		debug_print(t);
 	}
 }
 

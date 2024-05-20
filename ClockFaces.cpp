@@ -110,7 +110,7 @@ const Point adjacency[] PROGMEM = {
 
 Point adjacent_point_for(double angle)
 {
-	const int8_t index = static_cast<int8_t>(round(anle / QUARTER_PI)) % 8;
+	const int8_t index = static_cast<int8_t>(round(angle / QUARTER_PI) + 8) % 8;
 	return adjacency[index];
 }
 
@@ -146,7 +146,7 @@ void modern_analog(Display* display, ace_time::ZonedDateTime* time, double secon
 				  minute_y = sin(minuteAngle) * ANALOG_CLOCK_FACE_MINUTE_LENGTH + center_y;
 	const auto adjacent_minute = adjacent_point_for(minuteAngle);
 
-	display->drawLine(center_x, center_y, minute_x, minute_y);
+	// display->drawLine(center_x, center_y, minute_x, minute_y);
 	display->drawLine(center_x, center_y, minute_x + adjacent_minute.x, minute_y + adjacent_minute.y);
 	yield();
 	display->drawLine(center_x, center_y,
