@@ -5,11 +5,37 @@
 #include "Span.h"
 #include <Arduino.h>
 
+static const char hour_name_12[] PROGMEM = "12";
+static const char hour_name_1[] PROGMEM = "1";
+static const char hour_name_2[] PROGMEM = "2";
+static const char hour_name_3[] PROGMEM = "3";
+static const char hour_name_4[] PROGMEM = "4";
+static const char hour_name_5[] PROGMEM = "5";
+static const char hour_name_6[] PROGMEM = "6";
+static const char hour_name_7[] PROGMEM = "7";
+static const char hour_name_8[] PROGMEM = "8";
+static const char hour_name_9[] PROGMEM = "9";
+static const char hour_name_10[] PROGMEM = "10";
+static const char hour_name_11[] PROGMEM = "11";
+static const char* hour_names[] PROGMEM {
+	hour_name_12,
+	hour_name_1,
+	hour_name_2,
+	hour_name_3,
+	hour_name_4,
+	hour_name_5,
+	hour_name_6,
+	hour_name_7,
+	hour_name_8,
+	hour_name_9,
+	hour_name_10,
+	hour_name_11,
+};
+
 static const char main_menu_0[] PROGMEM = "Uhrdesign";
 static const char main_menu_1[] PROGMEM = "Wecker";
 static const char main_menu_2[] PROGMEM = "Dateiverwaltung";
 static const char main_menu_3[] PROGMEM = "Einstellungen";
-
 static const char main_menu_4[] PROGMEM = "Diagnostik";
 static const char* main_menu_array[] PROGMEM = { main_menu_0, main_menu_1, main_menu_2, main_menu_3, main_menu_4 };
 static const Span<char const*> main_menu { main_menu_array };

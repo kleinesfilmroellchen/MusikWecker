@@ -121,3 +121,56 @@ void draw_string(Display* display, char const* c_text, uint8_t line)
 		current_line++;
 	}
 }
+
+struct Point {
+	int8_t x;
+	int8_t y;
+};
+static_assert(sizeof(Point) == sizeof(uint16_t));
+
+// adjacent point for drawing a double thickness line
+const Point adjacency[] PROGMEM = {
+	{ 1, 0 },
+	{ 1, 1 },
+	{ 0, 1 },
+	{ -1, 1 },
+	{ -1, 0 },
+	{ -1, -1 },
+	{ 0, -1 },
+	{ 1, -1 },
+};
+
+int8_t point_index(double angle)
+{
+	return static_cast<int8_t>(round(angle / QUARTER_PI) + 8) % 8;
+}
+
+Point adjacent_point_for(double angle)
+{
+	return adjacency[point_index(angle)];
+}
+
+Point previous_adjacent_point_for(double angle)
+{
+	return adjacency[(point_index(angle) + 9) % 8];
+}
+
+void draw_stroked_line(Display* display, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, double angle, uint8_t stroke_width)
+{
+	const auto stroke_direction = adjacent_point_for(angle);
+	const auto previous_stroke_direction = previous_adjacent_point_for(angle);
+
+	for (size_t i = 1; i <= stroke_width; ++i) {
+		const uint8_t offset = i / 2;
+		const int8_t direction = i % 2 == 0 ? 1 : -1;
+
+		display->drawLine(x0 + offset * direction * stroke_direction.x,
+			y0 + offset * direction * stroke_direction.y,
+			x1 + offset * direction * stroke_direction.x,
+			y1 + offset * direction * stroke_direction.y);
+		display->drawLine(x0 + offset * direction * previous_stroke_direction.x,
+			y0 + offset * direction * previous_stroke_direction.y,
+			x1 + offset * direction * previous_stroke_direction.x,
+			y1 + offset * direction * previous_stroke_direction.y);
+	}
+}

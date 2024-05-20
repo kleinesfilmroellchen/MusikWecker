@@ -26,3 +26,8 @@ void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, doubl
 void draw_string(Display* display, char const* c_text, uint8_t line);
 
 void draw_rotated_xbm(Display* display, uint16_t x, uint16_t y, double angle, uint16_t w, uint16_t h, uint8_t const* bitmap);
+
+/**
+   Draw a line with a certain thickness.
+*/
+void draw_stroked_line(Display* display, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, double angle, uint8_t stroke_width);
