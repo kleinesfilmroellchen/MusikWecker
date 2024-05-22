@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "d6278cfc-4012-4a10-b49f-060a2a79052a": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "8ed2504d-8dfb-46f5-a327-1ba7da91e1a7"
+        }
+    },
+    "manufacturer": "",
+    "name": "7530",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "342e6749-ca84-4f6c-a236-7e24c64b125b"
+}

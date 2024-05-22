@@ -1,0 +1,117 @@
+{
+    "arcs": {},
+    "can_expand": false,
+    "junctions": {
+        "0d9c0c56-5937-4ae1-9b78-07f8cb9f8644": {
+            "position": [
+                8750000,
+                -5000000
+            ]
+        },
+        "181268fc-03b7-4fc2-b67c-4190c5a17716": {
+            "position": [
+                -3750000,
+                2500000
+            ]
+        },
+        "48c1ded3-0b0e-4243-be48-735e23c94f73": {
+            "position": [
+                -3750000,
+                -5000000
+            ]
+        },
+        "c0fd36ee-5c98-4844-a652-9b112a646a02": {
+            "position": [
+                8750000,
+                2500000
+            ]
+        }
+    },
+    "lines": {
+        "01b97cf4-5d6c-4f38-9e97-13778e89f3f5": {
+            "from": "0d9c0c56-5937-4ae1-9b78-07f8cb9f8644",
+            "layer": 0,
+            "to": "48c1ded3-0b0e-4243-be48-735e23c94f73",
+            "width": 0
+        },
+        "9fca774c-09e2-474c-9492-a9d184f34aef": {
+            "from": "48c1ded3-0b0e-4243-be48-735e23c94f73",
+            "layer": 0,
+            "to": "181268fc-03b7-4fc2-b67c-4190c5a17716",
+            "width": 0
+        },
+        "b263bb33-e382-4a59-9733-948bd0c3854d": {
+            "from": "c0fd36ee-5c98-4844-a652-9b112a646a02",
+            "layer": 0,
+            "to": "0d9c0c56-5937-4ae1-9b78-07f8cb9f8644",
+            "width": 0
+        },
+        "f6444055-be1b-4605-b2f3-3e6d283638c7": {
+            "from": "181268fc-03b7-4fc2-b67c-4190c5a17716",
+            "layer": 0,
+            "to": "c0fd36ee-5c98-4844-a652-9b112a646a02",
+            "width": 0
+        }
+    },
+    "name": "USB Type-C PD Power In",
+    "pins": {
+        "1a577989-5282-40e4-86bb-796337412806": {
+            "decoration": {
+                "clock": false,
+                "dot": false,
+                "driver": "default",
+                "schmitt": false
+            },
+            "length": 2500000,
+            "name_orientation": "in_line",
+            "name_visible": true,
+            "orientation": "right",
+            "pad_visible": true,
+            "position": [
+                11250000,
+                -2500000
+            ]
+        },
+        "2b59138a-bd4b-46be-bcaf-99e91a9d6099": {
+            "decoration": {
+                "clock": false,
+                "dot": false,
+                "driver": "default",
+                "schmitt": false
+            },
+            "length": 2500000,
+            "name_orientation": "in_line",
+            "name_visible": true,
+            "orientation": "right",
+            "pad_visible": true,
+            "position": [
+                11250000,
+                0
+            ]
+        }
+    },
+    "polygons": {},
+    "text_placements": {},
+    "texts": {
+        "c54ba0be-ba17-47de-b590-87115360f053": {
+            "font": "simplex",
+            "from_smash": false,
+            "layer": 0,
+            "origin": "center",
+            "placement": {
+                "angle": 0,
+                "mirror": false,
+                "shift": [
+                    -2500000,
+                    1250000
+                ]
+            },
+            "size": 1500000,
+            "text": "$REFDES",
+            "width": 0
+        }
+    },
+    "type": "symbol",
+    "unit": "0eda8b20-88f4-4006-920b-0b5a4cfeb36c",
+    "uuid": "c954b276-54c7-496f-b815-89e04fa3a8e1"
+}

@@ -1,0 +1,46 @@
+{
+    "MPN": [
+        false,
+        "USB Type-C PD Power In"
+    ],
+    "datasheet": [
+        false,
+        ""
+    ],
+    "description": [
+        false,
+        "USB Type-C Power Delivery power input 9V/12V/15V/20V"
+    ],
+    "entity": "dd6b292f-f71a-4e97-8eee-4d67a1fcc8f9",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        ""
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "1c75a8f1-ab47-42bd-85d8-8adb6b04157b",
+    "pad_map": {
+        "72f08edd-7f44-4be8-87a1-8f7ba79a860d": {
+            "gate": "b7479c26-4465-4d50-beaa-b04546c18f5d",
+            "pin": "1a577989-5282-40e4-86bb-796337412806"
+        },
+        "91f1ef94-c051-4748-9003-33fb42fd914a": {
+            "gate": "b7479c26-4465-4d50-beaa-b04546c18f5d",
+            "pin": "2b59138a-bd4b-46be-bcaf-99e91a9d6099"
+        }
+    },
+    "parametric": {},
+    "tags": [
+        "breakout",
+        "regulator",
+        "type-c",
+        "usb"
+    ],
+    "type": "part",
+    "uuid": "2c977c51-c2b9-483c-a3e0-d6b4cca62d4f",
+    "value": [
+        false,
+        ""
+    ]
+}

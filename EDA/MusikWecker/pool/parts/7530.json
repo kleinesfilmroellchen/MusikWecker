@@ -1,0 +1,49 @@
+{
+    "MPN": [
+        false,
+        "7530"
+    ],
+    "datasheet": [
+        false,
+        ""
+    ],
+    "description": [
+        false,
+        "Low-power DC-DC voltage regulator, 3.0V out"
+    ],
+    "entity": "342e6749-ca84-4f6c-a236-7e24c64b125b",
+    "inherit_model": true,
+    "inherit_tags": false,
+    "manufacturer": [
+        false,
+        ""
+    ],
+    "model": "00000000-0000-0000-0000-000000000000",
+    "package": "f94aec49-d6bf-4170-8d54-ba567cd9c9ea",
+    "pad_map": {
+        "0c65f99f-5e80-482c-abf3-5a46acfd1174": {
+            "gate": "d6278cfc-4012-4a10-b49f-060a2a79052a",
+            "pin": "ce54a1d0-8261-42dc-8983-48180f46a5ac"
+        },
+        "2857d642-7cf6-4eb9-8741-6249df6c8cab": {
+            "gate": "d6278cfc-4012-4a10-b49f-060a2a79052a",
+            "pin": "f983f488-bf71-4d34-8a28-b0033f894494"
+        },
+        "5d851f2d-3f8d-4732-b7e2-5a1c7eae2766": {
+            "gate": "d6278cfc-4012-4a10-b49f-060a2a79052a",
+            "pin": "473974e8-51bd-4b98-ab20-bcbaf87eaa1b"
+        }
+    },
+    "parametric": {},
+    "tags": [
+        "generic",
+        "ic",
+        "regulator"
+    ],
+    "type": "part",
+    "uuid": "db342e13-481d-4034-a73b-67cb70362642",
+    "value": [
+        false,
+        ""
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "gates": {
+        "b7479c26-4465-4d50-beaa-b04546c18f5d": {
+            "name": "Main",
+            "suffix": "",
+            "swap_group": 0,
+            "unit": "0eda8b20-88f4-4006-920b-0b5a4cfeb36c"
+        }
+    },
+    "manufacturer": "",
+    "name": "USB Type-C PD Power In",
+    "prefix": "U",
+    "tags": [],
+    "type": "entity",
+    "uuid": "dd6b292f-f71a-4e97-8eee-4d67a1fcc8f9"
+}

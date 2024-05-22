@@ -1,0 +1,33 @@
+{
+    "manufacturer": "",
+    "name": "USB Type-C PD Power In",
+    "pins": {
+        "1a577989-5282-40e4-86bb-796337412806": {
+            "alt_names": {
+                "e40e2977-05aa-44d5-bac8-d9457262cf58": {
+                    "direction": "power_output",
+                    "name": "GND"
+                }
+            },
+            "direction": "power_output",
+            "names": [],
+            "primary_name": "-",
+            "swap_group": 0
+        },
+        "2b59138a-bd4b-46be-bcaf-99e91a9d6099": {
+            "alt_names": {
+                "038d6381-6fb2-4e2c-a0bb-1de1563fc5b2": {
+                    "direction": "power_output",
+                    "name": "VDD"
+                }
+            },
+            "direction": "power_output",
+            "names": [],
+            "primary_name": "+",
+            "swap_group": 0
+        }
+    },
+    "type": "unit",
+    "uuid": "0eda8b20-88f4-4006-920b-0b5a4cfeb36c",
+    "version": 1
+}

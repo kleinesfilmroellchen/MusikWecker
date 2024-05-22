@@ -1,0 +1,26 @@
+{
+    "manufacturer": "",
+    "name": "7530",
+    "pins": {
+        "473974e8-51bd-4b98-ab20-bcbaf87eaa1b": {
+            "direction": "power_input",
+            "names": [],
+            "primary_name": "VIN",
+            "swap_group": 0
+        },
+        "ce54a1d0-8261-42dc-8983-48180f46a5ac": {
+            "direction": "bidirectional",
+            "names": [],
+            "primary_name": "GND",
+            "swap_group": 0
+        },
+        "f983f488-bf71-4d34-8a28-b0033f894494": {
+            "direction": "power_output",
+            "names": [],
+            "primary_name": "VOUT",
+            "swap_group": 0
+        }
+    },
+    "type": "unit",
+    "uuid": "8ed2504d-8dfb-46f5-a327-1ba7da91e1a7"
+}
