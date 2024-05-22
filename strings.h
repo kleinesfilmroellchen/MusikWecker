@@ -64,8 +64,10 @@ static const Span<char const*> file_menu { file_menu_array };
 
 static const char settings_menu_0[] PROGMEM = "Auto-Abschaltung";
 static const char settings_menu_1[] PROGMEM = "Zeitzone";
-static const char settings_menu_2[] PROGMEM = "Debugging";
-static const char* settings_menu_array[] PROGMEM = { settings_menu_0, settings_menu_1, settings_menu_2 };
+static const char settings_menu_2[] PROGMEM = "Datumsanzeige";
+static const char settings_menu_3[] PROGMEM = "Uhrzeitformat";
+static const char settings_menu_4[] PROGMEM = "Debugging";
+static const char* settings_menu_array[] PROGMEM = { settings_menu_0, settings_menu_1, settings_menu_2, settings_menu_3, settings_menu_4 };
 static const Span<char const*> settings_menu { settings_menu_array };
 
 static const char* yes PROGMEM = "Ja";
@@ -73,13 +75,22 @@ static const char* no PROGMEM = "Nein";
 static const std::array<char const*, 2> yes_no_array = { no, yes };
 static const Span<char const*> yes_no_menu { yes_no_array };
 
-static const char* auto_disable_menu_0 PROGMEM = "Deaktiviert";
+static const char* deactivated_text PROGMEM = "Deaktiviert";
+
+static const char* auto_disable_menu_0 PROGMEM = deactivated_text;
 static const char* auto_disable_menu_1 PROGMEM = "10 Sekunden";
 static const char* auto_disable_menu_2 PROGMEM = "5 Minuten";
 static const char* auto_disable_menu_3 PROGMEM = "10 Minuten";
 static const char* auto_disable_menu_4 PROGMEM = "30 Minuten";
 static const std::array<char const*, 5> auto_disable_array = { auto_disable_menu_0, auto_disable_menu_1, auto_disable_menu_2, auto_disable_menu_3, auto_disable_menu_4 };
 static const Span<char const*> auto_disable_menu { auto_disable_array };
+
+static const char* date_settings_menu_0 PROGMEM = deactivated_text;
+static const char* date_settings_menu_1 PROGMEM = "ISO 8601 (JJJJ-MM-TT)";
+static const char* date_settings_menu_2 PROGMEM = "Deutsch (TT.MM.JJJJ)";
+static const char* date_settings_menu_3 PROGMEM = "Deutsch kurz (TT.MM.JJ)";
+static const std::array<char const*, 4> date_settings_array = { date_settings_menu_0, date_settings_menu_1, date_settings_menu_2, date_settings_menu_3 };
+static const Span<char const*> date_settings_menu { date_settings_array };
 
 static const char* sd_types_0 PROGMEM = "invalid";
 static const char* sd_types_1 PROGMEM = "SD1";
@@ -91,3 +102,4 @@ static const char* debugging_label PROGMEM = "Firmware-Debugging\naktivieren";
 static const char* auto_disable_label PROGMEM = "Bildschirm abschalten\nbei Inaktivität";
 static const char* confirm_delete_label PROGMEM = "Wirklich löschen?";
 static const char* confirm_move_label PROGMEM = "Wirklich hierher\nverschieben?";
+static const char* date_settings_label PROGMEM = "Datumsanzeige auf dem\nUhrenbildschirm";

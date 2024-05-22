@@ -22,7 +22,7 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 	// - Status symbols above
 	// - Date below
 
-	auto date_text = TimeManager::the().date_de();
+	auto date_text = TimeManager::the().date_text_for_format(eeprom_settings.clock_settings.date_format);
 	auto current_time = TimeManager::the().current_time();
 
 	if (current_time.toEpochSeconds() != last_timestamp) {
@@ -69,7 +69,6 @@ Menu* ClockMenu::draw_menu(Display* display, uint16_t delta_millis)
 			display->getDisplayHeight());
 		yield();
 
-		// TODO: Draw different formats of date text depending on the setting
 		if (eeprom_settings.clock_settings.date_format != DateFormat::None) {
 			display->setFont(TINY_FONT);
 			display->drawUTF8(LEFT_TEXT_MARGIN, SCREEN_HEIGHT, date_text.c_str());

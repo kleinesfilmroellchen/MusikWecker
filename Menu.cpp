@@ -63,6 +63,19 @@ void apply_auto_disable_settings(AutoDisable auto_disable)
 	save_settings();
 }
 
+static std::array<DateFormat, 4> date_settings_options = {
+	DateFormat::None,
+	DateFormat::ISO8601,
+	DateFormat::German,
+	DateFormat::GermanShort,
+};
+
+void apply_date_settings(DateFormat date_format)
+{
+	eeprom_settings.clock_settings.date_format = date_format;
+	save_settings();
+}
+
 Menu* create_menu_structure()
 {
 	HeapSelectIram iram;
@@ -84,11 +97,16 @@ Menu* create_menu_structure()
 	auto auto_disable_settings = std::make_unique<SettingsMenu<AutoDisable>>(
 		auto_disable_label, &apply_auto_disable_settings, auto_disable_options,
 		auto_disable_menu);
+	auto date_settings = std::make_unique<SettingsMenu<DateFormat>>(
+		date_settings_label, &apply_date_settings, date_settings_options,
+		date_settings_menu);
 
-	static std::array<MenuEntry, 3> settings_submenus = {
+	static std::array<MenuEntry, 5> settings_submenus = {
 		MenuEntry { settings_menu_0, std::move(auto_disable_settings) },
 		MenuEntry { settings_menu_1, std::make_unique<TimeZoneSelectMenu>() },
-		MenuEntry { settings_menu_2, std::move(debugging_menu) },
+		MenuEntry { settings_menu_2, std::move(date_settings) },
+		MenuEntry { settings_menu_3, std::make_unique<NothingMenu>() /*std::make_unique<TimeFormatSettings>()*/ },
+		MenuEntry { settings_menu_4, std::move(debugging_menu) },
 	};
 	auto settings_menu_object = std::make_unique<OptionsMenu>(settings_submenus);
 

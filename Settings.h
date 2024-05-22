@@ -77,7 +77,7 @@ constexpr bool does_repeat(AlarmRepetition const& repetition)
 // Settings of a single alarm.
 struct Alarm {
 	// Time in the day when the alarm should trigger.
-	ace_time::LocalTime alarm_time;
+	ace_time::LocalTime alarm_time = ace_time::LocalTime::forError();
 	AlarmRepetition repetition;
 	// Whether the alarm will trigger. Non-repeating alarms are set to disabled the moment they trigger so they don’t trigger the next day again.
 	bool is_enabled = false;
@@ -95,6 +95,7 @@ struct EepromSettings {
 	/** Index into the timezone list, defined in zonelist.h */
 	uint16_t timezone = 0;
 	bool show_debug = false;
+	Alarm alarms[ALARM_COUNT];
 };
 
 // macro for size of setting data

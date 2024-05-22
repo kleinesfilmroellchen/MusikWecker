@@ -28,12 +28,28 @@ TimeManager::TimeManager()
 	}
 }
 
-String TimeManager::date_de() const
+String TimeManager::date_text_for_format(DateFormat format) const
 {
-	char date_text[11];
+	char date_text[11] {};
 	auto the_current_time = current_time();
-	snprintf_P(date_text, sizeof(date_text), PSTR("%02u.%02u.%4u"), the_current_time.day(), the_current_time.month(),
-		the_current_time.year());
+	switch (format) {
+	case DateFormat::None:
+		break;
+	case DateFormat::ISO8601:
+		snprintf_P(date_text, sizeof(date_text), PSTR("%04u-%02u-%02u"),
+			the_current_time.year(), the_current_time.month(), the_current_time.day());
+		break;
+	case DateFormat::German:
+		snprintf_P(date_text, sizeof(date_text), PSTR("%02u.%02u.%4u"), the_current_time.day(), the_current_time.month(),
+			the_current_time.year());
+		break;
+	case DateFormat::GermanShort: {
+		const uint8_t year_2digit = the_current_time.year() % 100;
+		snprintf_P(date_text, sizeof(date_text), PSTR("%02u.%02u.%02u"), the_current_time.day(), the_current_time.month(),
+			year_2digit);
+		break;
+	}
+	}
 	return { date_text };
 }
 

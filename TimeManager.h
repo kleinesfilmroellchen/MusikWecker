@@ -3,10 +3,11 @@
 #pragma once
 
 #include "Definitions.h"
-#include "ace_time/ZonedDateTime.h"
+#include "Settings.h"
 #include <AceTime.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <ace_time/ZonedDateTime.h>
 #include <memory>
 
 class TimeManager {
@@ -28,7 +29,7 @@ public:
 	String zone_name() const;
 	void set_zone(uint16_t zone_index);
 
-	String date_de() const;
+	String date_text_for_format(DateFormat format) const;
 
 private:
 	// Singleton instance
