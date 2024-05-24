@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "Settings.h"
 #include "SettingsMenu.h"
+#include "TimeFormatMenu.h"
 #include "VideoPlayer.h"
 #include "strings.h"
 #include <limits>
@@ -105,12 +106,11 @@ Menu* create_menu_structure()
 		MenuEntry { settings_menu_0, std::move(auto_disable_settings) },
 		MenuEntry { settings_menu_1, std::make_unique<TimeZoneSelectMenu>() },
 		MenuEntry { settings_menu_2, std::move(date_settings) },
-		MenuEntry { settings_menu_3, std::make_unique<NothingMenu>() /*std::make_unique<TimeFormatSettings>()*/ },
+		MenuEntry { settings_menu_3, std::make_unique<TimeFormatMenu>() },
 		MenuEntry { settings_menu_4, std::move(debugging_menu) },
 	};
 	auto settings_menu_object = std::make_unique<OptionsMenu>(settings_submenus);
 
-	// TODO: replace temporary nothing menus by the actual menus once implemented
 	static std::array<MenuEntry, 5> all_menus {
 		MenuEntry { main_menu_0, std::move(clock_face_menu) },
 		MenuEntry { main_menu_1, std::make_unique<VideoPlayer>() },

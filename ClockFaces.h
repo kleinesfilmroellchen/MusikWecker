@@ -28,10 +28,8 @@ constexpr uint8_t BINARY_CLOCK_FACE_MAX_BOXES_PER_ROW = static_cast<uint8_t>(SCR
 // typedef the clock face function pointer type
 using ClockFace = void (*)(Display*, ace_time::ZonedDateTime*, double second_fractions, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 
-/** Basic digital 24-hour clock. */
+/** Basic digital clock. */
 void basic_digital(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
-/** Digital 24-hour clock with number second indicator. */
-void digital_with_seconds(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Minimalistic analog clock without numbers. */
 void basic_analog(Display* display, ace_time::ZonedDateTime* time, double, uint8_t x0, uint8_t y0, uint8_t width, uint8_t height);
 /** Retro analog clock with Roman numerals. */
@@ -47,7 +45,6 @@ void day_seconds_binary(Display* display, ace_time::ZonedDateTime* time, double,
 
 static std::array<ClockFace, 7> clock_faces {
 	&basic_digital,
-	&digital_with_seconds,
 	&basic_analog,
 	&modern_analog,
 	&rotating_segment_analog,

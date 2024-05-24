@@ -5,11 +5,9 @@
 
 		 --------- Hardware:
 
-		 SD card reader on hardware SPI (TODO: pinout)
+		 SD card reader on hardware SPI
 
-		 TODO: pinout for I2S speaker
-
-		 OLED screen SSD1306-based I²C on SCL/SDA (TODO: pinout)
+		 OLED screen SSD1306-based I²C on SCL/SDA
 
 		 Buttons for menuing
 		 - Up and Down on analog 0 (voltage divider hack; Up at 3.3V, Down at 0V, Neutral at 1.6V)

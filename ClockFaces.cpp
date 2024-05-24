@@ -14,41 +14,47 @@ static uint8_t get_center(uint8_t start, uint8_t size)
 void basic_digital(Display* display, ace_time::ZonedDateTime* time, double,
 	uint8_t x0, uint8_t y0, uint8_t width, uint8_t height)
 {
+	auto hour = time->hour();
+	if (eeprom_settings.clock_settings.time_format != TimeFormat::Hours24) {
+		hour %= 12;
+		if (hour == 0)
+			hour = 12;
+	}
+
 	char time_text[6];
-	snprintf_P(time_text, sizeof(time_text), PSTR("%02u:%02u"), time->hour(), time->minute());
+	snprintf_P(time_text, sizeof(time_text), PSTR("%02u:%02u"), hour, time->minute());
 	yield();
 
 	display->setFont(CLOCK_FONT);
 	uint16_t text_width = display->getUTF8Width(time_text);
-	yield();
-
-	uint16_t text_start = text_width > width ? x0 : (width - text_width) / 2 + x0;
-	display->drawUTF8(text_start, (height + CLOCK_FONT_HEIGHT) / 2 + y0, time_text);
-	yield();
-}
-
-void digital_with_seconds(Display* display, ace_time::ZonedDateTime* time, double,
-	uint8_t x0, uint8_t y0, uint8_t width,
-	uint8_t height)
-{
-
-	char time_text[6];
-	snprintf_P(time_text, sizeof(time_text), PSTR("%02u:%02u"), time->hour(), time->minute());
-	yield();
-
-	display->setFont(CLOCK_FONT);
-	uint16_t text_width = display->getUTF8Width(time_text);
-	uint16_t text_start = text_width > width ? x0 : (width - text_width) / 2 + x0;
-	display->drawUTF8(text_start, (height + CLOCK_FONT_HEIGHT) / 2 + y0, time_text);
 
 	char second_text[3];
-	snprintf_P(second_text, sizeof(second_text), PSTR("%02u"), time->second());
-	yield();
+	if (eeprom_settings.clock_settings.show_seconds) {
+		snprintf_P(second_text, sizeof(second_text), PSTR("%02u"), time->second());
+		display->setFont(MAIN_FONT);
+		text_width += display->getUTF8Width(second_text) * 2;
+		display->setFont(CLOCK_FONT);
+	}
 
-	display->setFont(MAIN_FONT);
-	display->drawUTF8(text_start + text_width,
-		(height + CLOCK_FONT_HEIGHT) / 2 + y0, second_text);
 	yield();
+	uint16_t text_start = text_width > width ? x0 : (width - text_width) / 2 + x0;
+	display->drawUTF8(text_start, (height + CLOCK_FONT_HEIGHT) / 2 + y0, time_text);
+	text_start += display->getUTF8Width(time_text) + LEFT_TEXT_MARGIN;
+
+	if (eeprom_settings.clock_settings.show_seconds) {
+		yield();
+		display->setFont(MAIN_FONT);
+		display->drawUTF8(text_start,
+			(height + CLOCK_FONT_HEIGHT) / 2 + y0, second_text);
+		text_start += display->getUTF8Width(second_text) + LEFT_TEXT_MARGIN;
+	}
+
+	if (eeprom_settings.clock_settings.time_format == TimeFormat::Hours12AmPm) {
+		yield();
+		display->setFont(MAIN_FONT);
+		display->drawUTF8(text_start,
+			(height + CLOCK_FONT_HEIGHT) / 2 + y0, time->hour() < 12 ? am : pm);
+	}
 }
 
 void basic_analog(Display* display, ace_time::ZonedDateTime* time, double second_fractions,
@@ -78,7 +84,8 @@ void basic_analog(Display* display, ace_time::ZonedDateTime* time, double second
 	const double secOuterX = cos(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
 				 secOuterY = sin(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
 
-	display->drawLine(center_x, center_y, center_x + secOuterX, center_y + secOuterY);
+	if (eeprom_settings.clock_settings.show_seconds)
+		display->drawLine(center_x, center_y, center_x + secOuterX, center_y + secOuterY);
 
 	yield();
 	display->drawLine(center_x, center_y,
@@ -129,6 +136,12 @@ void modern_analog(Display* display, ace_time::ZonedDateTime* time, double secon
 	yield();
 	draw_stroked_line(display, center_x, center_y, hour_x, hour_y, hourAngle + HALF_PI, 3);
 
+	if (eeprom_settings.clock_settings.show_seconds) {
+		const double second_end_x = cos(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
+					 second_end_y = sin(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
+		display->drawLine(center_x, center_y, center_x + second_end_x, center_y + second_end_y);
+	}
+
 	display->setDrawColor(0);
 	display->drawPixel(center_x, center_y);
 	display->setDrawColor(1);
@@ -144,9 +157,11 @@ void rotating_segment_analog(Display* display, ace_time::ZonedDateTime* time, do
 	const uint16_t center_x = get_center(x0, width),
 				   center_y = get_center(y0, height);
 
+	// TODO: 24h format hour angle is not correct
 	const double secondAngle = second * TWO_PI / 60.0d,
 				 minuteAngle = minute * TWO_PI / 60.0d,
-				 hourAngle = (hour >= 12 ? hour - 12 : hour) * TWO_PI / 12.0d;
+				 hourAngle = (eeprom_settings.clock_settings.time_format == TimeFormat::Hours24 ? hour : (hour >= 12 ? hour - 12 : hour))
+		* TWO_PI / 12.0d;
 
 	// the offsets need to be as smooth as possible, but not time-precise
 	// make them dependent on internal milliseconds, which will only glitch out

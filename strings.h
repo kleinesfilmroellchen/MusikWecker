@@ -41,13 +41,12 @@ static const char* main_menu_array[] PROGMEM = { main_menu_0, main_menu_1, main_
 static const Span<char const*> main_menu { main_menu_array };
 
 static const char design_menu_0[] PROGMEM = "Digital";
-static const char design_menu_1[] PROGMEM = "Digital + Sekunden";
-static const char design_menu_2[] PROGMEM = "Analog (minimalistisch)";
-static const char design_menu_3[] PROGMEM = "Analog (modern)";
-static const char design_menu_4[] PROGMEM = "Rotierende Segmente";
-static const char design_menu_5[] PROGMEM = "Binär";
-static const char design_menu_6[] PROGMEM = "Binär (Tagsekunden)";
-static const char* design_menu_array[] PROGMEM = { design_menu_0, design_menu_1, design_menu_2, design_menu_3, design_menu_4, design_menu_5, design_menu_6 };
+static const char design_menu_1[] PROGMEM = "Analog (minimalistisch)";
+static const char design_menu_2[] PROGMEM = "Analog (modern)";
+static const char design_menu_3[] PROGMEM = "Rotierende Segmente";
+static const char design_menu_4[] PROGMEM = "Binär";
+static const char design_menu_5[] PROGMEM = "Binär (Tagsekunden)";
+static const char* design_menu_array[] PROGMEM = { design_menu_0, design_menu_1, design_menu_2, design_menu_3, design_menu_4, design_menu_5 };
 static const Span<char const*> design_menu { design_menu_array };
 
 static const char waketone_menu_0[] PROGMEM = "Zufällig (Reihe)";
@@ -103,3 +102,12 @@ static const char* auto_disable_label PROGMEM = "Bildschirm abschalten\nbei Inak
 static const char* confirm_delete_label PROGMEM = "Wirklich löschen?";
 static const char* confirm_move_label PROGMEM = "Wirklich hierher\nverschieben?";
 static const char* date_settings_label PROGMEM = "Datumsanzeige auf dem\nUhrenbildschirm";
+
+static char const* twelve_hour_format PROGMEM = "12 Stunden";
+static char const* twelve_hour_am_pm_format PROGMEM = "12 Std. (AM/PM)";
+static char const* twenty_four_hour_format PROGMEM = "24 Stunden";
+static char const* show_seconds PROGMEM = "Sekunden anzeigen";
+static const std::array<char const*, 4> time_formats = { twelve_hour_format, twelve_hour_am_pm_format, twenty_four_hour_format, show_seconds };
+
+static char const* am PROGMEM = "AM";
+static char const* pm PROGMEM = "PM";
