@@ -4,8 +4,9 @@ from itertools import batched, chain, product
 from math import ceil, floor, log2
 from pathlib import Path
 import cv2
-from PIL import Image
+from PIL import Image, ImageFilter
 from io import BytesIO
+import numpy as np
 import struct
 from typing import Iterable, Tuple, TypeVar
 from dataclasses import dataclass, field
@@ -512,6 +513,17 @@ def encode_block(
     # bytes([compressed_encoder_number, compressed_size])
     return bytes([compressed_encoder_number]) + compressed_image_data
 
+def make_self_delta(image: Image.Image) -> Image.Image:
+    image_bytes = image.convert(mode="L").tobytes()
+    delta_bytes = bytearray()
+    last_pixel = 0
+    for pixel in image_bytes:
+        pixel = int(pixel)
+        delta_bytes.append(last_pixel ^ pixel)
+        last_pixel = pixel
+    deltas = Image.frombytes(mode="L", size=image.size, data=delta_bytes).convert(mode="1")
+    return deltas
+
 
 def encode(input: Path):
     video = cv2.VideoCapture(str(input))
@@ -555,6 +567,8 @@ def encode(input: Path):
         # two CCITT Group 4 encoding options (stripped and unstripped)
         bin_output = BytesIO()
         image.save(bin_output, format="tiff", compression="group4")
+        image_self_delta = make_self_delta(image)
+        image_self_delta.save(f"frames/frame_delta_{count}.tiff")
         # compressed_image_data = bin_output.getbuffer()
         # compressed_image_data = strip_tiff(bin_output.getbuffer())
 
