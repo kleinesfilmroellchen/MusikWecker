@@ -2,6 +2,7 @@
 #include "Debug.h"
 #include "Definitions.h"
 #include "DisplayUtils.h"
+#include "LUTMath.h"
 #include "graphics.h"
 
 namespace ClockFaces {
@@ -68,10 +69,10 @@ void basic_analog(Display* display, ace_time::ZonedDateTime* time, double second
 
 	// draw 12 line segments representing hours
 	for (double i = 0; i < TWO_PI; i += PI_DIV6) {
-		const double inner_x = (cos(i - HALF_PI) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH)),
-					 inner_y = (sin(i - HALF_PI) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH)),
-					 outerX = (cos(i - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2),
-					 outerY = (sin(i - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2);
+		const double inner_x = (cos_lut(i - HALF_PI) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH)),
+					 inner_y = (sin_lut(i - HALF_PI) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH)),
+					 outerX = (cos_lut(i - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2),
+					 outerY = (sin_lut(i - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2);
 
 		yield();
 		display->drawLine(inner_x + center_x, inner_y + center_y, outerX + center_x,
@@ -81,21 +82,21 @@ void basic_analog(Display* display, ace_time::ZonedDateTime* time, double second
 	const double secondAngle = (second / 60.0d) * TWO_PI - HALF_PI,
 				 minuteAngle = (minute / 60.0d) * TWO_PI - HALF_PI,
 				 hourAngle = ((hour >= 12 ? hour - 12 : hour) / 12.0d) * TWO_PI - HALF_PI;
-	const double secOuterX = cos(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
-				 secOuterY = sin(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
+	const double secOuterX = cos_lut(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
+				 secOuterY = sin_lut(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
 
 	if (eeprom_settings.clock_settings.show_seconds)
 		display->drawLine(center_x, center_y, center_x + secOuterX, center_y + secOuterY);
 
 	yield();
 	display->drawLine(center_x, center_y,
-		cos(minuteAngle) * ANALOG_CLOCK_FACE_MINUTE_LENGTH + center_x,
-		sin(minuteAngle) * ANALOG_CLOCK_FACE_MINUTE_LENGTH + center_y);
+		cos_lut(minuteAngle) * ANALOG_CLOCK_FACE_MINUTE_LENGTH + center_x,
+		sin_lut(minuteAngle) * ANALOG_CLOCK_FACE_MINUTE_LENGTH + center_y);
 
 	yield();
 	display->drawLine(center_x, center_y,
-		cos(hourAngle) * ANALOG_CLOCK_FACE_HOUR_LENGTH + center_x,
-		sin(hourAngle) * ANALOG_CLOCK_FACE_HOUR_LENGTH + center_y);
+		cos_lut(hourAngle) * ANALOG_CLOCK_FACE_HOUR_LENGTH + center_x,
+		sin_lut(hourAngle) * ANALOG_CLOCK_FACE_HOUR_LENGTH + center_y);
 }
 
 void modern_analog(Display* display, ace_time::ZonedDateTime* time, double second_fractions,
@@ -115,10 +116,10 @@ void modern_analog(Display* display, ace_time::ZonedDateTime* time, double secon
 	display->setFont(u8g2_font_mozart_nbp_tf);
 	for (size_t i = 0; i < 12; i++) {
 		const double angle = i * PI_DIV6;
-		const double outerX = (cos(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2),
-					 outerY = (sin(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2);
+		const double outerX = (cos_lut(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2),
+					 outerY = (sin_lut(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2);
 		yield();
-		const char* number = hour_names[i];
+		const char* number = hour_names_modern[i];
 		const auto width = display->getUTF8Width(number);
 		display->drawUTF8(center_x + outerX - width / 2 + 1, center_y + outerY + 7 / 2, number);
 	}
@@ -127,24 +128,86 @@ void modern_analog(Display* display, ace_time::ZonedDateTime* time, double secon
 				 minuteAngle = (minute / 60.0d) * TWO_PI - HALF_PI,
 				 hourAngle = ((hour >= 12 ? hour - 12 : hour) / 12.0d) * TWO_PI - HALF_PI;
 
-	const uint8_t minute_x = cos(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_x,
-				  minute_y = sin(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_y,
-				  hour_x = cos(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_x,
-				  hour_y = sin(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_y;
+	const uint8_t minute_x = cos_lut(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_x,
+				  minute_y = sin_lut(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_y,
+				  hour_x = cos_lut(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_x,
+				  hour_y = sin_lut(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_y,
+				  // start position of the hands on the other side of the center point
+		counter_hand_minute_x = cos_lut(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_x;
 
-	draw_stroked_line(display, center_x, center_y, minute_x, minute_y, minuteAngle + HALF_PI, 2);
+	display->drawLine(center_x, center_y, minute_x, minute_y);
 	yield();
 	draw_stroked_line(display, center_x, center_y, hour_x, hour_y, hourAngle + HALF_PI, 3);
 
 	if (eeprom_settings.clock_settings.show_seconds) {
-		const double second_end_x = cos(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
-					 second_end_y = sin(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
+		const double second_end_x = cos_lut(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2),
+					 second_end_y = sin_lut(secondAngle) * (ANALOG_CLOCK_FACE_SIZE / 2 - ANALOG_CLOCK_FACE_LINE_LENGTH - 2);
 		display->drawLine(center_x, center_y, center_x + second_end_x, center_y + second_end_y);
 	}
 
 	display->setDrawColor(0);
 	display->drawPixel(center_x, center_y);
 	display->setDrawColor(1);
+}
+
+void retro_analog(Display* display, ace_time::ZonedDateTime* time, double second_fractions,
+	uint8_t x0, uint8_t y0, uint8_t width, uint8_t height)
+{
+	const auto inner_radius = ANALOG_CLOCK_FACE_LINE_LENGTH / 3.;
+
+	const double hour = time->hour() + time->minute() / 60.0d,
+				 minute = time->minute() + time->second() / 60.0d,
+				 second = time->second() + second_fractions;
+	const uint16_t center_x = get_center(x0, width),
+				   center_y = get_center(y0, height);
+
+	yield();
+	display->drawDisc(center_x, center_y, inner_radius);
+
+	display->setFont(TINY_FONT);
+	for (size_t i = 0; i < 12; i++) {
+		const double angle = i * PI_DIV6;
+		const double outerX = (cos_lut(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2),
+					 outerY = (sin_lut(angle - HALF_PI) * ANALOG_CLOCK_FACE_SIZE / 2);
+		yield();
+		const char* number = hour_names_retro[i];
+		const auto width = display->getUTF8Width(number);
+		display->drawUTF8(center_x + outerX - width / 2 + 1, center_y + outerY + 7 / 2, number);
+	}
+
+	const double secondAngle = (second / 60.0d) * TWO_PI - HALF_PI,
+				 minuteAngle = (minute / 60.0d) * TWO_PI - HALF_PI,
+				 hourAngle = ((hour >= 12 ? hour - 12 : hour) / 12.0d) * TWO_PI - HALF_PI;
+	constexpr double DECORATION_ANGLE_OFFSET = PI_FACTOR<1, 15>;
+
+	const uint8_t minute_x = cos_lut(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_x,
+				  minute_y = sin_lut(minuteAngle) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH + inner_radius) + center_y,
+				  hour_x = cos_lut(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_x,
+				  hour_y = sin_lut(hourAngle) * (ANALOG_CLOCK_FACE_HOUR_LENGTH + inner_radius) + center_y,
+				  minute_opposite_x = -cos_lut(minuteAngle) * (ANALOG_CLOCK_FACE_COUNTER_HAND_LENGTH + inner_radius) + center_x,
+				  minute_opposite_y = -sin_lut(minuteAngle) * (ANALOG_CLOCK_FACE_COUNTER_HAND_LENGTH + inner_radius) + center_y,
+				  hour_opposite_x = -cos_lut(hourAngle) * (ANALOG_CLOCK_FACE_COUNTER_HAND_LENGTH + inner_radius) + center_x,
+				  hour_opposite_y = -sin_lut(hourAngle) * (ANALOG_CLOCK_FACE_COUNTER_HAND_LENGTH + inner_radius) + center_y,
+				  minute_left_side_x = cos_lut(minuteAngle + DECORATION_ANGLE_OFFSET) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH) + center_x,
+				  minute_left_side_y = sin_lut(minuteAngle + DECORATION_ANGLE_OFFSET) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH) + center_y,
+				  minute_right_side_x = cos_lut(minuteAngle - DECORATION_ANGLE_OFFSET) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH) + center_x,
+				  minute_right_side_y = sin_lut(minuteAngle - DECORATION_ANGLE_OFFSET) * (ANALOG_CLOCK_FACE_MINUTE_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH) + center_y,
+				  hour_left_side_x = cos_lut(hourAngle + DECORATION_ANGLE_OFFSET * 2) * (ANALOG_CLOCK_FACE_HOUR_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH / 2.0) + center_x,
+				  hour_left_side_y = sin_lut(hourAngle + DECORATION_ANGLE_OFFSET * 2) * (ANALOG_CLOCK_FACE_HOUR_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH / 2.0) + center_y,
+				  hour_right_side_x = cos_lut(hourAngle - DECORATION_ANGLE_OFFSET * 2) * (ANALOG_CLOCK_FACE_HOUR_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH / 2.0) + center_x,
+				  hour_right_side_y = sin_lut(hourAngle - DECORATION_ANGLE_OFFSET * 2) * (ANALOG_CLOCK_FACE_HOUR_LENGTH - ANALOG_CLOCK_FACE_LINE_LENGTH / 2.0) + center_y;
+
+	display->drawLine(minute_opposite_x, minute_opposite_y, minute_x, minute_y);
+	display->drawLine(minute_right_side_x, minute_right_side_y, minute_x, minute_y);
+	display->drawLine(minute_x, minute_y, minute_left_side_x, minute_left_side_y);
+	yield();
+	display->drawLine(hour_opposite_x, hour_opposite_y, hour_x, hour_y);
+	display->drawLine(hour_right_side_x, hour_right_side_y, hour_x, hour_y);
+	display->drawLine(hour_x, hour_y, hour_left_side_x, hour_left_side_y);
+
+	// display->setDrawColor(0);
+	// display->drawPixel(center_x, center_y);
+	// display->setDrawColor(1);
 }
 
 void rotating_segment_analog(Display* display, ace_time::ZonedDateTime* time, double second_fractions,

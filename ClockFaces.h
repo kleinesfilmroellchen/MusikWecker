@@ -18,6 +18,8 @@ constexpr uint16_t ANALOG_CLOCK_FACE_LINE_LENGTH = 4;
 constexpr uint16_t ANALOG_CLOCK_FACE_HOUR_LENGTH = 10;
 // length of the minute hand
 constexpr uint16_t ANALOG_CLOCK_FACE_MINUTE_LENGTH = 16;
+// length of the opposing piece of a hand in retro analog clocks
+constexpr uint16_t ANALOG_CLOCK_FACE_COUNTER_HAND_LENGTH = 4;
 // size of the boxes in binary clocks
 constexpr uint16_t BINARY_CLOCK_FACE_BOX_SIZE = 8;
 // spacing between the boxes in binary clocks
@@ -46,6 +48,7 @@ void day_seconds_binary(Display* display, ace_time::ZonedDateTime* time, double,
 static std::array<ClockFace, 7> clock_faces {
 	&basic_digital,
 	&basic_analog,
+	&retro_analog,
 	&modern_analog,
 	&rotating_segment_analog,
 	&binary,

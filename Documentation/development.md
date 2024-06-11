@@ -46,7 +46,6 @@ Some of the things I still need to implement. In rough order of priority
 - Bugs/QOL
 	- File list doesn't reload everywhere when files are moved and deleted
 	- Diagnostics page is broken
-	- Move clock design page to new settings section (see below)
 - The entire alarm system
 	- Creating and deleting alarms
 	- Alarm settings (which are available?)

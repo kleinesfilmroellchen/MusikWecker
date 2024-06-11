@@ -1,4 +1,5 @@
 #include "DisplayUtils.h"
+#include "LUTMath.h"
 
 void draw_rotated_xbm(Display* display, uint16_t x_start, uint16_t y_start,
 	double angle, uint16_t w, uint16_t h,
@@ -71,8 +72,8 @@ void draw_arc(Display* display, uint16_t x0, uint16_t y0, uint16_t radius, doubl
 
 	// make sure we draw at least one pixel for small angles if we didn't return above.
 	// (don't use the draw() helper since the range check would likely fail)
-	display->drawPixel(x0 + round(cos(-start_angle + HALF_PI) * radius), y0 + round(sin(-start_angle + HALF_PI) * radius));
-	display->drawPixel(x0 + round(cos(-end_angle + HALF_PI) * radius), y0 + round(sin(-end_angle + HALF_PI) * radius));
+	display->drawPixel(x0 + round(cos_lut(-start_angle + HALF_PI) * radius), y0 + round(sin_lut(-start_angle + HALF_PI) * radius));
+	display->drawPixel(x0 + round(cos_lut(-end_angle + HALF_PI) * radius), y0 + round(sin_lut(-end_angle + HALF_PI) * radius));
 
 	while (x < y) {
 		if (f >= 0) {

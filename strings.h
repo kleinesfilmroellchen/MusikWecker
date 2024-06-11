@@ -17,7 +17,7 @@ static const char hour_name_8[] PROGMEM = "8";
 static const char hour_name_9[] PROGMEM = "9";
 static const char hour_name_10[] PROGMEM = "10";
 static const char hour_name_11[] PROGMEM = "11";
-static const char* hour_names[] PROGMEM {
+static const char* hour_names_modern[] PROGMEM {
 	hour_name_12,
 	hour_name_1,
 	hour_name_2,
@@ -32,21 +32,47 @@ static const char* hour_names[] PROGMEM {
 	hour_name_11,
 };
 
-static const char main_menu_0[] PROGMEM = "Uhrdesign";
-static const char main_menu_1[] PROGMEM = "Wecker";
-static const char main_menu_2[] PROGMEM = "Dateiverwaltung";
-static const char main_menu_3[] PROGMEM = "Einstellungen";
-static const char main_menu_4[] PROGMEM = "Diagnostik";
-static const char* main_menu_array[] PROGMEM = { main_menu_0, main_menu_1, main_menu_2, main_menu_3, main_menu_4 };
-static const Span<char const*> main_menu { main_menu_array };
+static const char hour_name_xii[] PROGMEM = "XII";
+static const char hour_name_i[] PROGMEM = "I";
+static const char hour_name_ii[] PROGMEM = "II";
+static const char hour_name_iii[] PROGMEM = "III";
+static const char hour_name_iv[] PROGMEM = "IV";
+static const char hour_name_v[] PROGMEM = "V";
+static const char hour_name_vi[] PROGMEM = "VI";
+static const char hour_name_vii[] PROGMEM = "VII";
+static const char hour_name_viii[] PROGMEM = "VIII";
+static const char hour_name_ix[] PROGMEM = "IX";
+static const char hour_name_x[] PROGMEM = "X";
+static const char hour_name_xi[] PROGMEM = "XI";
+static const char* hour_names_retro[] PROGMEM {
+	hour_name_xii,
+	hour_name_i,
+	hour_name_ii,
+	hour_name_iii,
+	hour_name_iv,
+	hour_name_v,
+	hour_name_vi,
+	hour_name_vii,
+	hour_name_viii,
+	hour_name_ix,
+	hour_name_x,
+	hour_name_xi,
+};
 
-static const char design_menu_0[] PROGMEM = "Digital";
-static const char design_menu_1[] PROGMEM = "Analog (minimalistisch)";
-static const char design_menu_2[] PROGMEM = "Analog (modern)";
-static const char design_menu_3[] PROGMEM = "Rotierende Segmente";
-static const char design_menu_4[] PROGMEM = "Binär";
-static const char design_menu_5[] PROGMEM = "Binär (Tagsekunden)";
-static const char* design_menu_array[] PROGMEM = { design_menu_0, design_menu_1, design_menu_2, design_menu_3, design_menu_4, design_menu_5 };
+static const char main_menu_alarms[] PROGMEM = "Wecker";
+static const char main_menu_files[] PROGMEM = "Dateiverwaltung";
+static const char main_menu_settings[] PROGMEM = "Einstellungen";
+static const char main_menu_diagnostics[] PROGMEM = "Diagnostik";
+static const char main_menu_video[] PROGMEM = "Video";
+
+static const char design_menu_digital[] PROGMEM = "Digital";
+static const char design_menu_analog[] PROGMEM = "Analog (minimalistisch)";
+static const char design_menu_analog_retro[] PROGMEM = "Analog (retro)";
+static const char design_menu_analog_modern[] PROGMEM = "Analog (modern)";
+static const char design_menu_rotating_segments[] PROGMEM = "Rotierende Segmente";
+static const char design_menu_binary[] PROGMEM = "Binär";
+static const char design_menu_binary_day[] PROGMEM = "Binär (Tagsekunden)";
+static const char* design_menu_array[] PROGMEM = { design_menu_digital, design_menu_analog, design_menu_analog_retro, design_menu_analog_modern, design_menu_rotating_segments, design_menu_binary, design_menu_binary_day };
 static const Span<char const*> design_menu { design_menu_array };
 
 static const char waketone_menu_0[] PROGMEM = "Zufällig (Reihe)";
@@ -55,19 +81,16 @@ static const char waketone_menu_2[] PROGMEM = "Festgelegt";
 static const char* waketone_menu_array[] PROGMEM = { waketone_menu_0, waketone_menu_1, waketone_menu_2 };
 static const Span<char const*> waketone_menu { waketone_menu_array };
 
-static const char file_menu_0[] PROGMEM = "Dateiansicht";
-static const char file_menu_1[] PROGMEM = "Verschieben";
-static const char file_menu_2[] PROGMEM = "Löschen";
-static const char* file_menu_array[] PROGMEM = { file_menu_0, file_menu_1, file_menu_2 };
-static const Span<char const*> file_menu { file_menu_array };
+static const char file_menu_view[] PROGMEM = "Dateiansicht";
+static const char file_menu_move[] PROGMEM = "Verschieben";
+static const char file_menu_delete[] PROGMEM = "Löschen";
 
-static const char settings_menu_0[] PROGMEM = "Auto-Abschaltung";
-static const char settings_menu_1[] PROGMEM = "Zeitzone";
-static const char settings_menu_2[] PROGMEM = "Datumsanzeige";
-static const char settings_menu_3[] PROGMEM = "Uhrzeitformat";
-static const char settings_menu_4[] PROGMEM = "Debugging";
-static const char* settings_menu_array[] PROGMEM = { settings_menu_0, settings_menu_1, settings_menu_2, settings_menu_3, settings_menu_4 };
-static const Span<char const*> settings_menu { settings_menu_array };
+static const char settings_menu_auto_disable[] PROGMEM = "Auto-Abschaltung";
+static const char settings_menu_timezone[] PROGMEM = "Zeitzone";
+static const char settings_menu_clock_design[] PROGMEM = "Uhrdesign";
+static const char settings_menu_date_format[] PROGMEM = "Datumsanzeige";
+static const char settings_menu_time_format[] PROGMEM = "Uhrzeitformat";
+static const char settings_menu_debugging[] PROGMEM = "Debugging";
 
 static const char* yes PROGMEM = "Ja";
 static const char* no PROGMEM = "Nein";

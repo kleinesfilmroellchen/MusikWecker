@@ -81,46 +81,47 @@ Menu* create_menu_structure()
 {
 	HeapSelectIram iram;
 
-	auto clock_face_menu = std::make_unique<ClockFaceSelectMenu>(design_menu, ClockFaces::clock_faces);
-
 	static std::array<MenuEntry, 3> file_submenus = {
-		MenuEntry { file_menu_0,
+		MenuEntry { file_menu_view,
 			std::make_unique<FileSelectMenu>(FileMenuState::None) },
-		MenuEntry { file_menu_1,
+		MenuEntry { file_menu_move,
 			std::make_unique<FileSelectMenu>(FileMenuState::Move) },
-		MenuEntry { file_menu_2,
+		MenuEntry { file_menu_delete,
 			std::make_unique<FileSelectMenu>(FileMenuState::Delete) },
 	};
-	auto file_menu_object = std::make_unique<OptionsMenu>(file_submenus);
+	static auto file_menu_object = std::make_unique<OptionsMenu>(file_submenus);
 
-	auto debugging_menu = std::make_unique<SettingsMenu<YesNoSelection>>(
+	static auto debugging_menu = std::make_unique<SettingsMenu<YesNoSelection>>(
 		debugging_label, &apply_debug_settings, yes_no_options, yes_no_menu);
-	auto auto_disable_settings = std::make_unique<SettingsMenu<AutoDisable>>(
+	static auto auto_disable_settings = std::make_unique<SettingsMenu<AutoDisable>>(
 		auto_disable_label, &apply_auto_disable_settings, auto_disable_options,
 		auto_disable_menu);
-	auto date_settings = std::make_unique<SettingsMenu<DateFormat>>(
+	static auto date_settings = std::make_unique<SettingsMenu<DateFormat>>(
 		date_settings_label, &apply_date_settings, date_settings_options,
 		date_settings_menu);
 
-	static std::array<MenuEntry, 5> settings_submenus = {
-		MenuEntry { settings_menu_0, std::move(auto_disable_settings) },
-		MenuEntry { settings_menu_1, std::make_unique<TimeZoneSelectMenu>() },
-		MenuEntry { settings_menu_2, std::move(date_settings) },
-		MenuEntry { settings_menu_3, std::make_unique<TimeFormatMenu>() },
-		MenuEntry { settings_menu_4, std::move(debugging_menu) },
+	static auto clock_face_menu = std::make_unique<ClockFaceSelectMenu>(design_menu, ClockFaces::clock_faces);
+
+	static std::array<MenuEntry, 6> settings_submenus = {
+		MenuEntry { settings_menu_auto_disable, std::move(auto_disable_settings) },
+		MenuEntry { settings_menu_timezone, std::make_unique<TimeZoneSelectMenu>() },
+		MenuEntry { settings_menu_clock_design, std::move(clock_face_menu) },
+		MenuEntry { settings_menu_date_format, std::move(date_settings) },
+		MenuEntry { settings_menu_time_format, std::make_unique<TimeFormatMenu>() },
+		MenuEntry { settings_menu_debugging, std::move(debugging_menu) },
 	};
-	auto settings_menu_object = std::make_unique<OptionsMenu>(settings_submenus);
+	static auto settings_menu_object = std::make_unique<OptionsMenu>(settings_submenus);
 
 	static std::array<MenuEntry, 5> all_menus {
-		MenuEntry { main_menu_0, std::move(clock_face_menu) },
-		MenuEntry { main_menu_1, std::make_unique<VideoPlayer>() },
-		MenuEntry { main_menu_2, std::move(file_menu_object) },
-		MenuEntry { main_menu_3, std::move(settings_menu_object) },
-		MenuEntry { main_menu_4, std::make_unique<DiagnosticMenu>() },
+		MenuEntry { main_menu_alarms, std::make_unique<NothingMenu>() },
+		MenuEntry { main_menu_files, std::move(file_menu_object) },
+		MenuEntry { main_menu_settings, std::move(settings_menu_object) },
+		MenuEntry { main_menu_diagnostics, std::make_unique<DiagnosticMenu>() },
+		MenuEntry { main_menu_video, std::make_unique<VideoPlayer>() },
 	};
-	OptionsMenu* main_menu = new OptionsMenu(all_menus);
+	static OptionsMenu* main_menu = new OptionsMenu(all_menus);
 
-	ClockMenu* clock = new ClockMenu(static_cast<Menu*>(main_menu));
+	static ClockMenu* clock = new ClockMenu(static_cast<Menu*>(main_menu));
 
 	return clock;
 }
