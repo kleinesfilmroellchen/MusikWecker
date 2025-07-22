@@ -8,3 +8,4 @@ zonelist.h
 bad_apple.h
 **/__pycache__/
 frames/**
+.pio

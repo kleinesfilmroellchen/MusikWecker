@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Definitions.h"
-#include "strings.h"
+#include "string_constants.h"
 #include <AceTime.h>
 #include <U8g2lib.h>
 #include <array>

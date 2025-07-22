@@ -5,7 +5,7 @@
 #include "NTPClient.h"
 #include "PrintString.h"
 #include "TimeManager.h"
-#include "strings.h"
+#include "string_constants.h"
 #include <AceTime.h>
 #include <SdFat.h>
 #include <WString.h>

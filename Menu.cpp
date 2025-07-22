@@ -11,7 +11,7 @@
 #include "SettingsMenu.h"
 #include "TimeFormatMenu.h"
 #include "VideoPlayer.h"
-#include "strings.h"
+#include "string_constants.h"
 #include <limits>
 #include <memory>
 #include <umm_malloc/umm_heap_select.h>

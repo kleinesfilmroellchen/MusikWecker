@@ -3,7 +3,7 @@
 #include "Globals.h"
 #include "PrintString.h"
 #include "SettingsMenu.h"
-#include "strings.h"
+#include "string_constants.h"
 #include <SdFat.h>
 #include <memory>
 #include <stdint.h>

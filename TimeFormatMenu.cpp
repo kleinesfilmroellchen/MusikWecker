@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "Settings.h"
 #include "graphics.h"
-#include "strings.h"
+#include "string_constants.h"
 
 Menu* TimeFormatMenu::draw_menu(Display* display, uint16_t delta_millis)
 {

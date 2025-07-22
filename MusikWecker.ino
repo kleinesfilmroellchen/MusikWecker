@@ -28,7 +28,7 @@
 #include "Menu.h"
 #include "Settings.h"
 #include "TimeManager.h"
-#include "strings.h"
+#include "string_constants.h"
 #include "zonelist.h"
 #include <AceTime.h>
 #include <ArduinoOTA.h>
