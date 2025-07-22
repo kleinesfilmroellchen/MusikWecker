@@ -1,7 +1,7 @@
 import argparse
 from enum import Enum
 from itertools import batched, chain, product
-from math import ceil, floor, log2
+from math import ceil, floor
 from pathlib import Path
 import cv2
 from PIL import Image, ImageFilter
@@ -9,8 +9,8 @@ from io import BytesIO
 import numpy as np
 import struct
 from typing import Iterable, Tuple, TypeVar
-from dataclasses import dataclass, field
-
+from bits import encode_leb, encode_rice, BitStream
+from turtle import encode_turtle
 
 target_height = 64
 fps = 8
@@ -88,123 +88,6 @@ def compress_into_nibbles(data: bytes) -> bytes:
     if index < len(data):
         append_byte(data[-1])
 
-    return output
-
-
-@dataclass
-class BitStream:
-    data: bytearray = field(default_factory=bytearray)
-    next_index: int = field(default=0, init=False)
-    current_bit: int = field(default=0, init=False)
-    current_byte: int = field(default=0, init=False)
-
-    # def read_bit(self) -> int:
-    #     if self.current_bit == 0:
-    #         self.current_byte = self.data[self.next_index]
-    #         self.next_index += 1
-    #     return 1 if self.current_byte & (1 << self.current_bit) > 0 else 0
-
-    # def read_bits(self, count: int) -> int:
-    #     output = 0
-    #     for _ in range(count):
-    #         bit = self.read_bit()
-    #         output = (output << 1) | bit
-    #     return output
-
-    def write_bits(self, value: int, count: int):
-        bit_count = count
-        while bit_count > 0:
-            next_bit = (value >> (bit_count - 1)) & 1
-            bit_count -= 1
-
-            self.current_byte <<= 1
-            self.current_byte |= next_bit
-            self.current_bit += 1
-
-            if self.current_bit > 7:
-                self.data.append(self.current_byte)
-                self.current_bit = 0
-                self.current_byte = 0
-
-    def write_to_byte_boundary(self):
-        if self.current_bit == 0:
-            return
-        self.write_bits(0, 8 - self.current_bit)
-
-    def write_rice(self, value: int, k: int) -> int:
-        """
-        Barring the zig-zag encoding, this is basically:
-        https://github.com/xiph/flac/blob/28e4f0528c76b296c561e922ba67d43751990599/src/libFLAC/bitwriter.c#L727
-        """
-        msbs = value >> k
-        pattern = 1 << k
-        pattern |= value & (pattern - 1)
-        self.write_bits(0, msbs)
-        self.write_bits(pattern, k + 1)
-        return msbs
-
-    def write_exponential_golomb(self, value: int):
-        """Rice order 0"""
-        leading_bits = int(floor(log2(value)) + 1)
-        self.write_bits(0, leading_bits - 1)
-        self.write_bits(value, leading_bits)
-
-
-def encode_rice(data: list[int]) -> tuple[bytes, int]:
-    """
-    Rice / Exponential Golomb coding for variable length integers.
-    Adaptive k algorithm based on https://ieeexplore.ieee.org/document/4362102,
-    a variant of the Melcode algorithm: https://ieeexplore.ieee.org/document/855427
-    """
-    M = 7
-
-    shortest_data = bytes()
-    shortest_len = 100000000000
-    shortest_k = 0
-
-    # for k in range(1, 10):
-    k = 4
-    stream = BitStream()
-    counter = 0
-    for value in data:
-        u = stream.write_rice(value, k)
-        # if u > 1:
-        #     counter += 1
-        # if u > 2:
-        #     counter += 1
-        # if u > 3:
-        #     counter += 1
-        # if u > 4:
-        #     counter += 1
-        # if u == 0 and (counter & (1 << k)) == 0:
-        #     counter -= 1
-        # if counter >= M:
-        #     k += 1
-        #     counter = 0
-        # if counter <= -M:
-        #     k -= 1
-        #     counter = 0
-    stream.write_to_byte_boundary()
-    # if len(stream.data) < shortest_len:
-    #     shortest_data = stream.data
-    #     shortest_len = len(shortest_data)
-    #     shortest_k = k
-
-    return (stream.data, shortest_k)
-
-
-def encode_leb(data: list[int]) -> bytes:
-    """LEB128 encoding for variable length integers."""
-    output = bytearray()
-    for value in data:
-        if value == 0:
-            output.append(0)
-        while value != 0:
-            byte = value & 0x7F
-            value >>= 7
-            if value != 0:
-                byte &= 0x80
-            output.append(byte)
     return output
 
 
@@ -426,7 +309,7 @@ T = TypeVar("T")
 
 
 def encode_block(
-    block: Image, previous_block: Image, encoder_counts: list[int], k_counts: list[int]
+    block: Image, previous_block: Image, encoder_counts: list[int], k_counts: list[int], frame:int
 ) -> bytes:
     block_data = bytes(reverse_mask(byte) for byte in block.tobytes())
     # do zig-zag or snaking encoding of the block data, which may generate longer stretches of the same color
@@ -464,6 +347,9 @@ def encode_block(
     garbagémon_compressed = encode_garbagémon(block_data)
     garbagémon_compressed_delta = encode_garbagémon(delta)
     garbagémon_snake_compressed = encode_garbagémon(block_data_snake)
+
+    turtle_compressed = encode_turtle(block_data, frame)
+
     # garbagémon_snake_compressed_delta = encode_garbagémon(delta_snake)
     # Pokémon
     # FIXME: doesn't properly account for two different start types so far
@@ -498,6 +384,7 @@ def encode_block(
             # rice_compressed_delta,
             # rice_snake_compressed,
             # block_data,
+            turtle_compressed,
         ]
     ):
         if len(data) < compressed_size:
@@ -513,6 +400,7 @@ def encode_block(
     # bytes([compressed_encoder_number, compressed_size])
     return bytes([compressed_encoder_number]) + compressed_image_data
 
+
 def make_self_delta(image: Image.Image) -> Image.Image:
     image_bytes = image.convert(mode="L").tobytes()
     delta_bytes = bytearray()
@@ -521,7 +409,9 @@ def make_self_delta(image: Image.Image) -> Image.Image:
         pixel = int(pixel)
         delta_bytes.append(last_pixel ^ pixel)
         last_pixel = pixel
-    deltas = Image.frombytes(mode="L", size=image.size, data=delta_bytes).convert(mode="1")
+    deltas = Image.frombytes(mode="L", size=image.size, data=delta_bytes).convert(
+        mode="1"
+    )
     return deltas
 
 
@@ -590,8 +480,9 @@ def encode(input: Path):
                 previous_block = last_frame.crop(box)
             else:
                 previous_block = block
+            print(f"### frame {count}")
             encoded_block = encode_block(
-                block, previous_block, encoder_counts, k_counts
+                block, previous_block, encoder_counts, k_counts, count
             )
             compressed_image_data += encoded_block
 
@@ -606,6 +497,8 @@ def encode(input: Path):
             reuse_count += 1
         frame_references.append(name_for_frame[bytes(compressed_image_data)])
 
+        # if count == 25:
+        #     raise Exception()
         raw_size += len(image_binary)
         count += 1
         if count % (fps * 3) == 0:
@@ -616,23 +509,24 @@ def encode(input: Path):
     print(f"{reuse_count / output_frame_count * 100:.2f}% of frames reused")
     print(
         ", ".join(
-            f"{count / (x_blocks*y_blocks*output_frame_count) * 100:.2f}% {name}"
+            f"{count / (x_blocks * y_blocks * output_frame_count) * 100:.2f}% {name}"
             for count, name in zip(
                 encoder_counts,
                 [
                     "nibble",
-                    # "nibble delta",
+                    "nibble delta",
                     "nibble snake",
-                    # "garbagémon",
-                    # "garbagémon delta",
-                    # "garbagémon snake",
+                    "garbagémon",
+                    "garbagémon delta",
+                    "garbagémon snake",
                     # "pokémon",
-                    "pokémon delta",
-                    "pokémon snake",
-                    "rice",
+                    # "pokémon delta",
+                    # "pokémon snake",
+                    # "rice",
                     # "rice delta",
-                    "rice snake",
+                    # "rice snake",
                     # "raw",
+                    "turtle",
                 ],
             )
         )
@@ -640,7 +534,7 @@ def encode(input: Path):
     print(
         "k:\n",
         ", ".join(
-            f"{count / (x_blocks*y_blocks*output_frame_count*7) * 100:.2f}% {k}"
+            f"{count / (x_blocks * y_blocks * output_frame_count * 7) * 100:.2f}% {k}"
             for k, count in enumerate(k_counts)
         ),
     )

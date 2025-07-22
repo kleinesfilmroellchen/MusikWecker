@@ -2,7 +2,7 @@
 
 |         |     |
 | ------- | --- |
-| Version | 0.2 |
+| Version | 0.3 |
 
 Single-bit Run Length Video, abbreviated with SRLV, is a simple video format for black-and-white (1 bit per pixel) intended for software decoding on weak hardware. With the mildly optimized SRLV optimization in this repository, an ESP8266 (a single Xtensa core at 160MHz) can decode 833 frames per second (1.2ms per frame) from 80MHz flash. The small amount of time spent on decoding video allows a microcontroller core to perform all the other time-consuming duties of video playback (audio decoding, I2S communication with the audio DAC, SPI communication when reading audio and/or video from an SD card, I2C or SPI communication with the display) without much worry that the video decoding part will slow it down.
 
@@ -128,3 +128,57 @@ The topmost bit (MSB) of a byte identifies the kind of coding used. `1` means bl
 > Unlike in the simple RLE, since arbitrary codewords can follow one another, it is not necessary to have runs of length 0.
 
 If the data does not specify all pixel values, the rest of the pixels are filled with 0.
+
+### Turtle compression
+
+Data for a frame consists of a frame header (9 byte) followed by any number of objects drawn onto the image.
+
+The frame header starts with an info byte of the form `i0000000`:
+
+- `i` is a flag determining whether to invert the frame colors at the end. By default, white (1) pixels are drawn on top of a black (0) background. If inverted, frames effectively have black pixels drawn on top of a white background.
+
+Following this are 8 bytes for the Huffman coding table. Each byte contains a 3-bit entry bitsize (biased by 1, so 1-8) and an entry. The bitsize occupies the topmost 3 bits while the entry itself is situated at the least significant bits and cut off according to the given bitsize. (Any bitsize above 5 is illegal, as the entry only has 5 bits available.)
+
+The entries for the table are always in this order:
+
+- 135L
+- 90L
+- 45L
+- F1
+- FN
+- FX
+- 45R
+- 90R
+- 135R
+
+See below for command names. In the following only these command names are used, which are substituted with their respective Huffman code in each frame.
+
+#### Objects
+
+An object starts with two header bytes of the form `txxxxxxx 0yyyyyyy`:
+
+- `t` is a flag determining whether this is a solid object (0) or a single-pixel object (1).
+- `x` is the X offset of the first pixel.
+- `y` is the Y offset of the first pixel.
+
+For solid objects, turtle graphics logic is used. The turtle has a current position on the image, as well as a grid direction that is aligned to 45 degrees (i.e. diagonal or horizontal or vertical). The initial facing direction is always down right (positive X and Y). Any command instructs the turtle to optionally change its facing direction, and then take at least one step in that new direction. The commands are:
+
+- `90L`: Rotate 90 degrees left, then take one step.
+- `90R`: Rotate 90 degrees right, then take one step.
+- `45L`: Rotate 45 degrees left, then take one step.
+- `45L`: Rotate 45 degrees right, then take one step.
+- `135L`: Rotate 135 degrees left, then take one step.
+- `135R`: Rotate 135 degrees right, then take one step.
+- `F1`: Move forward one step without rotating.
+- `FN`: Move forward at least 2 steps without rotating.
+- `FX`: Move forward until starting position or image border is reached.
+
+The `FN` command is the only one with a single parameter, namely the number of steps to move forward. The steps are encoded using Rice-Golomb coding with order `k = XXX` (TODO: decide on this k) and bias 1, such that the step count 2 is encoded as value 1.
+
+The turtle commands automatically end once the starting location is reached again. The starting position is always filled in, but there’s no initial step taken in the starting direction. Any surface enclosed by the edge drawn by the turtle is filled in. The usual even-odd filling algorithm is used: Any pixel is filled in if any line from it to infinity crosses through an odd number of edges. The filling algorithm disregards any existing objects in the image.
+
+The object is combined onto the full image by means of an XOR operation for each pixel, i.e. every pixel filled by the object is inverted in the final image.
+
+---
+
+TODO: single-pixel objects
