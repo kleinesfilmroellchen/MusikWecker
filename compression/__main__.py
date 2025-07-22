@@ -480,7 +480,7 @@ def encode(input: Path):
                 previous_block = last_frame.crop(box)
             else:
                 previous_block = block
-            # print(f"### frame {count}")
+            print(f"### frame {count}")
             encoded_block = encode_block(
                 block, previous_block, encoder_counts, k_counts, count
             )

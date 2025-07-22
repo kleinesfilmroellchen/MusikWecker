@@ -181,4 +181,6 @@ The object is combined onto the full image by means of an XOR operation for each
 
 ---
 
+Single-pixel objects are a list of pixels to be set.
+
 TODO: single-pixel objects

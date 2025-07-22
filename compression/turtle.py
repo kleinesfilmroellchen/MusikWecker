@@ -1,3 +1,10 @@
+"""
+A turtle-graphics encoding format. See SRLV.md for a detailed format description.
+
+The bulk of this file is concerned with finding objects that can be well-encoded using turtle movements.
+Lots of behaviors in this encoder are probably not fully optimal and have been hand-tuned against test datasets.
+"""
+
 from typing import Optional, Self
 from enum import Enum
 from dataclasses import dataclass, field
@@ -53,6 +60,13 @@ class Command(Enum):
                 return 2
             case Command.Right135:
                 return 3
+
+
+@dataclass(frozen=True, slots=True)
+class TurtleObject:
+    commands: list[tuple[Command, int]]
+    start_x: int
+    start_y: int
 
 
 @dataclass(slots=True, kw_only=True, frozen=True, match_args=True)
@@ -391,6 +405,8 @@ def encode_turtle(data: bytes, frame: int) -> bytes:
                 x = 0
                 y += 1
 
+    objects: list[TurtleObject] = []
+
     # image copy with all currently present objects, will be gradually filled up
     blitted = np.zeros_like(image)
     single_pixels = np.zeros_like(image)
@@ -400,11 +416,16 @@ def encode_turtle(data: bytes, frame: int) -> bytes:
         # search for first white pixel in the image that’s not been blitted yet
         # (by searching from top and left, we’ll always find an object edge)
         found_x, found_y = None, None
+        inverted = False
         for y, x in product(range(y_size), range(x_size)):
-            if image[x, y] and not blitted[x, y]:
+            if image[x, y] and (not blitted[x, y]):
                 found_x, found_y = x, y
                 break
-        # print(f"start encoding from {found_x}, {found_y}")
+            if (not image[x, y]) and blitted[x, y]:
+                found_x, found_y = x, y
+                inverted = True
+                break
+        # print(f"start encoding from {found_x}, {found_y}, inverted = {inverted}")
         if found_x is None or found_y is None:
             break
 
@@ -418,46 +439,60 @@ def encode_turtle(data: bytes, frame: int) -> bytes:
 
         last_used_pixel = (found_x, found_y)
         try:
+            # no need to invert image if `inverted`: as we have drawn “too much”,
+            # the relevant pixels will become white via the XOR again and will be detected normally
+            source = image ^ blitted
             # encode object starting at that pixel
             object_commands, edge, deadends = encode_object_from(
-                image ^ blitted, found_x, found_y
+                source, found_x, found_y
             )
             # fill object edge
             filled = fill_object_poly(found_x, found_y, object_commands, edge)
             # for y, x in product(range(y_size), range(x_size)):
             #     if deadends[x, y]:
-            #         debug_image.putpixel((x, y), (255, 0, 127))
+            #         debug_image.putpixel(
+            #             (x, y), (255, 0, 127) if not inverted else (127, 0, 60)
+            #         )
             #     if filled[x, y]:
-            #         debug_image.putpixel((x, y), (0, 255, 0))
+            #         debug_image.putpixel(
+            #             (x, y), (0, 255, 0) if not inverted else (0, 127, 0)
+            #         )
             #     if edge[x, y]:
-            #         debug_image.putpixel((x, y), (255, 255, 0))
+            #         debug_image.putpixel(
+            #             (x, y), (255, 255, 0) if not inverted else (127, 127, 0)
+            #         )
             # if len(object_commands) < 10:
             #     print(f"super short commands from {found_x}, {found_y}:", object_commands)
             # copy filled surface to blitted
-            # todo: should be xor
-            blitted |= filled
+            blitted ^= filled
             # discard deadends temporarily (for this pixel)
             # todo: probably useless
             deadend_pixels |= deadends
-            # todo: store command list
+            objects.append(TurtleObject(object_commands, found_x, found_y))
         except SnakingException as e:
             # todo: maybe restart search from the snaking-causing pixel, in the direction that it was using?
             # print(f"    discard snaking pixel: {e}")
             # discard the snaking pixel for this start pixel only; next loop iteration will retry from same start but with this path blocked off
             deadend_pixels[e.x, e.y] = True
-            blitted[e.x, e.y] = True
-            # debug_image.putpixel((e.x, e.y), (127, 0, 255))
+            blitted[e.x, e.y] ^= True
+            # debug_image.putpixel(
+            #     (e.x, e.y), (127, 0, 255) if not inverted else (60, 0, 127)
+            # )
         except Exception as e:
             # this happens for example for places where we can’t progress and backtrack past the start
             # in this case we know this start location will never yield results, so discard it
             # print(f"    couldn’t find object here, marking single pixel ({e})")
             single_pixels[found_x, found_y] = True
-            blitted[found_x, found_y] = True
-            # keep old debug info (deadends, snakes) from previous iterations
-            # if debug_image.getpixel((x, y)) == (0, 0, 0):
-            #     debug_image.putpixel((x, y), (255, 0, 0))
+            blitted[found_x, found_y] ^= True
+            # debug_image.putpixel(
+            #     (x, y), (255, 0, 0) if not inverted else (127, 0, 0)
+            # )
 
     # debug_image.save(f"frames/debug_{frame}.png")
+    if not np.array_equal(blitted, image):
+        print("warning: couldn’t encode frame, discarding.")
+        # HACK: return lots of data to make the encoder choose something else
+        return bytes(1024 * 32)
 
     return bytes(output)
 
