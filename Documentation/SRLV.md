@@ -155,9 +155,8 @@ See below for command names. In the following only these command names are used,
 
 #### Objects
 
-An object starts with two header bytes of the form `txxxxxxx 0yyyyyyy`:
+An object starts with two header bytes of the form `0xxxxxxx 0yyyyyyy`:
 
-- `t` is a flag determining whether this is a solid object (0) or a single-pixel object (1).
 - `x` is the X offset of the first pixel.
 - `y` is the Y offset of the first pixel.
 
@@ -179,8 +178,10 @@ The turtle commands automatically end once the starting location is reached agai
 
 The object is combined onto the full image by means of an XOR operation for each pixel, i.e. every pixel filled by the object is inverted in the final image.
 
----
+#### Single-pixel trailer
 
-Single-pixel objects are a list of pixels to be set.
+Single-pixel trailer objects are a list of pixels to be set.
 
-TODO: single-pixel objects
+After the same common header as the normal objects use, each following coordinate is encoded using Rice-Golomb coding with order `k = XXX` and zig-zag coding, such that 1 -> 1, -1 -> 2, 2 -> 3, -2 -> 4, 3 -> 5 etc.
+
+All pixel coordinates, each a pair (x, y), are encoded as the difference from the previous one.

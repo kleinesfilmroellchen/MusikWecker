@@ -348,7 +348,7 @@ def encode_block(
     garbagémon_compressed_delta = encode_garbagémon(delta)
     garbagémon_snake_compressed = encode_garbagémon(block_data_snake)
 
-    turtle_compressed = encode_turtle(block_data, frame)
+    turtle_compressed = encode_turtle(block_data, frame, k_counts)
 
     # garbagémon_snake_compressed_delta = encode_garbagémon(delta_snake)
     # Pokémon

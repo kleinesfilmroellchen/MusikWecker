@@ -5,6 +5,8 @@ The bulk of this file is concerned with finding objects that can be well-encoded
 Lots of behaviors in this encoder are probably not fully optimal and have been hand-tuned against test datasets.
 """
 
+from collections import defaultdict
+from functools import reduce
 from typing import Optional, Self
 from enum import Enum
 from dataclasses import dataclass, field
@@ -62,13 +64,6 @@ class Command(Enum):
                 return 3
 
 
-@dataclass(frozen=True, slots=True)
-class TurtleObject:
-    commands: list[tuple[Command, int]]
-    start_x: int
-    start_y: int
-
-
 @dataclass(slots=True, kw_only=True, frozen=True, match_args=True)
 class HuffmanTreeNode:
     probability: float
@@ -110,8 +105,10 @@ class HuffmanTreeNode:
 @dataclass(frozen=False, init=False)
 class HuffmanTable:
     code_table: dict[Command, list[bool]]
+    probabilities: dict[Command, float]
 
     def __init__(self, probabilities: dict[Command, float]):
+        self.probabilities = probabilities
         self.code_table = HuffmanTable.compute_table(probabilities)
 
     @staticmethod
@@ -136,6 +133,39 @@ class HuffmanTable:
     def write_command(self, stream: BitStream, command: Command):
         for bit in self.code_table[command]:
             stream.write_bits(int(bit), 1)
+
+
+@dataclass(slots=True, init=False)
+class TurtleObject:
+    commands: list[tuple[Command, int]]
+    start_x: int
+    start_y: int
+
+    def __init__(
+        self, commands: list[tuple[Command, int]], start_x: int, start_y: int
+    ) -> None:
+        self.commands = commands
+        self.start_x = start_x
+        self.start_y = start_y
+        if self.commands[-1][0] == Command.ForwardN:
+            self.commands[-1] = (Command.ForwardMany, 1)
+
+    def command_occurrences(self) -> dict[Command, int]:
+        occ = defaultdict(int)
+        for command, _ in self.commands:
+            occ[command] += 1
+        return occ
+
+    def write(self, stream: BitStream, table: HuffmanTable):
+        stream.write_bits(self.start_x, 8)
+        stream.write_bits(self.start_y, 8)
+
+        for command, dist in self.commands:
+            table.write_command(stream, command)
+            if command == Command.ForwardN:
+                # TODO: use k != 0
+                stream.write_exponential_golomb(dist)
+        stream.write_to_byte_boundary()
 
 
 def move_in_direction(direction: int, x: int, y: int, dist: int = 1) -> tuple[int, int]:
@@ -389,9 +419,15 @@ def fill_object_poly(
     return filled
 
 
-def encode_turtle(data: bytes, frame: int) -> bytes:
-    output = bytearray()
+def sum_occurrences(
+    existing: dict[Command, int], new: dict[Command, int]
+) -> dict[Command, int]:
+    for command in Command:
+        existing[command] += new[command]
+    return existing
 
+
+def encode_turtle(data: bytes, frame: int, k_counts: list[int]) -> bytes:
     image = np.zeros(shape=(x_size, y_size), dtype=bool)
     # debug_image: Image.Image = Image.new(mode="RGB", size=(x_size, y_size))
 
@@ -416,14 +452,14 @@ def encode_turtle(data: bytes, frame: int) -> bytes:
         # search for first white pixel in the image that’s not been blitted yet
         # (by searching from top and left, we’ll always find an object edge)
         found_x, found_y = None, None
-        inverted = False
+        # inverted = False
         for y, x in product(range(y_size), range(x_size)):
             if image[x, y] and (not blitted[x, y]):
                 found_x, found_y = x, y
                 break
             if (not image[x, y]) and blitted[x, y]:
                 found_x, found_y = x, y
-                inverted = True
+                # inverted = True
                 break
         # print(f"start encoding from {found_x}, {found_y}, inverted = {inverted}")
         if found_x is None or found_y is None:
@@ -494,7 +530,46 @@ def encode_turtle(data: bytes, frame: int) -> bytes:
         # HACK: return lots of data to make the encoder choose something else
         return bytes(1024 * 32)
 
-    return bytes(output)
+    command_occurrences = reduce(
+        sum_occurrences,
+        (obj.command_occurrences() for obj in objects),
+        {command: 0 for command in Command},
+    )
+    overall_sum = max(float(sum(val for val in command_occurrences.values())), 1.0)
+    command_table = HuffmanTable(
+        {key: float(val) / overall_sum for key, val in command_occurrences.items()}
+    )
+    # print(command_table)
+
+    stream = BitStream()
+    for obj in objects:
+        obj.write(stream, command_table)
+
+    # TODO: we’re not solving the TSP and getting a million dollars today
+    single_pixel_list: list[tuple[int, int]] = []
+    for y, x in product(range(y_size), range(x_size)):
+        if single_pixels[x, y]:
+            single_pixel_list.append((x, y))
+
+    if len(single_pixel_list) > 0:
+        current_pixel = single_pixel_list.pop()
+        stream.write_bits(current_pixel[0], 8)
+        stream.write_bits(current_pixel[1], 8)
+        while len(single_pixel_list) > 0:
+            single_pixel_list.sort(
+                key=lambda px: abs(current_pixel[0] - px[0]) + abs(current_pixel[1] - px[1])
+            )
+            next_x, next_y = single_pixel_list.pop()
+            dx, dy = current_pixel[0] - next_x, current_pixel[1] - next_y
+            dx = 2 * abs(dx) + (1 if dx >= 0 else 0)
+            dy = 2 * abs(dy) + (1 if dy >= 0 else 0)
+            stream.write_exponential_golomb(dx)
+            stream.write_exponential_golomb(dy)
+
+            current_pixel = (next_x, next_y)
+
+    stream.write_to_byte_boundary()
+    return stream.data
 
 
 if __name__ == "__main__":
