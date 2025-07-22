@@ -17,7 +17,13 @@ class DeadendException(Exception):
 
 # reached a position where we want to move to an already covered pixel -> we’re snaking and must discard this object
 class SnakingException(Exception):
-    pass
+    def __init__(self, x: int, y: int, dir: int = 0):
+        self.x = x
+        self.y = y
+        self.dir = dir
+        super(SnakingException, self).__init__(
+            f"trying to move to covered position {x}, {y}, we’re snaking in on ourselves"
+        )
 
 
 class Command(Enum):
@@ -118,24 +124,25 @@ class HuffmanTable:
             stream.write_bits(int(bit), 1)
 
 
-def move_in_direction(direction: int, x: int, y: int) -> tuple[int, int]:
+def move_in_direction(direction: int, x: int, y: int, dist: int = 1) -> tuple[int, int]:
     match direction:
         case 0:
-            return (x + 1, y)
+            return (x + dist, y)
         case 1:
-            return (x + 1, y + 1)
+            return (x + dist, y + dist)
         case 2:
-            return (x, y + 1)
+            return (x, y + dist)
         case 3:
-            return (x - 1, y + 1)
+            return (x - dist, y + dist)
         case 4:
-            return (x - 1, y)
+            return (x - dist, y)
         case 5:
-            return (x - 1, y - 1)
+            return (x - dist, y - dist)
         case 6:
-            return (x, y - 1)
+            return (x, y - dist)
         case 7:
-            return (x + 1, y - 1)
+            return (x + dist, y - dist)
+    raise TypeError(f"invalid direction {direction}")
 
 
 def direction_delta_to_command(current_direction: int, next_direction: int) -> Command:
@@ -204,7 +211,7 @@ def leftmost_uncovered_neighbor(
         if not deadend[neighbor_x, neighbor_y]:
             legal_neighbors.append((neighbor_x, neighbor_y))
 
-    found_covered_pixel = False
+    found_covered_pixel = None
     # iterate through directions from the left of the current one and find first matching neighbor
     for direction_delta in range(-3, 4):
         new_direction = (direction + direction_delta) % 8
@@ -216,15 +223,13 @@ def leftmost_uncovered_neighbor(
                 return (new_neighbor_x, new_neighbor_y, new_direction)
             # remember for later that there is a covered pixel
             if covered[new_neighbor_x, new_neighbor_y]:
-                found_covered_pixel = True
+                found_covered_pixel = (new_neighbor_x, new_neighbor_y)
             else:
                 # if our leftmost possible position is one of (but not the only) available pixels,
                 # we’re snaking in on ourselves, so we cannot reach the start through an entirely new path.
                 # if we only have covered pixels available, we’re also in a deadend (handled below, after loop exits unsuccessfully)
-                if found_covered_pixel:
-                    raise SnakingException(
-                        f"trying to move to covered position {x}, {y}, we’re snaking in on ourselves"
-                    )
+                if found_covered_pixel is not None:
+                    raise SnakingException(*found_covered_pixel)
                 return (new_neighbor_x, new_neighbor_y, new_direction)
     raise DeadendException(
         f"cannot find uncovered neighbor from position {x}, {y} in direction {direction}"
@@ -232,20 +237,20 @@ def leftmost_uncovered_neighbor(
 
 
 def undo_command(
-    command: tuple[Command, int], x: int, y: int, direction: int
+    command: Command, x: int, y: int, direction: int
 ) -> tuple[int, int, int]:
     # backwards from current direction, to return to old location
     back_direction = (direction + 4) % 8
     last_x, last_y = move_in_direction(back_direction, x, y)
     # turn back by the command’s turning amount to return to the old direction
-    return last_x, last_y, (direction - command[0].direction_delta()) % 8
+    return last_x, last_y, (direction - command.direction_delta()) % 8
 
 
 def encode_object_from(
     image: np.array, start_x: int, start_y: int
 ) -> tuple[list[tuple[Command, int]], np.array, np.array]:
     """Returns a list of commands (command, step_distance), the edge pixels, and the deadend pixels"""
-    commands: list[tuple[Command, int]] = []
+    commands: list[Command] = []
 
     current_x, current_y = start_x, start_y
     current_direction = 1
@@ -278,10 +283,12 @@ def encode_object_from(
             deadend_pixels[current_x, current_y] = True
             current_x, current_y, current_direction = prev_x, prev_y, prev_direction
             continue
+        # except SnakingException as e:
+        #     # tell the exception what direction that pixel was facing by replaying commands until here
 
         # move to neighbor and insert appropriate command
         command = direction_delta_to_command(current_direction, next_direction)
-        commands.append((command, 1))
+        commands.append(command)
         # print(f"        {command}")
         current_x, current_y, current_direction = next_x, next_y, next_direction
         # cover new pixel so that we don’t go there again
@@ -290,99 +297,28 @@ def encode_object_from(
         if current_x == start_x and current_y == start_y:
             break
 
-    # todo: consolidate forward movement commands
+    # consolidate forward movement commands
+    final_commands: list[tuple[Command, int]] = []
+    current_forward_run = 0
+    for command in commands:
+        if command == Command.Forward1:
+            current_forward_run += 1
+        else:
+            if current_forward_run == 1:
+                final_commands.append((Command.Forward1, 1))
+                current_forward_run = 0
+            elif current_forward_run > 1:
+                final_commands.append((Command.ForwardN, current_forward_run))
+                current_forward_run = 0
+            final_commands.append((command, 1))
+    if current_forward_run == 1:
+        final_commands.append((Command.Forward1, 1))
+        current_forward_run = 0
+    elif current_forward_run > 1:
+        final_commands.append((Command.ForwardN, current_forward_run))
+        current_forward_run = 0
 
-    return commands, covered_pixels, deadend_pixels
-
-
-def fill_object(
-    start_x: int,
-    start_y: int,
-    object_commands: list[tuple[Command, int]],
-    edge: np.array,
-) -> bytes:
-    filled = edge.copy()
-
-    # find first pixel to the right of the edge that is not covered
-    current_direction = 1
-    current_x = start_x
-    current_y = start_y
-    blank_pixel_x, blank_pixel_y = None, None
-    counter = 0
-    for command, dist in object_commands:
-        current_direction = (current_direction + command.direction_delta()) % 8
-        right_direction = (current_direction + 2) % 8
-        right_pixel_x, right_pixel_y = move_in_direction(
-            right_direction, current_x, current_y
-        )
-        dx, dy = move_in_direction(current_direction, current_x, current_y)
-        current_x, current_y = dx * dist, dy * dist
-        counter += 1
-        # don’t do this for the start location. later on, we know that any position right of us *must* be covered, because our successor can only move diagonally back right, which is to our right.
-        if counter == 1:
-            continue
-        if not edge[right_pixel_x, right_pixel_y]:
-            blank_pixel_x, blank_pixel_y = right_pixel_x, right_pixel_y
-            break
-
-    if blank_pixel_x is None and blank_pixel_y is None:
-        # nothing to do, edge has no gaps
-        return filled
-    # print(f"        found right pixel {blank_pixel_x}, {blank_pixel_y}")
-
-    # flood fill algorithm
-    unfilled_neighbor_queue: set[tuple[int, int]] = {(blank_pixel_x, blank_pixel_y)}
-    while len(unfilled_neighbor_queue) > 0:
-        new_x, new_y = unfilled_neighbor_queue.pop()
-        # print(f"        filling {new_x}, {new_y}")
-        filled[new_x, new_y] = True
-        # only consider rectangular neighbors, since edges can span diagonals
-        for delta_x, delta_y in [
-            (+1, 0),
-            (0, +1),
-            (-1, 0),
-            (0, -1),
-        ]:
-            next_x, next_y = new_x + delta_x, new_y + delta_y
-            if (
-                next_x >= x_size or next_x < 0 or next_y >= y_size or next_y < 0
-            ) or filled[next_x, next_y]:
-                continue
-            unfilled_neighbor_queue.add((next_x, next_y))
-
-    # import sys
-    # sys.exit()
-    return filled
-
-
-def fill_object_even_odd(
-    start_x: int,
-    start_y: int,
-    object_commands: list[tuple[Command, int]],
-    edge: np.array,
-) -> bytes:
-    filled = edge.copy()
-
-    row_counts = np.zeros(shape=filled.shape[1], dtype=int)
-    col_counts = np.zeros(shape=filled.shape[0], dtype=int)
-
-    for y in range(y_size):
-        for x in range(x_size):
-            if edge[x, y]:
-                # if previous pixel was filled too, do not increment count in any direction
-                if not (x > 0 and edge[x - 1, y]):
-                    row_counts[y] += 1
-
-                if not (y > 0 and edge[x, y - 1]):
-                    col_counts[x] += 1
-            # even-odd-rule, with “not filled” always winning
-            else:
-                if row_counts[y] % 2 == 1 and col_counts[x] % 2 == 1:
-                    # print(f"fill {x}, {y}, row {row_counts[y]} col {col_counts[x]}")
-                    filled[x, y] = True
-    # import sys
-    # sys.exit()
-    return filled
+    return final_commands, covered_pixels, deadend_pixels
 
 
 def is_point_in_path(x: int, y: int, poly: list[tuple[int, int]]) -> bool:
@@ -417,7 +353,7 @@ def fill_object_poly(
     start_y: int,
     object_commands: list[tuple[Command, int]],
     edge: np.array,
-) -> bytes:
+) -> np.array:
     filled = edge.copy()
 
     # find first pixel to the right of the edge that is not covered
@@ -427,8 +363,9 @@ def fill_object_poly(
     edge_list = [(current_x, current_y)]
     for command, dist in object_commands:
         current_direction = (current_direction + command.direction_delta()) % 8
-        dx, dy = move_in_direction(current_direction, current_x, current_y)
-        current_x, current_y = dx * dist, dy * dist
+        current_x, current_y = move_in_direction(
+            current_direction, current_x, current_y, dist
+        )
         edge_list.append((current_x, current_y))
 
     for y, x in product(range(y_size), range(x_size)):
@@ -438,11 +375,11 @@ def fill_object_poly(
     return filled
 
 
-def encode_turtle(data: bytes, frame:int) -> bytes:
+def encode_turtle(data: bytes, frame: int) -> bytes:
     output = bytearray()
 
     image = np.zeros(shape=(x_size, y_size), dtype=bool)
-    debug_image: Image.Image = Image.new(mode="RGB", size=(x_size, y_size))
+    # debug_image: Image.Image = Image.new(mode="RGB", size=(x_size, y_size))
 
     x, y = 0, 0
     for byte in data:
@@ -457,6 +394,8 @@ def encode_turtle(data: bytes, frame:int) -> bytes:
     # image copy with all currently present objects, will be gradually filled up
     blitted = np.zeros_like(image)
     single_pixels = np.zeros_like(image)
+    deadend_pixels = np.zeros_like(image)
+    last_used_pixel = None
     while not np.array_equal(blitted, image):
         # search for first white pixel in the image that’s not been blitted yet
         # (by searching from top and left, we’ll always find an object edge)
@@ -466,9 +405,18 @@ def encode_turtle(data: bytes, frame:int) -> bytes:
                 found_x, found_y = x, y
                 break
         # print(f"start encoding from {found_x}, {found_y}")
-        if found_x is None and found_y is None:
+        if found_x is None or found_y is None:
             break
 
+        # on a new pixel: discard all the snake blocking data, since it’s possibly not valid for this one
+        # this allows us to find better objects starting in different regions
+        if last_used_pixel != (found_x, found_y):
+            # print(f"new start pixel {found_x}, {found_y}, discarding snake data")
+            # unset deadend pixels again in the blitted image
+            blitted ^= deadend_pixels
+            deadend_pixels = np.zeros_like(image)
+
+        last_used_pixel = (found_x, found_y)
         try:
             # encode object starting at that pixel
             object_commands, edge, deadends = encode_object_from(
@@ -476,27 +424,40 @@ def encode_turtle(data: bytes, frame:int) -> bytes:
             )
             # fill object edge
             filled = fill_object_poly(found_x, found_y, object_commands, edge)
-            for y, x in product(range(y_size), range(x_size)):
-                if filled[x, y]:
-                    debug_image.putpixel((x, y), (0, 255, 0))
-                if edge[x, y]:
-                    debug_image.putpixel((x, y), (255, 255, 0))
-                if deadends[x, y]:
-                    debug_image.putpixel((x, y), (255, 0, 127))
+            # for y, x in product(range(y_size), range(x_size)):
+            #     if deadends[x, y]:
+            #         debug_image.putpixel((x, y), (255, 0, 127))
+            #     if filled[x, y]:
+            #         debug_image.putpixel((x, y), (0, 255, 0))
+            #     if edge[x, y]:
+            #         debug_image.putpixel((x, y), (255, 255, 0))
+            # if len(object_commands) < 10:
+            #     print(f"super short commands from {found_x}, {found_y}:", object_commands)
             # copy filled surface to blitted
             # todo: should be xor
-            blitted = blitted | filled
-            blitted = blitted  | deadends
-            single_pixels = single_pixels | deadends
+            blitted |= filled
+            # discard deadends temporarily (for this pixel)
+            # todo: probably useless
+            deadend_pixels |= deadends
             # todo: store command list
+        except SnakingException as e:
+            # todo: maybe restart search from the snaking-causing pixel, in the direction that it was using?
+            # print(f"    discard snaking pixel: {e}")
+            # discard the snaking pixel for this start pixel only; next loop iteration will retry from same start but with this path blocked off
+            deadend_pixels[e.x, e.y] = True
+            blitted[e.x, e.y] = True
+            # debug_image.putpixel((e.x, e.y), (127, 0, 255))
         except Exception as e:
+            # this happens for example for places where we can’t progress and backtrack past the start
+            # in this case we know this start location will never yield results, so discard it
             # print(f"    couldn’t find object here, marking single pixel ({e})")
-            # todo: mark deadends instead of start if they were found (they’re more likely the issue)
             single_pixels[found_x, found_y] = True
             blitted[found_x, found_y] = True
-            debug_image.putpixel((x, y), (255, 0, 0))
+            # keep old debug info (deadends, snakes) from previous iterations
+            # if debug_image.getpixel((x, y)) == (0, 0, 0):
+            #     debug_image.putpixel((x, y), (255, 0, 0))
 
-    debug_image.save(f"frames/debug_{frame}.png")
+    # debug_image.save(f"frames/debug_{frame}.png")
 
     return bytes(output)
 

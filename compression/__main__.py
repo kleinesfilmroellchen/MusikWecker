@@ -480,7 +480,7 @@ def encode(input: Path):
                 previous_block = last_frame.crop(box)
             else:
                 previous_block = block
-            print(f"### frame {count}")
+            # print(f"### frame {count}")
             encoded_block = encode_block(
                 block, previous_block, encoder_counts, k_counts, count
             )
@@ -497,7 +497,7 @@ def encode(input: Path):
             reuse_count += 1
         frame_references.append(name_for_frame[bytes(compressed_image_data)])
 
-        # if count == 25:
+        # if count == 42:
         #     raise Exception()
         raw_size += len(image_binary)
         count += 1
