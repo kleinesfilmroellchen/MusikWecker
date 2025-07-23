@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 from enum import Enum
 from itertools import batched, chain, product
 from math import ceil, floor
@@ -220,7 +221,7 @@ def encode_pokémon(data: bytes) -> tuple[bytes, PacketType]:
 
     output_stream.write_to_byte_boundary()
     # print([bin(x) for x in output_stream.data])
-    return (output_stream.data, first_packet_type)
+    return (output_stream.data, first_packet_type or PacketType.Data)
 
 
 def encode_garbagémon(data: bytes) -> bytes:
@@ -309,7 +310,13 @@ T = TypeVar("T")
 
 
 def encode_block(
-    block: Image, previous_block: Image, encoder_counts: list[int], k_counts: list[int], frame:int
+    block: Image.Image,
+    previous_block: Image.Image,
+    encoder_counts: list[int],
+    k_counts: list[int],
+    delta_counts: dict[int, int],
+    distance_counts: dict[int, int],
+    frame: int,
 ) -> bytes:
     block_data = bytes(reverse_mask(byte) for byte in block.tobytes())
     # do zig-zag or snaking encoding of the block data, which may generate longer stretches of the same color
@@ -348,7 +355,7 @@ def encode_block(
     garbagémon_compressed_delta = encode_garbagémon(delta)
     garbagémon_snake_compressed = encode_garbagémon(block_data_snake)
 
-    turtle_compressed = encode_turtle(block_data, frame, k_counts)
+    turtle_compressed = encode_turtle(block_data, frame, delta_counts, distance_counts)
 
     # garbagémon_snake_compressed_delta = encode_garbagémon(delta_snake)
     # Pokémon
@@ -365,7 +372,7 @@ def encode_block(
     # Pick best compressor. In the case that they are equal, pick fast compressor.
     compressed_image_data: bytes
     compressed_size: int = 100000000000000000
-    compressed_encoder_number: int
+    compressed_encoder_number: int = 0
     for i, data in enumerate(
         [
             nibble_compressed,
@@ -417,7 +424,7 @@ def make_self_delta(image: Image.Image) -> Image.Image:
 
 def encode(input: Path):
     video = cv2.VideoCapture(str(input))
-    success, image = video.read()
+    success, image_data = video.read()
     video_fps = video.get(cv2.CAP_PROP_FPS)
     video_frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT)
     video_seconds = video_frame_count / video_fps
@@ -431,18 +438,22 @@ def encode(input: Path):
     reuse_count = 0
     encoder_counts = [0] * 20
     k_counts = [0] * 20
+    delta_counts: dict[int, int] = defaultdict(int)
+    distance_counts: dict[int, int] = defaultdict(int)
 
     binary_size = 0
     raw_size = 0
 
     success = True
     last_frame: Image.Image | None = None
+    x_blocks: int = 1
+    y_blocks: int = 1
     while success:
         video.set(cv2.CAP_PROP_POS_MSEC, int(count * ms_per_frame))
-        success, image = video.read()
+        success, image_data = video.read()
         if not success:
             break
-        image: Image = Image.fromarray(image)
+        image: Image.Image = Image.fromarray(image_data)
         width, height = image.size
         height_scale = height / target_height
         image = image.resize((int(width / height_scale), int(target_height))).convert(
@@ -482,7 +493,13 @@ def encode(input: Path):
                 previous_block = block
             print(f"### frame {count}")
             encoded_block = encode_block(
-                block, previous_block, encoder_counts, k_counts, count
+                block,
+                previous_block,
+                encoder_counts,
+                k_counts,
+                delta_counts,
+                distance_counts,
+                count,
             )
             compressed_image_data += encoded_block
 
@@ -536,6 +553,22 @@ def encode(input: Path):
         ", ".join(
             f"{count / (x_blocks * y_blocks * output_frame_count * 7) * 100:.2f}% {k}"
             for k, count in enumerate(k_counts)
+        ),
+    )
+    total_deltas = sum(delta_counts.values())
+    total_distances = sum(distance_counts.values())
+    print(
+        "deltas:\n",
+        ", ".join(
+            f"{count / total_deltas * 100:.2f}% {delta}"
+            for delta, count in delta_counts.items()
+        ),
+    )
+    print(
+        "distances:\n",
+        ", ".join(
+            f"{count / total_distances * 100:.2f}% {distance}"
+            for distance, count in distance_counts.items()
         ),
     )
     print(

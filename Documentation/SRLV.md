@@ -172,7 +172,7 @@ For solid objects, turtle graphics logic is used. The turtle has a current posit
 - `FN`: Move forward at least 2 steps without rotating.
 - `FX`: Move forward until starting position or image border is reached.
 
-The `FN` command is the only one with a single parameter, namely the number of steps to move forward. The steps are encoded using Rice-Golomb coding with order `k = XXX` (TODO: decide on this k) and bias 1, such that the step count 2 is encoded as value 1.
+The `FN` command is the only one with a single parameter, namely the number of steps to move forward. The steps are encoded using Rice-Golomb coding with order `k = 2` and bias 1, such that the step count 2 is encoded as value 1.
 
 The turtle commands automatically end once the starting location is reached again. The starting position is always filled in, but there’s no initial step taken in the starting direction. Any surface enclosed by the edge drawn by the turtle is filled in. The usual even-odd filling algorithm is used: Any pixel is filled in if any line from it to infinity crosses through an odd number of edges. The filling algorithm disregards any existing objects in the image.
 
@@ -182,6 +182,6 @@ The object is combined onto the full image by means of an XOR operation for each
 
 Single-pixel trailer objects are a list of pixels to be set.
 
-After the same common header as the normal objects use, each following coordinate is encoded using Rice-Golomb coding with order `k = XXX` and zig-zag coding, such that 1 -> 1, -1 -> 2, 2 -> 3, -2 -> 4, 3 -> 5 etc.
+After the same common header as the normal objects use, each following coordinate is encoded using Rice-Golomb coding with order `k = 5` and zig-zag coding, such that 1 -> 1, -1 -> 2, 2 -> 3, -2 -> 4, 3 -> 5 etc.
 
 All pixel coordinates, each a pair (x, y), are encoded as the difference from the previous one.

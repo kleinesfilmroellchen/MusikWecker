@@ -7,7 +7,7 @@ Lots of behaviors in this encoder are probably not fully optimal and have been h
 
 from collections import defaultdict
 from functools import reduce
-from typing import Optional, Self
+from typing import Optional, Self, TypeVar
 from enum import Enum
 from dataclasses import dataclass, field
 from bits import BitStream
@@ -91,6 +91,7 @@ class HuffmanTreeNode:
             else:
                 return None
         else:
+            assert self.left is not None and self.right is not None
             left_sequence = self.left.bit_sequence_for(command)
             if left_sequence is not None:
                 left_sequence.insert(0, True)
@@ -156,15 +157,19 @@ class TurtleObject:
             occ[command] += 1
         return occ
 
-    def write(self, stream: BitStream, table: HuffmanTable):
+    def write(
+        self, stream: BitStream, table: HuffmanTable, distance_hist: dict[int, int]
+    ):
         stream.write_bits(self.start_x, 8)
         stream.write_bits(self.start_y, 8)
 
         for command, dist in self.commands:
             table.write_command(stream, command)
             if command == Command.ForwardN:
-                # TODO: use k != 0
-                stream.write_exponential_golomb(dist)
+                distance_hist[dist] += 1
+                assert dist > 1
+                # experiments say k = 2 is a good idea here
+                stream.write_rice(dist - 1, 2)
         stream.write_to_byte_boundary()
 
 
@@ -405,14 +410,21 @@ def fill_object_poly(
     current_x = start_x
     current_y = start_y
     edge_list = [(current_x, current_y)]
+    # keep track of object AABB such that we only run the poly intersection check where necessary
+    min_x, min_y = (1000000,) * 2
+    max_x, max_y = (-1000000,) * 2
     for command, dist in object_commands:
         current_direction = (current_direction + command.direction_delta()) % 8
         current_x, current_y = move_in_direction(
             current_direction, current_x, current_y, dist
         )
+        min_x = min(min_x, current_x)
+        min_y = min(min_y, current_y)
+        max_x = max(max_x, current_x)
+        max_y = max(max_y, current_y)
         edge_list.append((current_x, current_y))
 
-    for y, x in product(range(y_size), range(x_size)):
+    for y, x in product(range(min_y, max_y + 1), range(min_x, max_x + 1)):
         if is_point_in_path(x, y, edge_list):
             filled[x, y] = True
 
@@ -427,7 +439,9 @@ def sum_occurrences(
     return existing
 
 
-def encode_turtle(data: bytes, frame: int, k_counts: list[int]) -> bytes:
+def encode_turtle(
+    data: bytes, frame: int, delta_hist: dict[int, int], distance_hist: dict[int, int]
+) -> bytes:
     image = np.zeros(shape=(x_size, y_size), dtype=bool)
     # debug_image: Image.Image = Image.new(mode="RGB", size=(x_size, y_size))
 
@@ -543,7 +557,7 @@ def encode_turtle(data: bytes, frame: int, k_counts: list[int]) -> bytes:
 
     stream = BitStream()
     for obj in objects:
-        obj.write(stream, command_table)
+        obj.write(stream, command_table, distance_hist)
 
     # TODO: we’re not solving the TSP and getting a million dollars today
     single_pixel_list: list[tuple[int, int]] = []
@@ -557,14 +571,17 @@ def encode_turtle(data: bytes, frame: int, k_counts: list[int]) -> bytes:
         stream.write_bits(current_pixel[1], 8)
         while len(single_pixel_list) > 0:
             single_pixel_list.sort(
-                key=lambda px: abs(current_pixel[0] - px[0]) + abs(current_pixel[1] - px[1])
+                key=lambda px: abs(current_pixel[0] - px[0])
+                + abs(current_pixel[1] - px[1])
             )
             next_x, next_y = single_pixel_list.pop()
             dx, dy = current_pixel[0] - next_x, current_pixel[1] - next_y
             dx = 2 * abs(dx) + (1 if dx >= 0 else 0)
             dy = 2 * abs(dy) + (1 if dy >= 0 else 0)
-            stream.write_exponential_golomb(dx)
-            stream.write_exponential_golomb(dy)
+            delta_hist[dx] += 1
+            delta_hist[dy] += 1
+            stream.write_rice(dx, 5)
+            stream.write_rice(dy, 5)
 
             current_pixel = (next_x, next_y)
 
